@@ -1,0 +1,10 @@
+{
+  "id": "extended-headings",
+  "name": "Extended Headings",
+  "version": "0.4.8",
+  "minAppVersion": "1.7.2",
+  "description": "Extends Obsidian's heading system through H12 with consistent editing, styling, folding, outlines, links, navigation, and heading-level markers.",
+  "author": "obsidiest",
+  "authorUrl": "https://github.com/obsidiest",
+  "isDesktopOnly": false
+}

@@ -1,0 +1,629 @@
+/* @settings
+name: Extended Headings
+id: extended-headings-style
+settings:
+  -
+    id: extended-heading-color
+    title: H7+ color
+    description: Fallback text color for extended headings without an individual color override
+    type: variable-themed-color
+    format: hex
+    default-light: '#3b3b3b'
+    default-dark: '#dcddde'
+  -
+    id: extended-level-7-headings
+    title: Level 7 Headings
+    type: heading
+    level: 2
+    collapsed: true
+  -
+    id: extended-h7-size
+    title: H7 font size
+    type: variable-number-slider
+    default: 0.95
+    min: 0.6
+    max: 1.4
+    step: 0.05
+    format: em
+  -
+    id: extended-h7-weight
+    title: H7 font weight
+    type: variable-number-slider
+    default: 700
+    min: 100
+    max: 900
+    step: 50
+  -
+    id: extended-h7-color
+    title: H7 text color
+    type: variable-themed-color
+    format: hex
+    default-light: '#'
+    default-dark: '#'
+  -
+    id: extended-h7-variant
+    title: H7 font variant
+    type: variable-select
+    allowEmpty: false
+    default: normal
+    options:
+      -
+        label: Normal
+        value: normal
+      -
+        label: Small caps
+        value: small-caps
+      -
+        label: All small caps
+        value: all-small-caps
+  -
+    id: extended-h7-style
+    title: H7 font style
+    type: variable-select
+    allowEmpty: false
+    default: normal
+    options:
+      -
+        label: Normal
+        value: normal
+      -
+        label: Italic
+        value: italic
+  -
+    id: extended-h7-l
+    title: H7 divider line
+    description: Adds a border below the heading
+    type: class-toggle
+    default: false
+  -
+    id: extended-level-8-headings
+    title: Level 8 Headings
+    type: heading
+    level: 2
+    collapsed: true
+  -
+    id: extended-h8-size
+    title: H8 font size
+    type: variable-number-slider
+    default: 0.9
+    min: 0.6
+    max: 1.4
+    step: 0.05
+    format: em
+  -
+    id: extended-h8-weight
+    title: H8 font weight
+    type: variable-number-slider
+    default: 650
+    min: 100
+    max: 900
+    step: 50
+  -
+    id: extended-h8-color
+    title: H8 text color
+    type: variable-themed-color
+    format: hex
+    default-light: '#'
+    default-dark: '#'
+  -
+    id: extended-h8-variant
+    title: H8 font variant
+    type: variable-select
+    allowEmpty: false
+    default: normal
+    options:
+      -
+        label: Normal
+        value: normal
+      -
+        label: Small caps
+        value: small-caps
+      -
+        label: All small caps
+        value: all-small-caps
+  -
+    id: extended-h8-style
+    title: H8 font style
+    type: variable-select
+    allowEmpty: false
+    default: normal
+    options:
+      -
+        label: Normal
+        value: normal
+      -
+        label: Italic
+        value: italic
+  -
+    id: extended-h8-l
+    title: H8 divider line
+    description: Adds a border below the heading
+    type: class-toggle
+    default: false
+  -
+    id: extended-level-9-headings
+    title: Level 9 Headings
+    type: heading
+    level: 2
+    collapsed: true
+  -
+    id: extended-h9-size
+    title: H9 font size
+    type: variable-number-slider
+    default: 0.85
+    min: 0.6
+    max: 1.4
+    step: 0.05
+    format: em
+  -
+    id: extended-h9-weight
+    title: H9 font weight
+    type: variable-number-slider
+    default: 600
+    min: 100
+    max: 900
+    step: 50
+  -
+    id: extended-h9-color
+    title: H9 text color
+    type: variable-themed-color
+    format: hex
+    default-light: '#'
+    default-dark: '#'
+  -
+    id: extended-h9-variant
+    title: H9 font variant
+    type: variable-select
+    allowEmpty: false
+    default: normal
+    options:
+      -
+        label: Normal
+        value: normal
+      -
+        label: Small caps
+        value: small-caps
+      -
+        label: All small caps
+        value: all-small-caps
+  -
+    id: extended-h9-style
+    title: H9 font style
+    type: variable-select
+    allowEmpty: false
+    default: normal
+    options:
+      -
+        label: Normal
+        value: normal
+      -
+        label: Italic
+        value: italic
+  -
+    id: extended-h9-l
+    title: H9 divider line
+    description: Adds a border below the heading
+    type: class-toggle
+    default: false
+  -
+    id: extended-level-10-headings
+    title: Level 10 Headings
+    type: heading
+    level: 2
+    collapsed: true
+  -
+    id: extended-h10-size
+    title: H10 font size
+    type: variable-number-slider
+    default: 0.82
+    min: 0.6
+    max: 1.4
+    step: 0.01
+    format: em
+  -
+    id: extended-h10-weight
+    title: H10 font weight
+    type: variable-number-slider
+    default: 600
+    min: 100
+    max: 900
+    step: 50
+  -
+    id: extended-h10-color
+    title: H10 text color
+    type: variable-themed-color
+    format: hex
+    default-light: '#'
+    default-dark: '#'
+  -
+    id: extended-h10-variant
+    title: H10 font variant
+    type: variable-select
+    allowEmpty: false
+    default: normal
+    options:
+      -
+        label: Normal
+        value: normal
+      -
+        label: Small caps
+        value: small-caps
+      -
+        label: All small caps
+        value: all-small-caps
+  -
+    id: extended-h10-style
+    title: H10 font style
+    type: variable-select
+    allowEmpty: false
+    default: normal
+    options:
+      -
+        label: Normal
+        value: normal
+      -
+        label: Italic
+        value: italic
+  -
+    id: extended-h10-l
+    title: H10 divider line
+    description: Adds a border below the heading
+    type: class-toggle
+    default: false
+  -
+    id: extended-level-11-headings
+    title: Level 11 Headings
+    type: heading
+    level: 2
+    collapsed: true
+  -
+    id: extended-h11-size
+    title: H11 font size
+    type: variable-number-slider
+    default: 0.79
+    min: 0.6
+    max: 1.4
+    step: 0.01
+    format: em
+  -
+    id: extended-h11-weight
+    title: H11 font weight
+    type: variable-number-slider
+    default: 600
+    min: 100
+    max: 900
+    step: 50
+  -
+    id: extended-h11-color
+    title: H11 text color
+    type: variable-themed-color
+    format: hex
+    default-light: '#'
+    default-dark: '#'
+  -
+    id: extended-h11-variant
+    title: H11 font variant
+    type: variable-select
+    allowEmpty: false
+    default: normal
+    options:
+      -
+        label: Normal
+        value: normal
+      -
+        label: Small caps
+        value: small-caps
+      -
+        label: All small caps
+        value: all-small-caps
+  -
+    id: extended-h11-style
+    title: H11 font style
+    type: variable-select
+    allowEmpty: false
+    default: normal
+    options:
+      -
+        label: Normal
+        value: normal
+      -
+        label: Italic
+        value: italic
+  -
+    id: extended-h11-l
+    title: H11 divider line
+    description: Adds a border below the heading
+    type: class-toggle
+    default: false
+  -
+    id: extended-level-12-headings
+    title: Level 12 Headings
+    type: heading
+    level: 2
+    collapsed: true
+  -
+    id: extended-h12-size
+    title: H12 font size
+    type: variable-number-slider
+    default: 0.76
+    min: 0.6
+    max: 1.4
+    step: 0.01
+    format: em
+  -
+    id: extended-h12-weight
+    title: H12 font weight
+    type: variable-number-slider
+    default: 600
+    min: 100
+    max: 900
+    step: 50
+  -
+    id: extended-h12-color
+    title: H12 text color
+    type: variable-themed-color
+    format: hex
+    default-light: '#'
+    default-dark: '#'
+  -
+    id: extended-h12-variant
+    title: H12 font variant
+    type: variable-select
+    allowEmpty: false
+    default: normal
+    options:
+      -
+        label: Normal
+        value: normal
+      -
+        label: Small caps
+        value: small-caps
+      -
+        label: All small caps
+        value: all-small-caps
+  -
+    id: extended-h12-style
+    title: H12 font style
+    type: variable-select
+    allowEmpty: false
+    default: normal
+    options:
+      -
+        label: Normal
+        value: normal
+      -
+        label: Italic
+        value: italic
+  -
+    id: extended-h12-l
+    title: H12 divider line
+    description: Adds a border below the heading
+    type: class-toggle
+    default: false
+*/
+
+body {
+  --extended-h7-size: 0.95em;
+  --extended-h8-size: 0.9em;
+  --extended-h9-size: 0.85em;
+  --extended-h10-size: 0.82em;
+  --extended-h11-size: 0.79em;
+  --extended-h12-size: 0.76em;
+  --extended-h7-weight: 700;
+  --extended-h8-weight: 650;
+  --extended-h9-weight: 600;
+  --extended-h10-weight: 600;
+  --extended-h11-weight: 600;
+  --extended-h12-weight: 600;
+  --extended-h7-variant: normal;
+  --extended-h8-variant: normal;
+  --extended-h9-variant: normal;
+  --extended-h10-variant: normal;
+  --extended-h11-variant: normal;
+  --extended-h12-variant: normal;
+  --extended-h7-style: normal;
+  --extended-h8-style: normal;
+  --extended-h9-style: normal;
+  --extended-h10-style: normal;
+  --extended-h11-style: normal;
+  --extended-h12-style: normal;
+  --extended-heading-color: var(--text-normal);
+  --extended-h7-color: var(--extended-heading-color);
+  --extended-h8-color: var(--extended-heading-color);
+  --extended-h9-color: var(--extended-heading-color);
+  --extended-h10-color: var(--extended-heading-color);
+  --extended-h11-color: var(--extended-heading-color);
+  --extended-h12-color: var(--extended-heading-color);
+  --extended-heading-divider-color: var(--divider-color, var(--background-modifier-border));
+}
+
+.extended-heading-line,
+.extended-heading-reading {
+  font-family: var(--font-text);
+  line-height: var(--line-height-tight, 1.3);
+}
+
+.extended-heading-line.extended-heading-7,
+.extended-heading-reading.extended-heading-7 {
+  color: var(--extended-h7-color);
+  font-size: var(--extended-h7-size);
+  font-style: var(--extended-h7-style);
+  font-variant: var(--extended-h7-variant);
+  font-weight: var(--extended-h7-weight);
+}
+
+.extended-heading-line.extended-heading-8,
+.extended-heading-reading.extended-heading-8 {
+  color: var(--extended-h8-color);
+  font-size: var(--extended-h8-size);
+  font-style: var(--extended-h8-style);
+  font-variant: var(--extended-h8-variant);
+  font-weight: var(--extended-h8-weight);
+}
+
+.extended-heading-line.extended-heading-9,
+.extended-heading-reading.extended-heading-9 {
+  color: var(--extended-h9-color);
+  font-size: var(--extended-h9-size);
+  font-style: var(--extended-h9-style);
+  font-variant: var(--extended-h9-variant);
+  font-weight: var(--extended-h9-weight);
+}
+
+.extended-heading-line.extended-heading-10,
+.extended-heading-reading.extended-heading-10 {
+  color: var(--extended-h10-color);
+  font-size: var(--extended-h10-size);
+  font-style: var(--extended-h10-style);
+  font-variant: var(--extended-h10-variant);
+  font-weight: var(--extended-h10-weight);
+}
+
+.extended-heading-line.extended-heading-11,
+.extended-heading-reading.extended-heading-11 {
+  color: var(--extended-h11-color);
+  font-size: var(--extended-h11-size);
+  font-style: var(--extended-h11-style);
+  font-variant: var(--extended-h11-variant);
+  font-weight: var(--extended-h11-weight);
+}
+
+.extended-heading-line.extended-heading-12,
+.extended-heading-reading.extended-heading-12 {
+  color: var(--extended-h12-color);
+  font-size: var(--extended-h12-size);
+  font-style: var(--extended-h12-style);
+  font-variant: var(--extended-h12-variant);
+  font-weight: var(--extended-h12-weight);
+}
+
+.extended-h7-l .extended-heading-7,
+.extended-h8-l .extended-heading-8,
+.extended-h9-l .extended-heading-9,
+.extended-h10-l .extended-heading-10,
+.extended-h11-l .extended-heading-11,
+.extended-h12-l .extended-heading-12 {
+  border-bottom: 1px solid var(--extended-heading-divider-color);
+  margin-block-end: 0.6em;
+  padding-bottom: 0.4em;
+}
+
+.extended-heading-marker {
+  color: var(--text-faint);
+  font-size: 0.8em;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 400;
+}
+
+/* Inline MarkdownRenderer fallback for heading-subpath links on H7+ lines. */
+.extended-heading-link-widget,
+.extended-heading-link-widget > p {
+  display: inline;
+  margin: 0;
+  padding: 0;
+}
+
+body.extended-headings-hide-markers
+  .markdown-source-view.mod-cm6.is-live-preview
+  .cm-line:not(.cm-active)
+  .extended-heading-marker-hideable,
+body.extended-headings-hide-markers
+  .markdown-source-view.mod-cm6.is-live-preview
+  .cm-line:not(.cm-active)
+  .extended-heading-closing-marker {
+  display: none;
+}
+
+/* Lapel-compatible heading-level gutter, extended through H12. */
+body:not(.extended-headings-show-level-markers) .cm-extended-heading-gutter,
+body:not(.extended-headings-markers-in-source)
+  .markdown-source-view.mod-cm6:not(.is-live-preview)
+  .cm-extended-heading-gutter {
+  display: none;
+}
+
+.cm-extended-heading-gutter.cm-lapel {
+  font-size: var(--font-smallest);
+  letter-spacing: 0.015em;
+  text-align: end;
+  width: 4ch;
+}
+
+.table-cell-wrapper .cm-extended-heading-gutter { display: none; }
+
+body.extended-headings-markers-before .cm-extended-heading-gutter { order: -20; }
+body:not(.extended-headings-markers-before) .cm-extended-heading-gutter { order: 20; }
+
+.cm-heading-marker {
+  color: var(--text-faint);
+  display: inline-block;
+}
+
+.cm-heading-marker-spacer { visibility: hidden; }
+.cm-heading-marker[data-level="1"] { --heading-marker: "H1"; }
+.cm-heading-marker[data-level="2"] { --heading-marker: "H2"; }
+.cm-heading-marker[data-level="3"] { --heading-marker: "H3"; }
+.cm-heading-marker[data-level="4"] { --heading-marker: "H4"; }
+.cm-heading-marker[data-level="5"] { --heading-marker: "H5"; }
+.cm-heading-marker[data-level="6"] { --heading-marker: "H6"; }
+.cm-heading-marker[data-level="7"] { --heading-marker: "H7"; }
+.cm-heading-marker[data-level="8"] { --heading-marker: "H8"; }
+.cm-heading-marker[data-level="9"] { --heading-marker: "H9"; }
+.cm-heading-marker[data-level="10"] { --heading-marker: "H10"; }
+.cm-heading-marker[data-level="11"] { --heading-marker: "H11"; }
+.cm-heading-marker[data-level="12"] { --heading-marker: "H12"; }
+.cm-heading-marker::before { content: var(--heading-marker); }
+
+.extended-heading-reading {
+  align-items: center;
+  display: flex;
+  margin-block: var(--heading-spacing, 1em) 0.45em;
+  position: relative;
+}
+
+.extended-heading-fold {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: var(--text-faint);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  height: 1.2em;
+  justify-content: center;
+  margin-inline: -1.25em 0.25em;
+  padding: 0;
+  width: 1em;
+}
+
+[data-extended-hidden-by] { display: none !important; }
+
+.extended-outline { padding: 0.25rem; }
+.extended-heading-rename-input { width: 100%; }
+.extended-outline-empty { color: var(--text-muted); padding: 0.75rem; }
+.extended-outline-list { display: flex; flex-direction: column; gap: 1px; }
+.extended-outline-item {
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-s);
+  box-shadow: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: block;
+  font: inherit;
+  overflow: hidden;
+  padding: 0.25rem 0.4rem;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+.extended-outline-item:hover { background: var(--background-modifier-hover); color: var(--text-normal); }
+.extended-outline-level-7,
+.extended-outline-level-8,
+.extended-outline-level-9,
+.extended-outline-level-10,
+.extended-outline-level-11,
+.extended-outline-level-12 { color: var(--text-faint); }

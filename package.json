@@ -1,0 +1,34 @@
+{
+  "name": "obsidian-extended-headings",
+  "version": "0.4.8",
+  "description": "Extend Obsidian's heading workflow through H12.",
+  "type": "module",
+  "private": true,
+  "author": {
+    "name": "obsidiest",
+    "url": "https://github.com/obsidiest"
+  },
+  "license": "MIT",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "node esbuild.config.mjs production",
+    "dev": "node esbuild.config.mjs",
+    "check": "tsc --noEmit --pretty false",
+    "lint": "eslint .",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "devDependencies": {
+    "@codemirror/language": "^6.11.3",
+    "@codemirror/state": "6.5.0",
+    "@codemirror/view": "6.38.6",
+    "@eslint/js": "9.33.0",
+    "@eslint/json": "0.14.0",
+    "@types/node": "24.1.0",
+    "esbuild": "0.25.8",
+    "eslint": "9.33.0",
+    "eslint-plugin-obsidianmd": "0.4.1",
+    "obsidian": "1.13.1",
+    "typescript": "5.9.2",
+    "typescript-eslint": "8.40.0"
+  }
+}
