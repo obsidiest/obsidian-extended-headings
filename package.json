@@ -1,7 +1,7 @@
 {
   "name": "obsidian-extended-headings",
-  "version": "0.4.8",
-  "description": "Extend Obsidian's heading workflow through H12.",
+  "version": "0.4.9",
+  "description": "Extend ATX heading support through H12.",
   "type": "module",
   "private": true,
   "author": {
@@ -14,7 +14,7 @@
     "build": "node esbuild.config.mjs production",
     "dev": "node esbuild.config.mjs",
     "check": "tsc --noEmit --pretty false",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings 0",
     "test": "node --test tests/*.test.mjs"
   },
   "devDependencies": {

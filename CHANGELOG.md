@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.4.9
+
+- Raised the minimum supported Obsidian version to 1.13.0 and replaced the legacy settings renderer with searchable declarative settings.
+- Removed `Obsidian` from the manifest description to satisfy Community-directory requirements.
+- Replaced native DOM element construction with Obsidian DOM helpers and simplified Reading View insertion.
+- Renamed the reindex command ID from `reindex-extended-headings` to `reindex` and its name to `Reindex headings`.
+- Removed deprecated slider-tooltip calls and the folding rule's `!important` declaration.
+- Expanded README disclosures for vault-wide Markdown enumeration and clipboard writes.
+- Added signed GitHub artifact attestations for release assets.
+- Made ESLint warnings fail validation so review warnings cannot silently pass CI.
+- Retained Obsidian 1.13.7 as the latest audited compatibility target.
+
 ## 0.4.8
 
 - Removed all default hotkey assignments in accordance with Obsidian's community-plugin guidelines.

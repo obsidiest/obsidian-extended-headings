@@ -16,7 +16,7 @@ export class ExtendedOutlineView extends ItemView {
   }
 
   getDisplayText(): string {
-    return "Extended Outline";
+    return "Extended outline";
   }
 
   getIcon(): string {

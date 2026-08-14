@@ -22,7 +22,7 @@ test("keeps release versions and compatibility metadata synchronized", () => {
   const packageJson = JSON.parse(read("package.json"));
   const versions = JSON.parse(read("versions.json"));
 
-  assert.equal(manifest.version, "0.4.8");
+  assert.equal(manifest.version, "0.4.9");
   assert.equal(packageJson.version, manifest.version);
   assert.equal(versions[manifest.version], manifest.minAppVersion);
 });
@@ -36,7 +36,7 @@ test("documents compatibility, disclosures, attribution, and licensing", () => {
   assert.match(readme, /GPT-5\.6 Sol \(Extra High\), OpenAI/);
   assert.match(readme, /GPT-5\.6 Sol \(Max\), OpenAI/);
   assert.match(readme, /\[MIT\]\(LICENSE\)/);
-  assert.match(changelog, /## 0\.4\.8/);
+  assert.match(changelog, /## 0\.4\.9/);
 });
 
 test("builds production output for GitHub release assets", () => {
@@ -48,4 +48,8 @@ test("builds production output for GitHub release assets", () => {
   assert.match(release, /dist\/main\.js/);
   assert.match(release, /manifest\.json/);
   assert.match(release, /styles\.css/);
+  assert.match(release, /actions\/attest@v4/);
+  assert.match(release, /attestations: write/);
+  assert.match(release, /id-token: write/);
+  assert.match(release, /generate_release_notes: true/);
 });

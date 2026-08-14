@@ -15,11 +15,11 @@ The default maximum is H12. It can be lowered to H7 under **Settings → Communi
 ## Obsidian compatibility
 
 - **Latest compatibility target:** Obsidian 1.13.7 (Desktop, public release).
-- **Minimum supported Obsidian version:** 1.7.2.
+- **Minimum supported Obsidian version:** 1.13.0.
 
-The compatibility target records the newest Obsidian base-program version audited and tested when this release was prepared. It is distinct from the minimum supported version in `manifest.json`; auditing a newer release does not unnecessarily prevent installation on earlier supported versions. Version 0.4.7 corrects the minimum to 1.7.2 because the plugin uses `Workspace.revealLeaf`, introduced in that release.
+The compatibility target records the newest Obsidian base-program version audited and tested when this release was prepared. Version 0.4.9 deliberately raises the minimum from 1.7.2 to 1.13.0 so the plugin can use Obsidian's searchable declarative settings API without retaining a second legacy settings renderer. Earlier releases remain mapped to their historical minimum versions in `versions.json`.
 
-Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 0.4.8 has not been device-tested on Obsidian Mobile.
+Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 0.4.9 has not been device-tested on Obsidian Mobile.
 
 ## Features
 
@@ -41,6 +41,7 @@ Extended Headings declares mobile compatibility because its runtime uses Obsidia
 - H1–H12-aware rename, copy-link, and copy-embed commands.
 - Heading- or block-specific copy actions in the editor context menu.
 - Minimal-style typography controls for every extended level from H7 through H12.
+- Searchable plugin settings through Obsidian 1.13's declarative settings API.
 
 ## Settings
 
@@ -84,8 +85,8 @@ Commands operate on every heading in the selected line range, or on the heading 
 | Rename this heading (H1–H12) | None | Uses Obsidian's native workflow for H1–H6 and updates matching vault links for H7–H12. |
 | Copy embed to current block or heading (H1–H12) | None | Copies a heading embed or creates/reuses a block ID and copies its embed. |
 | Copy link to current block or heading (H1–H12) | None | Copies a heading link or creates/reuses a block ID and copies its link. |
-| Open Extended Outline | None | Opens the plugin's supported-API outline pane. |
-| Reindex extended headings | None | Rebuilds the experimental core-heading bridge. |
+| Open extended outline | None | Opens the plugin's supported-API outline pane. |
+| Reindex headings | None | Rebuilds the experimental core-heading bridge. |
 
 Extended Headings deliberately assigns no default hotkeys, preventing conflicts with Obsidian and other plugins. Assign desired combinations under **Settings → Hotkeys**. To reproduce the original workflow, use:
 
@@ -157,6 +158,8 @@ If you received the combined distribution ZIP, the contents of `_source` are the
 - No access to files outside the active Obsidian vault.
 - No bundled third-party runtime dependencies; editor integrations use the Obsidian-provided CodeMirror modules.
 - Settings are stored through Obsidian's plugin data API.
+- Startup and manual reindexing enumerate Markdown file paths inside the active vault and read those notes through Obsidian's Vault API to index H7–H12 headings. No files outside the vault are examined.
+- Copy-link and copy-embed commands write the generated reference to the system clipboard only when explicitly invoked. The plugin does not read clipboard contents.
 - The experimental core bridge changes only Obsidian's in-memory metadata cache and does not rewrite note content.
 - Heading-shift, set-heading, and contextual-insert commands modify only the active editor selection or cursor line when explicitly invoked.
 - Copying a reference to an ordinary block may append a block ID to that block when none exists.
@@ -166,7 +169,7 @@ Keep Obsidian's File Recovery enabled and maintain ordinary vault backups before
 
 ## Development and release
 
-The repository includes a package lock, the official `eslint-plugin-obsidianmd` rules, automated type-checking and tests, and GitHub Actions workflows for validation and releases. Before publishing a release:
+The repository includes a package lock, the official `eslint-plugin-obsidianmd` rules, automated type-checking and tests, and GitHub Actions workflows for validation and releases. ESLint warnings fail validation. The release workflow also generates signed GitHub artifact attestations for `main.js`, `manifest.json`, and `styles.css`. Before publishing a release:
 
 1. Make the version in `manifest.json`, `package.json`, and `versions.json` agree.
 2. Run `npm ci`, `npm run check`, `npm run lint`, `npm test`, and `npm run build`.
@@ -181,6 +184,7 @@ Only the initial version is submitted through the Obsidian Community directory f
 - Core implementation through version 0.4.6 generated with **GPT-5.6 Sol (Extra High), OpenAI**, under obsidiest's direction.
 - Version 0.4.7 attribution, documentation, repository preparation, and release packaging generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 - Version 0.4.8 default-hotkey removal, documentation, validation, and release packaging generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
+- Version 0.4.9 Community-review remediation, declarative-settings migration, validation, documentation, and release packaging generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 
 Incorporates features inspired by the following Obsidian community plugins:
 

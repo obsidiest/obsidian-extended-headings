@@ -47,15 +47,15 @@ export default class ExtendedHeadingsPlugin extends Plugin {
       toggleReadingFold(target);
     });
 
-    this.addRibbonIcon("list-tree", "Open Extended Outline", () => void this.activateOutline());
+    this.addRibbonIcon("list-tree", "Open extended outline", () => void this.activateOutline());
     this.addCommand({
       id: "open-extended-outline",
-      name: "Open Extended Outline",
+      name: "Open extended outline",
       callback: () => void this.activateOutline(),
     });
     this.addCommand({
-      id: "reindex-extended-headings",
-      name: "Reindex extended headings",
+      id: "reindex",
+      name: "Reindex headings",
       callback: async () => {
         await this.coreIntegration?.reindexAll();
         new Notice("Extended headings reindexed");
@@ -291,7 +291,7 @@ export default class ExtendedHeadingsPlugin extends Plugin {
     const existing = this.app.workspace.getLeavesOfType(EXTENDED_OUTLINE_VIEW)[0];
     const leaf = existing ?? this.app.workspace.getRightLeaf(false);
     if (!leaf) {
-      new Notice("Could not open Extended Outline");
+      new Notice("Could not open extended outline");
       return;
     }
     if (!existing) await leaf.setViewState({ type: EXTENDED_OUTLINE_VIEW, active: true });

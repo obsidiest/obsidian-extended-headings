@@ -598,7 +598,7 @@ body:not(.extended-headings-markers-before) .cm-extended-heading-gutter { order:
   width: 1em;
 }
 
-[data-extended-hidden-by] { display: none !important; }
+.markdown-preview-view [data-extended-hidden-by] { display: none; }
 
 .extended-outline { padding: 0.25rem; }
 .extended-heading-rename-input { width: 100%; }

@@ -48,40 +48,43 @@ function lineRanges(text: string): Array<{ from: number; to: number; heading: Pa
   return ranges;
 }
 
-function appendParagraph(source: HTMLParagraphElement, fragment: DocumentFragment, before: Node): void {
+function appendParagraph(source: HTMLParagraphElement, fragment: DocumentFragment): void {
   if (!fragment.textContent?.trim()) return;
   const paragraph = source.cloneNode(false) as HTMLParagraphElement;
   paragraph.removeAttribute("id");
   paragraph.dataset.extendedHeadingsProcessed = "true";
   paragraph.append(fragment);
-  before.parentNode?.insertBefore(paragraph, before);
+  source.before(paragraph);
 }
 
 function appendHeading(
   source: HTMLParagraphElement,
   heading: ParsedHeading,
   fragment: DocumentFragment,
-  before: Node,
   settings: ExtendedHeadingsSettings,
 ): void {
-  const element = document.createElement("div");
-  element.className = `extended-heading-reading extended-heading-${heading.level}`;
+  const element = createDiv({
+    cls: `extended-heading-reading extended-heading-${heading.level}`,
+  });
   element.setAttribute("role", "heading");
   element.setAttribute("aria-level", String(heading.level));
   element.dataset.heading = fragment.textContent?.trim() ?? heading.rawBody;
   element.tabIndex = -1;
 
   if (settings.readingModeFolding) {
-    const fold = document.createElement("button");
-    fold.className = "extended-heading-fold";
-    fold.type = "button";
-    fold.setAttribute("aria-label", "Fold heading");
-    fold.setAttribute("aria-expanded", "true");
-    fold.textContent = "⌄";
+    const fold = createEl("button", {
+      cls: "extended-heading-fold",
+      text: "⌄",
+      attr: {
+        type: "button",
+        "aria-label": "Fold heading",
+        "aria-expanded": "true",
+      },
+    });
     element.append(fold);
   }
   element.append(fragment);
-  source.parentNode?.insertBefore(element, before);
+  source.before(element);
 }
 
 export function renderExtendedHeadings(root: HTMLElement, getSettings: () => ExtendedHeadingsSettings): void {
@@ -98,17 +101,16 @@ export function renderExtendedHeadings(root: HTMLElement, getSettings: () => Ext
     let cursor = 0;
     for (const match of matches) {
       const regularEnd = match.from > cursor && text[match.from - 1] === "\n" ? match.from - 1 : match.from;
-      appendParagraph(paragraph, cloneTextRange(paragraph, cursor, regularEnd), paragraph);
+      appendParagraph(paragraph, cloneTextRange(paragraph, cursor, regularEnd));
       appendHeading(
         paragraph,
         match.heading,
         cloneTextRange(paragraph, match.heading.bodyFrom, match.heading.bodyTo),
-        paragraph,
         settings,
       );
       cursor = match.to < text.length && text[match.to] === "\n" ? match.to + 1 : match.to;
     }
-    appendParagraph(paragraph, cloneTextRange(paragraph, cursor, text.length), paragraph);
+    appendParagraph(paragraph, cloneTextRange(paragraph, cursor, text.length));
     paragraph.remove();
   }
 }

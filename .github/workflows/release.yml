@@ -7,6 +7,9 @@ on:
 
 permissions:
   contents: write
+  id-token: write
+  attestations: write
+  artifact-metadata: write
 
 jobs:
   release:
@@ -31,9 +34,18 @@ jobs:
             echo "Tag $GITHUB_REF_NAME does not match manifest version $manifest_version."
             exit 1
           fi
+      - name: Attest release assets
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            dist/main.js
+            manifest.json
+            styles.css
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
+          generate_release_notes: true
+          fail_on_unmatched_files: true
           files: |
             dist/main.js
             manifest.json

@@ -37,16 +37,25 @@ test("uses the user's current Lapel marker preferences as defaults", () => {
 });
 
 test("manifest describes the plugin's overall purpose", () => {
-  assert.equal(manifest.version, "0.4.8");
+  assert.equal(manifest.version, "0.4.9");
   assert.equal(
     manifest.description,
-    "Extends Obsidian's heading system through H12 with consistent editing, styling, folding, outlines, links, navigation, and heading-level markers.",
+    "Extends ATX heading support through H12 with consistent editing, styling, folding, outlines, links, navigation, and heading-level markers.",
   );
+  assert.doesNotMatch(manifest.description, /\bobsidian\b/i);
 });
 
-test("declares the latest audited Obsidian version and accurate API minimum", () => {
+test("declares the latest audited Obsidian version and declarative-settings minimum", () => {
   assert.match(readme, /Latest compatibility target:\*\* Obsidian 1\.13\.7/);
-  assert.match(readme, /Minimum supported Obsidian version:\*\* 1\.7\.2/);
-  assert.equal(manifest.minAppVersion, "1.7.2");
-  assert.equal(versions[manifest.version], "1.7.2");
+  assert.match(readme, /Minimum supported Obsidian version:\*\* 1\.13\.0/);
+  assert.equal(manifest.minAppVersion, "1.13.0");
+  assert.equal(versions[manifest.version], "1.13.0");
+});
+
+test("uses searchable declarative settings without a legacy display renderer", () => {
+  assert.match(settings, /getSettingDefinitions\(\)/);
+  assert.match(settings, /SettingDefinitionItem<SettingsKey>/);
+  assert.match(settings, /setControlValue\(key: string, value: unknown\)/);
+  assert.doesNotMatch(settings, /\bdisplay\(\): void/);
+  assert.doesNotMatch(settings, /setDynamicTooltip/);
 });

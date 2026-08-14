@@ -34,6 +34,13 @@ test("registers the consolidated rename and reference commands", () => {
   assert.match(main, /id: "copy-link-to-current-block-or-heading"/);
 });
 
+test("uses a plugin-neutral reindex command ID and name", () => {
+  assert.match(main, /id: "reindex"/);
+  assert.match(main, /name: "Reindex headings"/);
+  assert.doesNotMatch(main, /reindex-extended-headings/);
+  assert.doesNotMatch(main, /name: "Reindex extended headings"/);
+});
+
 test("does not assign default hotkeys", () => {
   assert.doesNotMatch(main, /\bhotkeys\s*:/);
 });

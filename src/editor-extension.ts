@@ -38,8 +38,7 @@ class ExtendedHeadingLinkWidget extends WidgetType {
   }
 
   toDOM(): HTMLElement {
-    const container = document.createElement("span");
-    container.className = "extended-heading-link-widget";
+    const container = createSpan({ cls: "extended-heading-link-widget" });
     const component = new Component();
     component.load();
     renderedLinkComponents.set(container, component);
@@ -86,8 +85,9 @@ class HeadingLevelMarker extends GutterMarker {
   }
 
   toDOM(): HTMLElement {
-    const marker = document.createElement("span");
-    marker.className = `cm-heading-marker${this.spacer ? " cm-heading-marker-spacer" : ""}`;
+    const marker = createSpan({
+      cls: `cm-heading-marker${this.spacer ? " cm-heading-marker-spacer" : ""}`,
+    });
     marker.dataset.level = String(this.level);
     if (!this.spacer) marker.setAttribute("aria-label", `Heading level ${this.level}`);
     return marker;

@@ -13,6 +13,9 @@ export default [
         tsconfigRootDir: import.meta.dirname,
       },
     },
+    rules: {
+      "obsidianmd/ui/sentence-case": ["warn", { acronyms: ["H1", "H12"] }],
+    },
   },
   {
     files: ["tests/**/*.mjs"],
@@ -22,15 +25,10 @@ export default [
     },
   },
   {
-    files: ["src/settings.ts"],
-    rules: {
-      "obsidianmd/settings-tab/prefer-setting-definitions": "off",
-    },
-  },
-  {
     files: ["esbuild.config.mjs"],
     rules: {
       "obsidianmd/no-global-this": "off",
+      "obsidianmd/no-nodejs-modules": "off",
     },
   },
 ];
