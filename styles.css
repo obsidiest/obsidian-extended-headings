@@ -20,7 +20,7 @@ settings:
     id: extended-h7-size
     title: H7 font size
     type: variable-number-slider
-    default: 0.95
+    default: 0.9
     min: 0.6
     max: 1.4
     step: 0.05
@@ -29,7 +29,7 @@ settings:
     id: extended-h7-weight
     title: H7 font weight
     type: variable-number-slider
-    default: 700
+    default: 500
     min: 100
     max: 900
     step: 50
@@ -94,7 +94,7 @@ settings:
     id: extended-h8-weight
     title: H8 font weight
     type: variable-number-slider
-    default: 650
+    default: 500
     min: 100
     max: 900
     step: 50
@@ -150,7 +150,7 @@ settings:
     id: extended-h9-size
     title: H9 font size
     type: variable-number-slider
-    default: 0.85
+    default: 0.9
     min: 0.6
     max: 1.4
     step: 0.05
@@ -159,7 +159,7 @@ settings:
     id: extended-h9-weight
     title: H9 font weight
     type: variable-number-slider
-    default: 600
+    default: 500
     min: 100
     max: 900
     step: 50
@@ -215,7 +215,7 @@ settings:
     id: extended-h10-size
     title: H10 font size
     type: variable-number-slider
-    default: 0.82
+    default: 0.9
     min: 0.6
     max: 1.4
     step: 0.01
@@ -224,7 +224,7 @@ settings:
     id: extended-h10-weight
     title: H10 font weight
     type: variable-number-slider
-    default: 600
+    default: 500
     min: 100
     max: 900
     step: 50
@@ -280,7 +280,7 @@ settings:
     id: extended-h11-size
     title: H11 font size
     type: variable-number-slider
-    default: 0.79
+    default: 0.9
     min: 0.6
     max: 1.4
     step: 0.01
@@ -289,7 +289,7 @@ settings:
     id: extended-h11-weight
     title: H11 font weight
     type: variable-number-slider
-    default: 600
+    default: 500
     min: 100
     max: 900
     step: 50
@@ -345,7 +345,7 @@ settings:
     id: extended-h12-size
     title: H12 font size
     type: variable-number-slider
-    default: 0.76
+    default: 0.9
     min: 0.6
     max: 1.4
     step: 0.01
@@ -354,7 +354,7 @@ settings:
     id: extended-h12-weight
     title: H12 font weight
     type: variable-number-slider
-    default: 600
+    default: 500
     min: 100
     max: 900
     step: 50
@@ -403,18 +403,18 @@ settings:
 */
 
 body {
-  --extended-h7-size: 0.95em;
+  --extended-h7-size: 0.9em;
   --extended-h8-size: 0.9em;
-  --extended-h9-size: 0.85em;
-  --extended-h10-size: 0.82em;
-  --extended-h11-size: 0.79em;
-  --extended-h12-size: 0.76em;
-  --extended-h7-weight: 700;
-  --extended-h8-weight: 650;
-  --extended-h9-weight: 600;
-  --extended-h10-weight: 600;
-  --extended-h11-weight: 600;
-  --extended-h12-weight: 600;
+  --extended-h9-size: 0.9em;
+  --extended-h10-size: 0.9em;
+  --extended-h11-size: 0.9em;
+  --extended-h12-size: 0.9em;
+  --extended-h7-weight: 500;
+  --extended-h8-weight: 500;
+  --extended-h9-weight: 500;
+  --extended-h10-weight: 500;
+  --extended-h11-weight: 500;
+  --extended-h12-weight: 500;
   --extended-h7-variant: normal;
   --extended-h8-variant: normal;
   --extended-h9-variant: normal;
@@ -510,10 +510,10 @@ body {
 
 .extended-heading-marker {
   color: var(--text-faint);
-  font-size: 0.8em;
-  font-style: normal;
-  font-variant: normal;
-  font-weight: 400;
+  font-size: inherit;
+  font-style: inherit;
+  font-variant: inherit;
+  font-weight: inherit;
 }
 
 /* Inline MarkdownRenderer fallback for heading-subpath links on H7+ lines. */

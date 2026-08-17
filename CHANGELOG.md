@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.4.11
+
+- Made H7–H12 ATX hash markers inherit their heading's configured font weight, matching the native H1–H6 relationship.
+- Extended marker inheritance to font style and font variant so all per-level typography remains synchronized.
+- Replaced the reused README image with a purpose-built 1200×800 preview showing every extended level from H7 through H12, including an active heading with visible hashes and inactive headings with concealed hashes.
+- Added regression coverage preventing fixed marker typography from being reintroduced.
+- Retained Obsidian 1.13.7 as the latest audited compatibility target.
+
+## 0.4.10
+
+- Made Live Preview and Source Mode H7–H12 ATX hash markers inherit the configured heading font size instead of applying an additional `0.8em` reduction.
+- Changed the default H7–H12 font size to `0.9em` and font weight to `500` for every extended level.
+- Retained `normal` as the default H7 font variant and font style.
+- Added regression coverage for the marker-size inheritance and Style Settings defaults.
+- Retained Obsidian 1.13.7 as the latest audited compatibility target.
+
 ## 0.4.9
 
 - Raised the minimum supported Obsidian version to 1.13.0 and replaced the legacy settings renderer with searchable declarative settings.

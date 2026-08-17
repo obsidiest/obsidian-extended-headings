@@ -19,7 +19,7 @@ The default maximum is H12. It can be lowered to H7 under **Settings → Communi
 
 The compatibility target records the newest Obsidian base-program version audited and tested when this release was prepared. Version 0.4.9 deliberately raises the minimum from 1.7.2 to 1.13.0 so the plugin can use Obsidian's searchable declarative settings API without retaining a second legacy settings renderer. Earlier releases remain mapped to their historical minimum versions in `versions.json`.
 
-Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 0.4.9 has not been device-tested on Obsidian Mobile.
+Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 0.4.11 has not been device-tested on Obsidian Mobile.
 
 ## Features
 
@@ -41,7 +41,14 @@ Extended Headings declares mobile compatibility because its runtime uses Obsidia
 - H1–H12-aware rename, copy-link, and copy-embed commands.
 - Heading- or block-specific copy actions in the editor context menu.
 - Minimal-style typography controls for every extended level from H7 through H12.
+- H7–H12 ATX hash markers that track the size, weight, style, and variant selected for their heading level.
 - Searchable plugin settings through Obsidian 1.13's declarative settings API.
+
+## Feature preview
+
+This representative Live Preview shows every extended level. H9 is active, so its nine ATX hashes and caret are visible; the inactive H7, H8, and H10–H12 lines demonstrate the default hash-concealment behavior:
+
+![Extended headings H7 through H12 in Live Preview, with H9 active and the remaining levels inactive](docs/images/extended-heading-levels-live-preview.png)
 
 ## Settings
 
@@ -65,7 +72,7 @@ Extended Headings declares mobile compatibility because its runtime uses Obsidia
 | Children behavior | `Outdent to 0` | Controls how a contiguous child list is re-indented when its preceding line becomes a heading. |
 | Tab size | `4` | Sets the spaces per indentation level for child-list operations. |
 
-With the **Style Settings** community plugin enabled, open **Settings → Style Settings → Extended Headings**. H7 through H12 each have a collapsible section with font size, weight, individual light/dark color, variant, style, and divider controls. A shared H7+ color remains the fallback until an individual level color is set.
+With the **Style Settings** community plugin enabled, open **Settings → Style Settings → Extended Headings**. H7 through H12 each have a collapsible section with font size, weight, individual light/dark color, variant, style, and divider controls. The default size and weight for every extended level are `0.9em` and `500`; H7 also defaults to the `normal` font variant and style. A shared H7+ color remains the fallback until an individual level color is set. ATX hashes inherit the selected font size, weight, style, and variant for their H7–H12 level.
 
 ## Commands and hotkeys
 
@@ -185,6 +192,8 @@ Only the initial version is submitted through the Obsidian Community directory f
 - Version 0.4.7 attribution, documentation, repository preparation, and release packaging generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 - Version 0.4.8 default-hotkey removal, documentation, validation, and release packaging generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 - Version 0.4.9 Community-review remediation, declarative-settings migration, validation, documentation, and release packaging generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
+- Version 0.4.10 marker-size correction, typography-default update, regression coverage, documentation, and release packaging generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
+- Version 0.4.11 complete marker-typography correction, README visual replacement, regression coverage, documentation, and release packaging generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 
 Incorporates features inspired by the following Obsidian community plugins:
 

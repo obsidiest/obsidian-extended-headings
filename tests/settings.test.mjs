@@ -37,7 +37,7 @@ test("uses the user's current Lapel marker preferences as defaults", () => {
 });
 
 test("manifest describes the plugin's overall purpose", () => {
-  assert.equal(manifest.version, "0.4.9");
+  assert.equal(manifest.version, "0.4.11");
   assert.equal(
     manifest.description,
     "Extends ATX heading support through H12 with consistent editing, styling, folding, outlines, links, navigation, and heading-level markers.",
