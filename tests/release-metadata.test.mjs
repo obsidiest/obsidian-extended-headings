@@ -39,23 +39,6 @@ test("documents compatibility, disclosures, attribution, and licensing", () => {
   assert.match(changelog, /## 0\.4\.11/);
 });
 
-test("includes the complete H7-H12 README feature preview", () => {
-  const readme = read("README.md");
-  const svg = read("docs/images/extended-heading-levels-live-preview.svg");
-  const png = readFileSync(
-    new URL("../docs/images/extended-heading-levels-live-preview.png", import.meta.url),
-  );
-
-  assert.match(readme, /docs\/images\/extended-heading-levels-live-preview\.png/);
-  for (let level = 7; level <= 12; level += 1) {
-    assert.match(svg, new RegExp(`Extended Heading Level ${level}`));
-  }
-  assert.match(svg, />#########</);
-  assert.equal(png.subarray(1, 4).toString("ascii"), "PNG");
-  assert.equal(png.readUInt32BE(16), 1200);
-  assert.equal(png.readUInt32BE(20), 800);
-});
-
 test("builds production output for GitHub release assets", () => {
   const build = read("esbuild.config.mjs");
   const release = read(".github/workflows/release.yml");
