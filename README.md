@@ -186,7 +186,7 @@ The repository includes a package lock, the official `eslint-plugin-obsidianmd` 
 Only the initial version is submitted through the Obsidian Community directory form. Later versions are discovered from matching GitHub releases.
 
 
-## Motivation for This Plugin
+## Personal Motivation for This Plugin
 
 I often find myself writing long, highly categorized, deeply nested notes in Obsidian and I use the default Outline plugin pane to navigate through the various headings and their levels. I also would use heading markers from the [Lapel](https://github.com/liamcain/obsidian-lapel) plugin, hotkeys and context menu commands to copy heading links through the [Copy Block Link](https://github.com/mgmeyers/obsidian-copy-block-link) plugin, and hotkeys to shift a set of heading levels through the [Heading Shifter](https://github.com/k4a-l/obsidian-heading-shifter) plugin. While I do generally agree with constraining oneself to the default Markdown heading amount of 6 levels for most documents, I prefer the flexibility of having more than 6 headings, such as up to 12 (although in practice I have yet to go beyond 9), for some documents instead of having to subdivide those documents into seperate ones. In order to attain this flexibility with Obsidian with all the aforementioned features for all of the new additional heading levels (those other plugins, as released at the time of writing, only work with the default 1-6 heading levels), along with the default ones, I needed to create this plugin.
 
