@@ -192,7 +192,7 @@ I often find myself writing long, highly categorized, deeply nested notes in Obs
 
 While I do generally agree with constraining oneself to the default Markdown heading amount of 6 levels for most documents, I prefer the flexibility of having more than 6 headings, such as up to 12 (although in practice I have yet to go beyond 9), for some documents instead of having to subdivide those documents into seperate ones. In order to attain this flexibility with Obsidian with all the aforementioned features for all of the new additional heading levels (those other plugins, as released at the time of writing, only work with the default 1 – 6 heading levels), along with the default ones, I needed to create this plugin.
 
-I had hoped someone capable and ambitious might create a plugin like this before the present era of competent AI coding agents. However, since no one else has publically shared such a creation (to my knowledge), and since the requisite AI coding capability has emerged in frontier models to create this plugin just from iterative development with detailed English prompts and output testing by the prompter, I decided to create and share this plugin myself.
+I had hoped someone capable and sufficiently ambitious might create a plugin like this before the present era of competent AI coding agents. However, since no one else has publically shared such a creation (to my knowledge), and since the requisite AI coding capability has emerged in frontier models to create this plugin just from iterative development with detailed English prompts and output testing by the prompter, I decided to create and share this plugin myself.
 
 ## Credits and attribution
 
