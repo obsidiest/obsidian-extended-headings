@@ -186,7 +186,7 @@ The repository includes a package lock, the official `eslint-plugin-obsidianmd` 
 Only the initial version is submitted through the Obsidian Community directory form. Later versions are discovered from matching GitHub releases.
 
 
-## Personal Motivation for This Plugin
+## Personal Motivation for Creating This Plugin
 
 I often find myself writing long, highly categorized, deeply nested notes in Obsidian, and I use the default Outline plugin pane to navigate through and/or move the various headings and their levels. I also would use heading markers from the [Lapel](https://github.com/liamcain/obsidian-lapel) plugin; hotkeys and context menu commands to copy heading links through the [Copy Block Link](https://github.com/mgmeyers/obsidian-copy-block-link) plugin; and hotkeys to shift a set of heading levels through the [Heading Shifter](https://github.com/k4a-l/obsidian-heading-shifter) plugin to facilitate efficient navigation and manipulation of those headings.
 
