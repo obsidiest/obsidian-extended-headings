@@ -14,6 +14,12 @@ test("defaults to the full H12 range and native-style inactive-line concealment"
   assert.match(settings, /Hashes are hidden by default\./);
 });
 
+test("defaults copied heading references to complete ancestor paths", () => {
+  assert.match(settings, /copyFullyNestedHeadingPaths:\s*true/);
+  assert.match(settings, /name: "Copy fully nested heading paths"/);
+  assert.match(settings, /key: "copyFullyNestedHeadingPaths"/);
+});
+
 test("retains configurable inactive-line hash concealment behavior", () => {
   assert.match(styles, /body\.extended-headings-hide-markers/);
   assert.match(styles, /\.cm-line:not\(\.cm-active\)/);

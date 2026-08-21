@@ -12,6 +12,7 @@ export interface ExtendedHeadingsSettings {
   hideMarkersInLivePreview: boolean;
   coreIntegration: boolean;
   readingModeFolding: boolean;
+  copyFullyNestedHeadingPaths: boolean;
   lowerHeadingLimit: number;
   overrideTabBehavior: boolean;
   showHeadingMarkers: boolean;
@@ -32,6 +33,7 @@ export const DEFAULT_SETTINGS: ExtendedHeadingsSettings = {
   hideMarkersInLivePreview: true,
   coreIntegration: true,
   readingModeFolding: true,
+  copyFullyNestedHeadingPaths: true,
   lowerHeadingLimit: 1,
   overrideTabBehavior: false,
   showHeadingMarkers: true,
@@ -108,6 +110,16 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
           type: "toggle",
           key: "coreIntegration",
           defaultValue: DEFAULT_SETTINGS.coreIntegration,
+        },
+      },
+      {
+        name: "Copy fully nested heading paths",
+        desc: "Include every ancestor heading when copying a heading link or embed so repeated heading titles resolve precisely. Disable this to copy only the shorter target-heading link.",
+        aliases: ["copy link", "copy embed", "ancestor headings", "duplicate headings"],
+        control: {
+          type: "toggle",
+          key: "copyFullyNestedHeadingPaths",
+          defaultValue: DEFAULT_SETTINGS.copyFullyNestedHeadingPaths,
         },
       },
       {
@@ -330,6 +342,7 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
       case "hideMarkersInLivePreview":
       case "coreIntegration":
       case "readingModeFolding":
+      case "copyFullyNestedHeadingPaths":
       case "overrideTabBehavior":
       case "showHeadingMarkers":
       case "showMarkersBeforeLineNumbers":

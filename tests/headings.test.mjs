@@ -12,7 +12,7 @@ const compiled = ts.transpileModule(source, {
 const module = { exports: {} };
 const require = createRequire(import.meta.url);
 vm.runInNewContext(compiled, { module, exports: module.exports, require });
-const { parseHeadingLine, scanHeadings } = module.exports;
+const { headingPathAtLine, parseHeadingLine, scanHeadings } = module.exports;
 
 test("recognizes H7 through configured maximum", () => {
   const headings = scanHeadings("####### Seven\n######## Eight\n######### Nine\n########## Ten", 7, 9);
@@ -47,4 +47,30 @@ test("tracks offsets with CRLF", () => {
   const headings = scanHeadings("Text\r\n####### Heading\r\nBody", 7, 9);
   assert.equal(headings[0].from, 6);
   assert.equal(headings[0].to, 21);
+});
+
+test("builds the complete ancestor path for repeated heading names", () => {
+  const text = [
+    "# Standing Workstation Ergonomics",
+    "## Ergonomic Typical Use Guidelines",
+    "## Standing Desk Ergonomics",
+    "### Ergonomic Typical Use Guidelines",
+  ].join("\n");
+
+  assert.deepEqual(
+    Array.from(headingPathAtLine(text, 1), (heading) => heading.rawBody),
+    ["Standing Workstation Ergonomics", "Ergonomic Typical Use Guidelines"],
+  );
+  assert.deepEqual(
+    Array.from(headingPathAtLine(text, 3), (heading) => heading.rawBody),
+    [
+      "Standing Workstation Ergonomics",
+      "Standing Desk Ergonomics",
+      "Ergonomic Typical Use Guidelines",
+    ],
+  );
+});
+
+test("returns no heading path for a non-heading target line", () => {
+  assert.deepEqual(Array.from(headingPathAtLine("# Parent\nBody", 1)), []);
 });

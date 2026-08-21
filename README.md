@@ -58,6 +58,7 @@ This representative Live Preview shows every extended level. H8 is active, so it
 | Hide hashes on inactive Live Preview lines | On | Conceals H7+ hashes when their line is inactive. |
 | Reading View folding | On | Shows a folding control beside extended headings in Reading View. |
 | Core Outline and heading-link bridge | On | Adds H7+ entries to Obsidian's in-memory heading cache for the core Outline, heading links, and navigation. |
+| Copy fully nested heading paths | On | Includes every ancestor heading in copied heading links and embeds; disable it to copy only the shorter target-heading link. |
 | Lower limit of heading | `1` | Sets the shallowest level that **Decrease headings** may reach; `0` permits conversion to a paragraph. |
 | Enable override Tab behavior | Off | Makes Tab and Shift+Tab shift headings when the active selection contains a heading. |
 | Show heading level markers | On | Shows Lapel-compatible H1–H12 markers in the editor gutter. |
@@ -90,8 +91,8 @@ Commands operate on every heading in the selected line range, or on the heading 
 | Insert heading one level higher | None | Inserts a heading one level above the surrounding section. |
 | Insert extended heading one level deeper | None | Inserts the next extended level beneath H6–H11. |
 | Rename this heading (H1–H12) | None | Uses Obsidian's native workflow for H1–H6 and updates matching vault links for H7–H12. |
-| Copy embed to current block or heading (H1–H12) | None | Copies a heading embed or creates/reuses a block ID and copies its embed. |
-| Copy link to current block or heading (H1–H12) | None | Copies a heading link or creates/reuses a block ID and copies its link. |
+| Copy embed to current block or heading (H1–H12) | None | Copies a fully nested heading embed by default or creates/reuses a block ID and copies its embed. |
+| Copy link to current block or heading (H1–H12) | None | Copies a fully nested heading link by default or creates/reuses a block ID and copies its link. |
 | Open extended outline | None | Opens the plugin's supported-API outline pane. |
 | Reindex headings | None | Rebuilds the experimental core-heading bridge. |
 
@@ -103,7 +104,7 @@ Extended Headings deliberately assigns no default hotkeys, preventing conflicts 
 - **Copy embed to current block or heading (H1–H12):** `F6`.
 - **Copy link to current block or heading (H1–H12):** `F7`.
 
-The editor context menu exposes the same reference behavior. Right-clicking an H1–H12 line shows **Copy link to heading** followed by **Copy heading embed**; right-clicking an ordinary block shows **Copy link to block** followed by **Copy block embed**.
+The editor context menu exposes the same reference behavior. Right-clicking an H1–H12 line shows **Copy link to heading** followed by **Copy heading embed**; right-clicking an ordinary block shows **Copy link to block** followed by **Copy block embed**. Disable **Copy fully nested heading paths** to make both heading commands and both heading context-menu actions copy only the target heading title instead of its complete ancestor path.
 
 ## Replacing Heading Shifter, Lapel, and Copy Block Link
 

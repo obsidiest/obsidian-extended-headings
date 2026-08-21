@@ -96,3 +96,24 @@ export function scanHeadings(
 
   return headings;
 }
+
+export function headingPathAtLine(
+  text: string,
+  targetLine: number,
+  maximumLevel = 12,
+): ParsedHeading[] {
+  const path: ParsedHeading[] = [];
+
+  for (const heading of scanHeadings(text, 1, maximumLevel)) {
+    if (heading.line > targetLine) break;
+
+    while (path.length > 0 && path[path.length - 1].level >= heading.level) {
+      path.pop();
+    }
+    path.push(heading);
+
+    if (heading.line === targetLine) return path;
+  }
+
+  return [];
+}

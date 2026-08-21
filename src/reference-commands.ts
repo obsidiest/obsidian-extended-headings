@@ -10,7 +10,7 @@ import {
   stripHeading,
   type TFile,
 } from "obsidian";
-import { parseHeadingLine } from "./headings";
+import { headingPathAtLine, parseHeadingLine } from "./headings";
 import { normalizeHeadingAnchor } from "./reference-utils";
 
 type BlockTarget = SectionCache | ListItemCache;
@@ -42,6 +42,7 @@ export class ReferenceCommandService {
   constructor(
     private readonly app: App,
     private readonly maximumLevel: () => number,
+    private readonly copyFullyNestedHeadingPaths: () => boolean,
   ) {}
 
   targetKind(editor: Editor, view: MarkdownFileInfo): ReferenceTargetKind | null {
@@ -65,7 +66,24 @@ export class ReferenceCommandService {
         new Notice("This heading has no linkable text");
         return;
       }
-      await this.copyLink(file, `#${anchor}`, embed);
+
+      const hierarchy = this.copyFullyNestedHeadingPaths()
+        ? headingPathAtLine(
+          editor.getValue(),
+          heading.line,
+          this.maximumLevel(),
+        )
+        : [];
+      const ancestors = hierarchy.length > 0
+        && hierarchy[hierarchy.length - 1].line === heading.line
+        ? hierarchy.slice(0, -1)
+        : [];
+      const anchors = ancestors
+        .map((ancestor) => normalizeHeadingAnchor(stripHeading(ancestor.rawBody)))
+        .filter((ancestorAnchor) => ancestorAnchor.length > 0);
+      anchors.push(anchor);
+
+      await this.copyLink(file, `#${anchors.join("#")}`, embed);
       return;
     }
 

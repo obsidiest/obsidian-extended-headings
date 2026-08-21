@@ -69,6 +69,7 @@ export default class ExtendedHeadingsPlugin extends Plugin {
     const references = new ReferenceCommandService(
       this.app,
       () => this.settings.maximumLevel,
+      () => this.settings.copyFullyNestedHeadingPaths,
     );
     this.addCommand({
       id: "rename-this-heading",

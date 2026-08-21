@@ -57,6 +57,13 @@ test("adds heading- and block-specific editor context-menu items", () => {
   assert.match(references, /return this\.blockAtCursor\(editor, view\.file\) \? "block" : null/);
 });
 
+test("copies heading references with their complete ancestor path", () => {
+  assert.match(references, /headingPathAtLine\(/);
+  assert.match(references, /this\.copyFullyNestedHeadingPaths\(\)/);
+  assert.match(references, /hierarchy\.slice\(0, -1\)/);
+  assert.match(references, /`#\$\{anchors\.join\("#"\)\}`/);
+});
+
 test("preserves true H7-H12 levels in Obsidian's default Outline bridge", () => {
   assert.match(coreIntegration, /level:\s*heading\.level/);
   assert.doesNotMatch(coreIntegration, /toCoreHeadingCacheLevel/);
