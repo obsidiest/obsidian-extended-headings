@@ -22,7 +22,7 @@ test("keeps release versions and compatibility metadata synchronized", () => {
   const packageJson = JSON.parse(read("package.json"));
   const versions = JSON.parse(read("versions.json"));
 
-  assert.equal(manifest.version, "0.4.11");
+  assert.equal(manifest.version, "0.4.12");
   assert.equal(packageJson.version, manifest.version);
   assert.equal(versions[manifest.version], manifest.minAppVersion);
 });
@@ -36,7 +36,7 @@ test("documents compatibility, disclosures, attribution, and licensing", () => {
   assert.match(readme, /GPT-5\.6 Sol \(Extra High\), OpenAI/);
   assert.match(readme, /GPT-5\.6 Sol \(Max\), OpenAI/);
   assert.match(readme, /\[MIT\]\(LICENSE\)/);
-  assert.match(changelog, /## 0\.4\.11/);
+  assert.match(changelog, /## 0\.4\.12/);
 });
 
 test("builds production output for GitHub release assets", () => {
