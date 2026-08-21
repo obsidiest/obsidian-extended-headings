@@ -37,7 +37,7 @@ Extended Headings declares mobile compatibility because its runtime uses Obsidia
 - Forced heading conversion, contextual insertion, and H1–H12 **Set as heading** commands.
 - A configurable lower heading limit and optional Tab/Shift+Tab override.
 - Formatting-cleanup and child-list behaviors inspired by Heading Shifter.
-- Lapel-compatible `H1`–`H12` markers in the editor gutter.
+- `H1`–`H12` markers in the editor gutter.
 - H1–H12-aware rename, copy-link, and copy-embed commands.
 - Heading- or block-specific copy actions in the editor context menu.
 - Minimal-style typography controls for every extended level from H7 through H12.
@@ -108,7 +108,7 @@ The editor context menu exposes the same reference behavior. Right-clicking an H
 
 ## Replacing Heading Shifter, Lapel, and Copy Block Link
 
-Extended Headings can replace the relevant Heading Shifter, Lapel, and Copy Block Link features used by this workflow:
+Extended Headings can (and probably should, when this plugin is used) replace the relevant Heading Shifter, Lapel, and Copy Block Link features used by this workflow:
 
 1. Install and enable Extended Headings.
 2. Confirm or assign the desired command hotkeys under **Settings → Hotkeys**.
