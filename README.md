@@ -90,8 +90,8 @@ Commands operate on every heading in the selected line range, or on the heading 
 | Insert heading one level higher | None | Inserts a heading one level above the surrounding section. |
 | Insert extended heading one level deeper | None | Inserts the next extended level beneath H6–H11. |
 | Rename this heading (H1–H12) | None | Uses Obsidian's native workflow for H1–H6 and updates matching vault links for H7–H12. |
-| Copy embed to current block or heading (H1–H12) | None | Copies a heading embed or creates/reuses a block ID and copies its embed. |
-| Copy link to current block or heading (H1–H12) | None | Copies a heading link or creates/reuses a block ID and copies its link. |
+| Copy embed to current block or heading (H1–H12) | None | Copies a fully nested heading embed or creates/reuses a block ID and copies its embed. |
+| Copy link to current block or heading (H1–H12) | None | Copies a fully nested heading link or creates/reuses a block ID and copies its link. |
 | Open extended outline | None | Opens the plugin's supported-API outline pane. |
 | Reindex headings | None | Rebuilds the experimental core-heading bridge. |
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Changed copied heading links and embeds to include the complete ancestor-heading path, allowing repeated heading names in separate sections to resolve to the heading at the cursor.
+
 ## 0.4.11
 
 - Made H7–H12 ATX hash markers inherit their heading's configured font weight, matching the native H1–H6 relationship.
