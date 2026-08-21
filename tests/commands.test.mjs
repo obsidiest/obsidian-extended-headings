@@ -59,6 +59,7 @@ test("adds heading- and block-specific editor context-menu items", () => {
 
 test("copies heading references with their complete ancestor path", () => {
   assert.match(references, /headingPathAtLine\(/);
+  assert.match(references, /this\.copyFullyNestedHeadingPaths\(\)/);
   assert.match(references, /hierarchy\.slice\(0, -1\)/);
   assert.match(references, /`#\$\{anchors\.join\("#"\)\}`/);
 });

@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Changed copied heading links and embeds to include the complete ancestor-heading path, allowing repeated heading names in separate sections to resolve to the heading at the cursor.
+- Added the default-on **Copy fully nested heading paths** setting so users can restore the previous shorter, target-heading-only references for both commands and context-menu actions.
 
 ## 0.4.11
 

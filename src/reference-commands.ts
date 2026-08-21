@@ -42,6 +42,7 @@ export class ReferenceCommandService {
   constructor(
     private readonly app: App,
     private readonly maximumLevel: () => number,
+    private readonly copyFullyNestedHeadingPaths: () => boolean,
   ) {}
 
   targetKind(editor: Editor, view: MarkdownFileInfo): ReferenceTargetKind | null {
@@ -66,11 +67,13 @@ export class ReferenceCommandService {
         return;
       }
 
-      const hierarchy = headingPathAtLine(
-        editor.getValue(),
-        heading.line,
-        this.maximumLevel(),
-      );
+      const hierarchy = this.copyFullyNestedHeadingPaths()
+        ? headingPathAtLine(
+          editor.getValue(),
+          heading.line,
+          this.maximumLevel(),
+        )
+        : [];
       const ancestors = hierarchy.length > 0
         && hierarchy[hierarchy.length - 1].line === heading.line
         ? hierarchy.slice(0, -1)

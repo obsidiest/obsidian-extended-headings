@@ -63,7 +63,7 @@ class MockEditor {
   getValue() { return this.text; }
 }
 
-test("copies distinct fully nested links for repeated heading names", async () => {
+test("copies distinct fully nested references and supports the shorter legacy behavior", async () => {
   clipboardWrites.length = 0;
   generatedSubpaths.length = 0;
   const text = [
@@ -81,17 +81,24 @@ test("copies distinct fully nested links for repeated heading names", async () =
       },
     },
   };
-  const service = new ReferenceCommandService(app, () => 12);
+  const nestedService = new ReferenceCommandService(app, () => 12, () => true);
+  const truncatedService = new ReferenceCommandService(app, () => 12, () => false);
 
-  await service.copyCurrent(new MockEditor(text, 1), { file }, false);
-  await service.copyCurrent(new MockEditor(text, 3), { file }, true);
+  await nestedService.copyCurrent(new MockEditor(text, 1), { file }, false);
+  await nestedService.copyCurrent(new MockEditor(text, 3), { file }, true);
+  await truncatedService.copyCurrent(new MockEditor(text, 3), { file }, false);
+  await truncatedService.copyCurrent(new MockEditor(text, 3), { file }, true);
 
   assert.deepEqual(generatedSubpaths, [
     "#Standing Workstation Ergonomics#Ergonomic Typical Use Guidelines",
     "#Standing Workstation Ergonomics#Standing Desk Ergonomics#Ergonomic Typical Use Guidelines",
+    "#Ergonomic Typical Use Guidelines",
+    "#Ergonomic Typical Use Guidelines",
   ]);
   assert.deepEqual(clipboardWrites, [
     "[[Ergonomics#Standing Workstation Ergonomics#Ergonomic Typical Use Guidelines]]",
     "![[Ergonomics#Standing Workstation Ergonomics#Standing Desk Ergonomics#Ergonomic Typical Use Guidelines]]",
+    "[[Ergonomics#Ergonomic Typical Use Guidelines]]",
+    "![[Ergonomics#Ergonomic Typical Use Guidelines]]",
   ]);
 });
