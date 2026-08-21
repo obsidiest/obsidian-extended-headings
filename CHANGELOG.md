@@ -1,9 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.4.12
 
 - Changed copied heading links and embeds to include the complete ancestor-heading path, allowing repeated heading names in separate sections to resolve to the heading at the cursor.
 - Added the default-on **Copy fully nested heading paths** setting so users can restore the previous shorter, target-heading-only references for both commands and context-menu actions.
+- Retained Obsidian 1.13.7 as the latest audited compatibility target.
 
 ## 0.4.11
 

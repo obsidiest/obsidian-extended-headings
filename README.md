@@ -19,7 +19,7 @@ The default maximum is H12. It can be lowered to H7 under **Settings → Communi
 
 The compatibility target records the newest Obsidian base-program version audited and tested when this release was prepared. Version 0.4.9 deliberately raises the minimum from 1.7.2 to 1.13.0 so the plugin can use Obsidian's searchable declarative settings API without retaining a second legacy settings renderer. Earlier releases remain mapped to their historical minimum versions in `versions.json`.
 
-Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 0.4.11 has not been device-tested on Obsidian Mobile.
+Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 0.4.12 has not been device-tested on Obsidian Mobile.
 
 ## Features
 
@@ -204,6 +204,7 @@ I had hoped someone capable and sufficiently ambitious might create a plugin lik
 - Version 0.4.9 Community-review remediation, declarative-settings migration, validation, documentation, and release packaging generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 - Version 0.4.10 marker-size correction, typography-default update, regression coverage, documentation, and release packaging generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 - Version 0.4.11 complete marker-typography correction, README visual replacement, regression coverage, documentation, and release packaging generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
+- Version 0.4.12 nested heading-path references, compatibility toggle, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 
 Incorporates features inspired by the following Obsidian community plugins:
 
