@@ -73,7 +73,7 @@ settings:
   -
     id: extended-hash-marker-size
     title: Hash marker font size
-    description: Relative to the corresponding H7–H12 heading size; 1 matches the heading
+    description: Relative to the corresponding H1–H12 heading size; 1 matches the heading
     type: variable-number-slider
     default: 1
     min: 0.5
@@ -83,7 +83,7 @@ settings:
   -
     id: extended-hash-marker-weight
     title: Hash marker font weight
-    description: Inherit matches the corresponding H7–H12 heading weight
+    description: Inherit matches the corresponding H1–H12 heading weight
     type: variable-select
     allowEmpty: false
     default: inherit
@@ -628,6 +628,21 @@ body {
   font-weight: var(--extended-hash-marker-weight);
 }
 
+/* Native H1-H6 hashes receive the same global marker controls as H7-H12. */
+.markdown-source-view.mod-cm6
+  :is(
+    .HyperMD-header-1,
+    .HyperMD-header-2,
+    .HyperMD-header-3,
+    .HyperMD-header-4,
+    .HyperMD-header-5,
+    .HyperMD-header-6
+  )
+  .cm-formatting-header {
+  font-size: var(--extended-hash-marker-size);
+  font-weight: var(--extended-hash-marker-weight);
+}
+
 /* Inline MarkdownRenderer fallback for heading-subpath links on H7+ lines. */
 .extended-heading-link-widget,
 .extended-heading-link-widget > p {
@@ -675,20 +690,6 @@ body:not(.extended-headings-markers-before) .cm-extended-heading-gutter { order:
 }
 
 .cm-heading-marker-spacer { visibility: hidden; }
-.cm-heading-marker[data-level="1"] { --heading-marker: "H1"; }
-.cm-heading-marker[data-level="2"] { --heading-marker: "H2"; }
-.cm-heading-marker[data-level="3"] { --heading-marker: "H3"; }
-.cm-heading-marker[data-level="4"] { --heading-marker: "H4"; }
-.cm-heading-marker[data-level="5"] { --heading-marker: "H5"; }
-.cm-heading-marker[data-level="6"] { --heading-marker: "H6"; }
-.cm-heading-marker[data-level="7"] { --heading-marker: "H7"; }
-.cm-heading-marker[data-level="8"] { --heading-marker: "H8"; }
-.cm-heading-marker[data-level="9"] { --heading-marker: "H9"; }
-.cm-heading-marker[data-level="10"] { --heading-marker: "H10"; }
-.cm-heading-marker[data-level="11"] { --heading-marker: "H11"; }
-.cm-heading-marker[data-level="12"] { --heading-marker: "H12"; }
-.cm-heading-marker::before { content: var(--heading-marker); }
-
 .extended-heading-outline-svg {
   align-items: center;
   display: inline-flex;
@@ -696,10 +697,35 @@ body:not(.extended-headings-markers-before) .cm-extended-heading-gutter { order:
   vertical-align: -0.125em;
 }
 
+.extended-headings-style-settings-number-input {
+  box-sizing: border-box;
+  width: 5.25rem;
+  min-width: 5.25rem;
+  height: var(--input-height);
+  margin-inline-start: var(--size-2-2, 0.25rem);
+  padding-inline: var(--size-2-2, 0.25rem);
+  border: var(--input-border-width, 1px) solid var(--background-modifier-border);
+  border-radius: var(--input-radius, var(--radius-s));
+  background: var(--background-modifier-form-field);
+  color: var(--text-normal);
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+.extended-headings-style-settings-number-input:focus {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+  outline: none;
+}
+
 .extended-heading-outline-svg > svg {
   flex: 0 0 auto;
   height: 1em;
   width: 1em;
+}
+
+.extended-heading-outline-svg-parenthesized {
+  margin-inline-start: 0;
 }
 
 .extended-heading-reading {

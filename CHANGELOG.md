@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.14
+
+- Fixed H10–H12 editor-gutter markers being clipped to `H1` by rendering their complete level labels as measured DOM text.
+- Extended the global hash marker size and weight controls to native H1–H6 headings, so all four global marker typography controls now apply across H1–H12.
+- Fixed default Outline rendering for inline SVGs enclosed in trailing parentheses and preserved each SVG's parenthesized placement.
+- Added synchronized precise number inputs for every numerical Style Settings control: all fourteen sliders and both inherited global weight selectors.
+- Preserved transient incomplete, out-of-range, and off-step typing until editing ends, matching the corrected Quick Switcher Advanced 0.5.2 interaction.
+- Retained Obsidian 1.13.7 as the latest audited compatibility target.
+
 ## 0.4.13
 
 - Added global Style Settings controls for heading level marker size and weight and H7–H12 hash marker size and weight, while preserving the current inherited appearance by default.

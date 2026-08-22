@@ -3,6 +3,7 @@ import test from "node:test";
 import { readFileSync } from "node:fs";
 
 const styles = readFileSync(new URL("../styles.css", import.meta.url), "utf8");
+const extension = readFileSync(new URL("../src/editor-extension.ts", import.meta.url), "utf8");
 
 test("exposes complete Style Settings controls for H7 through H12", () => {
   for (let level = 7; level <= 12; level += 1) {
@@ -60,10 +61,9 @@ test("applies each level's typography variables and divider class", () => {
 
 test("defines Lapel-compatible gutter markers through H12", () => {
   assert.match(styles, /\.cm-extended-heading-gutter\.cm-lapel/);
-  assert.match(styles, /\.cm-heading-marker::before/);
-  for (let level = 1; level <= 12; level += 1) {
-    assert.match(styles, new RegExp(`\\.cm-heading-marker\\[data-level="${level}"\\]`));
-  }
+  assert.match(extension, /marker\.setText\(`H\$\{this\.level\}`\);/);
+  assert.doesNotMatch(styles, /\.cm-heading-marker::before/);
+  assert.match(extension, /marker\.dataset\.level = String\(this\.level\);/);
 });
 
 test("supports marker placement and Source Mode visibility settings", () => {
@@ -83,6 +83,15 @@ test("keeps H7+ ATX markers aligned with their heading typography", () => {
   assert.match(styles, /--extended-hash-marker-weight:\s*inherit;/);
   assert.doesNotMatch(markerRule[1], /font-size:\s*0\.8em;/);
   assert.doesNotMatch(markerRule[1], /font-weight:\s*400;/);
+});
+
+test("applies global hash typography controls to native H1-H6 markers", () => {
+  const nativeMarkerRule = styles.match(
+    /:is\(\s*\.HyperMD-header-1,[\s\S]*?\.HyperMD-header-6\s*\)\s+\.cm-formatting-header\s*\{([^}]*)\}/s,
+  );
+  assert.ok(nativeMarkerRule);
+  assert.match(nativeMarkerRule[1], /font-size:\s*var\(--extended-hash-marker-size\);/);
+  assert.match(nativeMarkerRule[1], /font-weight:\s*var\(--extended-hash-marker-weight\);/);
 });
 
 test("applies global typography controls to H1-H12 gutter markers", () => {

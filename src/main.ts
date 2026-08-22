@@ -12,6 +12,7 @@ import { EXTENDED_OUTLINE_VIEW, ExtendedOutlineView } from "./outline-view";
 import { ReferenceCommandService } from "./reference-commands";
 import { HeadingRenameService } from "./rename-heading";
 import { renderExtendedHeadings, toggleReadingFold } from "./reading";
+import { StyleSettingsPrecisionControls } from "./style-settings-precision";
 import {
   DEFAULT_SETTINGS,
   ExtendedHeadingsSettingTab,
@@ -22,6 +23,7 @@ export default class ExtendedHeadingsPlugin extends Plugin {
   settings: ExtendedHeadingsSettings = DEFAULT_SETTINGS;
   private coreIntegration: CoreIntegration | null = null;
   private coreOutlineSvgRenderer: CoreOutlineSvgRenderer | null = null;
+  private styleSettingsPrecisionControls: StyleSettingsPrecisionControls | null = null;
 
   async onload(): Promise<void> {
     await this.loadSettings();
@@ -30,6 +32,27 @@ export default class ExtendedHeadingsPlugin extends Plugin {
     // Notify it after this stylesheet has been registered so controls appear
     // immediately when either plugin is enabled or updated.
     this.app.workspace.trigger("parse-style-settings");
+    this.styleSettingsPrecisionControls = new StyleSettingsPrecisionControls();
+    this.styleSettingsPrecisionControls.start();
+    this.app.workspace.iterateAllLeaves((leaf) => {
+      this.styleSettingsPrecisionControls?.observeDocument(
+        leaf.view.containerEl.ownerDocument,
+      );
+    });
+    this.registerEvent(
+      this.app.workspace.on("window-open", (_workspaceWindow, openedWindow) => {
+        this.styleSettingsPrecisionControls?.observeDocument(openedWindow.document);
+      }),
+    );
+    this.registerEvent(
+      this.app.workspace.on("layout-change", () => {
+        this.app.workspace.iterateAllLeaves((leaf) => {
+          this.styleSettingsPrecisionControls?.observeDocument(
+            leaf.view.containerEl.ownerDocument,
+          );
+        });
+      }),
+    );
 
     this.registerEditorExtension(createEditorExtension(() => this.settings));
     this.registerMarkdownPostProcessor((element) =>
@@ -237,6 +260,7 @@ export default class ExtendedHeadingsPlugin extends Plugin {
   }
 
   onunload(): void {
+    this.styleSettingsPrecisionControls?.stop();
     this.coreOutlineSvgRenderer?.destroy();
     this.coreIntegration?.stop();
     void this.coreIntegration?.removeAll(false);
