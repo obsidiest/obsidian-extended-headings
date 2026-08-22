@@ -19,7 +19,7 @@ The default maximum is H12. It can be lowered to H7 under **Settings → Communi
 
 The compatibility target records the newest Obsidian base-program version audited and tested when this release was prepared. Version 0.4.9 deliberately raises the minimum from 1.7.2 to 1.13.0 so the plugin can use Obsidian's searchable declarative settings API without retaining a second legacy settings renderer. Earlier releases remain mapped to their historical minimum versions in `versions.json`.
 
-Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 0.4.14 has not been device-tested on Obsidian Mobile.
+Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 0.4.15 has not been device-tested on Obsidian Mobile.
 
 ## Features
 
@@ -43,7 +43,7 @@ Extended Headings declares mobile compatibility because its runtime uses Obsidia
 - Heading- or block-specific copy actions in the editor context menu.
 - Minimal-style typography controls for every extended level from H7 through H12.
 - Global Style Settings controls for heading level marker size and weight and for hash marker size and weight across all H1–H12 heading levels.
-- Synchronized precise number inputs for every numerical Style Settings control.
+- Synchronized precise number inputs that accept arbitrary in-range values for every numerical Style Settings control.
 - H7–H12 ATX hash markers that track the size, weight, style, and variant selected for their heading level.
 - Searchable plugin settings through Obsidian 1.13's declarative settings API.
 
@@ -77,7 +77,7 @@ This representative Live Preview shows every extended level. H8 is active, so it
 | Children behavior | `Outdent to 0` | Controls how a contiguous child list is re-indented when its preceding line becomes a heading. |
 | Tab size | `4` | Sets the spaces per indentation level for child-list operations. |
 
-With the **Style Settings** community plugin enabled, open **Settings → Style Settings → Extended Headings**. Global controls set the heading level marker size and weight and the hash marker size and weight across all H1–H12 heading levels. Both marker-size controls default to `1em`, relative to their existing context, and both marker-weight controls default to `inherit`, so enabling the controls does not change the current appearance. Every adjustable numerical value has a synchronized precise number input beside its slider or weight selector. A blank global-weight input means **Inherit**; complete in-range values update immediately, while incomplete, out-of-range, and off-step typing remains editable and reverts to the last accepted value when editing ends. H7 through H12 each also have a collapsible section with font size, weight, individual light/dark color, variant, style, and divider controls. The default size and weight for every extended level are `0.9em` and `500`; H7 also defaults to the `normal` font variant and style. A shared H7+ color remains the fallback until an individual level color is set. Unless overridden by the global controls, ATX hashes inherit the selected font size, weight, style, and variant for their corresponding heading level.
+With the **Style Settings** community plugin enabled, open **Settings → Style Settings → Extended Headings**. Global controls set the heading level marker size and weight and the hash marker size and weight across all H1–H12 heading levels. Both marker-size controls default to `1em`, relative to their existing context, and both marker-weight controls default to `inherit`, so enabling the controls does not change the current appearance. Every adjustable numerical value has a synchronized precise number input beside its slider or weight selector. These boxes accept arbitrary in-range values, including decimals between the slider's predefined ticks. A blank global-weight input means **Inherit**. Complete in-range values update immediately; incomplete values such as `1.` and out-of-range values remain editable but revert to the last accepted value when editing ends. The editor preserves decimal typing and its caret position instead of rewriting the box during entry. H7 through H12 each also have a collapsible section with font size, weight, individual light/dark color, variant, style, and divider controls. The default size and weight for every extended level are `0.9em` and `500`; H7 also defaults to the `normal` font variant and style. A shared H7+ color remains the fallback until an individual level color is set. Unless overridden by the global controls, ATX hashes inherit the selected font size, weight, style, and variant for their corresponding heading level.
 
 ## Commands and hotkeys
 
@@ -214,6 +214,7 @@ I had hoped someone capable and sufficiently ambitious might create a plugin lik
 - Version 0.4.12 nested heading-path references, compatibility toggle, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 - Version 0.4.13 marker typography controls, core Outline SVG rendering, Community-scorecard remediation, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 - Version 0.4.14 H1–H12 marker controls, precise Style Settings inputs, heading-marker and parenthesized-Outline-SVG fixes, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
+- Version 0.4.15 intrinsic H10–H12 gutter sizing, arbitrary-value and caret-stable Style Settings inputs, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 
 Incorporates features inspired by the following Obsidian community plugins:
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.15
+
+- Fixed active and inactive H10–H12 editor-gutter markers still appearing as `H1` by replacing Lapel's two-character fixed gutter width with intrinsic sizing for the complete label.
+- Allowed arbitrary in-range numerical values in every precise Style Settings input, including values between a slider's predefined ticks.
+- Allowed arbitrary in-range values in both global marker-weight boxes while retaining the existing **Inherit** dropdown option and restoring custom persisted weights when settings are reopened.
+- Preserved incomplete decimal text such as `1.` and the caret position while typing instead of immediately rewriting the input.
+- Retained Obsidian 1.13.7 as the latest audited compatibility target.
+
 ## 0.4.14
 
 - Fixed H10–H12 editor-gutter markers being clipped to `H1` by rendering their complete level labels as measured DOM text.

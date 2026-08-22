@@ -30,13 +30,20 @@ function inputElement(initialValue = "") {
   let value = initialValue;
   const input = {
     type: "",
+    inputMode: "",
     className: "",
     min: "",
     max: "",
     step: "",
     placeholder: "",
+    selectionStart: 0,
+    selectionEnd: 0,
     ownerDocument: null,
     setAttribute() {},
+    setSelectionRange(start, end) {
+      this.selectionStart = start;
+      this.selectionEnd = end;
+    },
     addEventListener(type, listener) {
       const registered = listeners.get(type) ?? [];
       registered.push(listener);
@@ -60,8 +67,18 @@ function inputElement(initialValue = "") {
           value = input.max;
           return;
         }
+        if (input.step !== "" && input.step !== "any") {
+          const minimum = input.min === "" ? 0 : Number(input.min);
+          const step = Number(input.step);
+          if (Number.isFinite(step) && step > 0) {
+            value = String(minimum + Math.round((nextNumber - minimum) / step) * step);
+            return;
+          }
+        }
       }
       value = nextValue;
+      input.selectionStart = 0;
+      input.selectionEnd = 0;
     },
   });
   Object.defineProperty(input, "valueAsNumber", {
@@ -72,10 +89,20 @@ function inputElement(initialValue = "") {
 
 function selectElement(initialValue, values) {
   const listeners = new Map();
-  return {
+  const select = {
     value: initialValue,
-    options: values.map((value) => ({ value })),
+    options: values.map((value) => ({ value, dataset: {} })),
     ownerDocument: null,
+    createEl(tag, options) {
+      assert.equal(tag, "option");
+      const option = {
+        value: options?.attr?.value ?? "",
+        textContent: options?.text ?? "",
+        dataset: {},
+      };
+      this.options.push(option);
+      return option;
+    },
     addEventListener(type, listener) {
       const registered = listeners.get(type) ?? [];
       registered.push(listener);
@@ -86,6 +113,7 @@ function selectElement(initialValue, values) {
       return true;
     },
   };
+  return select;
 }
 
 function sliderRow({ id, slider, numberInput }) {
@@ -136,10 +164,18 @@ function sliderRow({ id, slider, numberInput }) {
   };
 }
 
-function selectRow({ id, select, numberInput }) {
+function selectRow({ id, select, numberInput, computedValue = "inherit" }) {
   const ownerDocument = {
+    body: {},
     defaultView: {
       Event: TestEvent,
+      getComputedStyle() {
+        return {
+          getPropertyValue(property) {
+            return property === `--${id}` ? computedValue : "";
+          },
+        };
+      },
       setTimeout(callback) {
         callback();
         return 1;
@@ -197,42 +233,57 @@ test("adds precise inputs to every Extended Headings numerical slider", () => {
   const row = sliderRow({ id: "extended-h7-size", slider, numberInput });
 
   assert.equal(precision.enhanceStyleSettingsNumberControls(row), 1);
-  assert.equal(numberInput.type, "number");
+  assert.equal(numberInput.type, "text");
+  assert.equal(numberInput.inputMode, "decimal");
   assert.equal(numberInput.value, "0.9");
   assert.equal(numberInput.min, "0.6");
   assert.equal(numberInput.max, "1.4");
-  assert.equal(numberInput.step, "0.05");
+  assert.equal(numberInput.step, "any");
 });
 
-test("preserves incomplete slider typing and commits only a complete valid value", () => {
+test("preserves decimal typing, caret position, and arbitrary in-range slider values", () => {
   assert.equal(typeof precision.enhanceStyleSettingsNumberControls, "function");
-  const slider = inputElement("500");
+  const slider = inputElement("0.9");
   slider.type = "range";
-  slider.min = "100";
-  slider.max = "900";
-  slider.step = "50";
+  slider.min = "0.6";
+  slider.max = "1.4";
+  slider.step = "0.05";
   const numberInput = inputElement();
-  const row = sliderRow({ id: "extended-h7-weight", slider, numberInput });
+  const row = sliderRow({ id: "extended-h7-size", slider, numberInput });
   precision.enhanceStyleSettingsNumberControls(row);
 
-  numberInput.value = "5";
+  numberInput.value = "1";
+  numberInput.setSelectionRange(1, 1);
   numberInput.dispatchEvent(new TestEvent("input"));
-  assert.equal(numberInput.value, "5");
-  assert.equal(slider.value, "500");
+  assert.equal(slider.value, "1");
+  assert.equal(numberInput.value, "1");
+  assert.equal(numberInput.selectionStart, 1);
 
-  numberInput.value = "550";
+  numberInput.value = "1.";
+  numberInput.setSelectionRange(2, 2);
   numberInput.dispatchEvent(new TestEvent("input"));
-  assert.equal(slider.value, "550");
+  assert.equal(slider.value, "1");
+  assert.equal(numberInput.value, "1.");
+  assert.equal(numberInput.selectionStart, 2);
 
-  numberInput.value = "575";
+  numberInput.value = "1.03";
+  numberInput.setSelectionRange(4, 4);
   numberInput.dispatchEvent(new TestEvent("input"));
-  assert.equal(numberInput.value, "575");
-  assert.equal(slider.value, "550");
+  assert.equal(slider.value, "1.03");
+  assert.equal(slider.step, "0.05");
+  assert.equal(numberInput.value, "1.03");
+  assert.equal(numberInput.selectionStart, 4);
+
+  numberInput.value = "1.5";
+  numberInput.setSelectionRange(3, 3);
+  numberInput.dispatchEvent(new TestEvent("input"));
+  assert.equal(numberInput.value, "1.5");
+  assert.equal(slider.value, "1.03");
   numberInput.dispatchEvent(new TestEvent("change"));
-  assert.equal(numberInput.value, "550");
+  assert.equal(numberInput.value, "1.03");
 });
 
-test("adds precise inputs to the two inherited global weight selects", () => {
+test("accepts arbitrary weights while retaining the inherited global selectors", () => {
   assert.equal(typeof precision.enhanceStyleSettingsNumberControls, "function");
   const select = selectElement("inherit", ["inherit", "100", "200", "300", "400", "500", "600", "700", "800", "900"]);
   const numberInput = inputElement();
@@ -252,14 +303,46 @@ test("adds precise inputs to the two inherited global weight selects", () => {
   assert.equal(numberInput.value, "5");
 
   numberInput.value = "500";
+  numberInput.setSelectionRange(3, 3);
   numberInput.dispatchEvent(new TestEvent("input"));
   assert.equal(select.value, "500");
+  assert.equal(numberInput.selectionStart, 3);
 
-  numberInput.value = "550";
+  numberInput.value = "500.";
+  numberInput.setSelectionRange(4, 4);
   numberInput.dispatchEvent(new TestEvent("input"));
   assert.equal(select.value, "500");
+  assert.equal(numberInput.value, "500.");
+  assert.equal(numberInput.selectionStart, 4);
+
+  numberInput.value = "500.5";
+  numberInput.setSelectionRange(5, 5);
+  numberInput.dispatchEvent(new TestEvent("input"));
+  assert.equal(select.value, "500.5");
+  assert.ok(select.options.some((option) => option.value === "500.5"));
+  assert.equal(numberInput.selectionStart, 5);
+
+  numberInput.value = "950";
+  numberInput.dispatchEvent(new TestEvent("input"));
+  assert.equal(select.value, "500.5");
   numberInput.dispatchEvent(new TestEvent("change"));
-  assert.equal(numberInput.value, "500");
+  assert.equal(numberInput.value, "500.5");
+});
+
+test("restores an arbitrary persisted weight from the generated CSS variable", () => {
+  const select = selectElement("", ["inherit", "100", "200", "300", "400", "500", "600", "700", "800", "900"]);
+  const numberInput = inputElement();
+  const row = selectRow({
+    id: "extended-hash-marker-weight",
+    select,
+    numberInput,
+    computedValue: "437.5",
+  });
+
+  assert.equal(precision.enhanceStyleSettingsNumberControls(row), 1);
+  assert.equal(select.value, "437.5");
+  assert.equal(numberInput.value, "437.5");
+  assert.ok(select.options.some((option) => option.value === "437.5"));
 });
 
 test("covers all fourteen sliders plus both inherited global weight controls", () => {
