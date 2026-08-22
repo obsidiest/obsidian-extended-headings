@@ -76,6 +76,27 @@ test("extracts multiple inline SVGs in source order and collapses label whitespa
   assert.equal(outlineSvg.extractInlineSvgFragments("No inline image"), null);
 });
 
+test("matches and preserves an SVG enclosed by trailing parentheses", () => {
+  assert.equal(typeof outlineSvg.extractInlineSvgFragments, "function");
+  const parsed = outlineSvg.extractInlineSvgFragments(
+    'book-open-text (<svg viewBox="0 0 24 24"><path d="M12 5v16"/></svg>)',
+  );
+
+  assert.equal(parsed?.label, "book-open-text ()");
+  assert.equal(parsed?.placement, "inside-trailing-parentheses");
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(outlineSvg.matchOutlineSvgSpecs(["book-open-text ()"], [parsed]))),
+    [
+      {
+        itemIndex: 0,
+        placement: "inside-trailing-parentheses",
+        svgMarkup: ['<svg viewBox="0 0 24 24"><path d="M12 5v16"/></svg>'],
+      },
+    ],
+  );
+  assert.match(source, /insertBeforeTrailingParenthesis/);
+});
+
 test("matches duplicate Outline labels only when their SVG assignment is unambiguous", () => {
   assert.equal(typeof outlineSvg.matchOutlineSvgSpecs, "function");
   const exact = outlineSvg.matchOutlineSvgSpecs(

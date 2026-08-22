@@ -88,6 +88,7 @@ class HeadingLevelMarker extends GutterMarker {
     const marker = createSpan({
       cls: `cm-heading-marker${this.spacer ? " cm-heading-marker-spacer" : ""}`,
     });
+    marker.setText(`H${this.level}`);
     marker.dataset.level = String(this.level);
     if (!this.spacer) marker.setAttribute("aria-label", `Heading level ${this.level}`);
     return marker;
