@@ -66,6 +66,20 @@ test("defines Lapel-compatible gutter markers through H12", () => {
   assert.match(extension, /marker\.dataset\.level = String\(this\.level\);/);
 });
 
+test("reserves enough intrinsic gutter width for complete H10-H12 markers", () => {
+  const gutterRule = styles.match(
+    /\.cm-extended-heading-gutter\.cm-lapel\s*\{([^}]*)\}/s,
+  );
+  assert.ok(gutterRule);
+  assert.match(gutterRule[1], /width:\s*max-content;/);
+  assert.doesNotMatch(gutterRule[1], /(?:^|;)\s*width:\s*4ch;/);
+
+  const markerRule = styles.match(/\.cm-heading-marker\s*\{([^}]*)\}/s);
+  assert.ok(markerRule);
+  assert.match(markerRule[1], /min-width:\s*3ch;/);
+  assert.match(markerRule[1], /white-space:\s*nowrap;/);
+});
+
 test("supports marker placement and Source Mode visibility settings", () => {
   assert.match(styles, /extended-headings-markers-before/);
   assert.match(styles, /extended-headings-markers-in-source/);

@@ -51,7 +51,7 @@ test("describes heading markers without Lapel compatibility wording", () => {
 });
 
 test("manifest describes the plugin's overall purpose", () => {
-  assert.equal(manifest.version, "0.4.14");
+  assert.equal(manifest.version, "0.4.15");
   assert.equal(
     manifest.description,
     "Extends ATX heading support through H12 with consistent editing, styling, folding, outlines, links, navigation, and heading-level markers.",
@@ -79,6 +79,8 @@ test("documents marker typography and default Outline SVG rendering", () => {
   assert.match(readme, /hash marker size and weight/i);
   assert.match(readme, /all H1.H12 heading levels/i);
   assert.match(readme, /precise number input/i);
+  assert.match(readme, /arbitrary in-range values/i);
+  assert.match(readme, /preserv(?:e|es).*decimal.*caret/i);
   assert.match(readme, /Render inline SVGs in default Outline/);
   assert.match(readme, /inside trailing parentheses/i);
   assert.match(readme, /sanitizeHTMLToDom/);

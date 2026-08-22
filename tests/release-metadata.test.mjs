@@ -22,7 +22,7 @@ test("keeps release versions and compatibility metadata synchronized", () => {
   const packageJson = JSON.parse(read("package.json"));
   const versions = JSON.parse(read("versions.json"));
 
-  assert.equal(manifest.version, "0.4.14");
+  assert.equal(manifest.version, "0.4.15");
   assert.equal(packageJson.version, manifest.version);
   assert.equal(versions[manifest.version], manifest.minAppVersion);
 });
@@ -35,11 +35,12 @@ test("documents compatibility, disclosures, attribution, and licensing", () => {
   assert.match(readme, /Privacy, security, and file-change disclosures/);
   assert.match(readme, /GPT-5\.6 Sol \(Extra High\), OpenAI/);
   assert.match(readme, /GPT-5\.6 Sol \(Max\), OpenAI/);
-  assert.match(readme, /Version 0\.4\.14 has not been device-tested on Obsidian Mobile/);
+  assert.match(readme, /Version 0\.4\.15 has not been device-tested on Obsidian Mobile/);
   assert.match(readme, /\[MIT\]\(LICENSE\)/);
-  assert.match(changelog, /## 0\.4\.14/);
+  assert.match(changelog, /## 0\.4\.15/);
   assert.match(changelog, /inline SVG/i);
   assert.match(changelog, /marker.*size.*weight/is);
+  assert.match(changelog, /arbitrary.*in-range.*numerical/is);
 });
 
 test("builds production output for GitHub release assets", () => {

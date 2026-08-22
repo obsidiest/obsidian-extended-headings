@@ -60,7 +60,8 @@ export function enhanceStyleSettingsNumberControls(root: ParentNode): number {
     if (!control || control.querySelector(`.${NUMBER_INPUT_CLASS}`)) continue;
 
     const slider = row.querySelector<HTMLInputElement>('input[type="range"]');
-    const select = isNumericSelectRow(row)
+    const numericSelectId = getNumericSelectId(row);
+    const select = numericSelectId
       ? row.querySelector<HTMLSelectElement>("select")
       : null;
     if (!slider && !select) continue;
@@ -68,7 +69,11 @@ export function enhanceStyleSettingsNumberControls(root: ParentNode): number {
     const ownerDocument = (slider ?? select)?.ownerDocument;
     if (!ownerDocument) continue;
     const numberInput = control.createEl("input");
-    numberInput.type = "number";
+    // Chromium sanitizes transient values such as `1.` in a number input.
+    // A decimal-keyboard text input preserves the user's text and caret while
+    // the explicit parser below still accepts only complete finite numbers.
+    numberInput.type = "text";
+    numberInput.inputMode = "decimal";
     numberInput.className = NUMBER_INPUT_CLASS;
     const settingName = row.querySelector(".setting-item-name")?.textContent?.trim();
     numberInput.setAttribute(
@@ -78,7 +83,9 @@ export function enhanceStyleSettingsNumberControls(root: ParentNode): number {
     numberInput.setAttribute("title", "Enter a precise value");
 
     if (slider) configureSliderInput(numberInput, slider, ownerDocument);
-    else if (select) configureNumericSelectInput(numberInput, select, ownerDocument);
+    else if (select && numericSelectId) {
+      configureNumericSelectInput(numberInput, select, ownerDocument, numericSelectId);
+    }
 
     const resetButton = control.querySelector<HTMLElement>(".clickable-icon");
     resetButton?.addEventListener("click", () => {
@@ -99,22 +106,34 @@ function configureSliderInput(
   numberInput.value = slider.value;
   numberInput.min = slider.min;
   numberInput.max = slider.max;
-  numberInput.step = slider.step || "any";
+  numberInput.step = "any";
+  let syncingFromNumberInput = false;
 
   const syncFromSlider = (): void => {
+    if (syncingFromNumberInput) return;
     numberInput.value = slider.value;
   };
   const syncToSlider = (eventType: "input" | "change"): boolean => {
-    const value = getValidNumberValue(numberInput, slider.min, slider.max, slider.step);
+    const value = getValidNumberValue(numberInput, slider.min, slider.max);
     if (value === null) return false;
 
-    const changed = slider.value !== value;
-    slider.value = value;
-    const EventConstructor = ownerDocument.defaultView?.Event ?? Event;
-    if (eventType === "change" && changed) {
-      slider.dispatchEvent(new EventConstructor("input", { bubbles: true }));
+    const originalStep = slider.step;
+    syncingFromNumberInput = true;
+    try {
+      // Keep the slider's ordinary pointer/keyboard ticks, but temporarily
+      // remove step quantization while its existing listener persists a typed value.
+      slider.step = "any";
+      const changed = slider.value !== value;
+      slider.value = value;
+      const EventConstructor = ownerDocument.defaultView?.Event ?? Event;
+      if (eventType === "change" && changed) {
+        slider.dispatchEvent(new EventConstructor("input", { bubbles: true }));
+      }
+      slider.dispatchEvent(new EventConstructor(eventType, { bubbles: true }));
+    } finally {
+      slider.step = originalStep;
+      syncingFromNumberInput = false;
     }
-    slider.dispatchEvent(new EventConstructor(eventType, { bubbles: true }));
     return true;
   };
 
@@ -130,6 +149,7 @@ function configureNumericSelectInput(
   numberInput: HTMLInputElement,
   select: HTMLSelectElement,
   ownerDocument: Document,
+  settingId: string,
 ): void {
   const numericOptions = Array.from(select.options)
     .map((option) => parseFiniteNumber(option.value))
@@ -137,13 +157,14 @@ function configureNumericSelectInput(
     .sort((left, right) => left - right);
   const minimum = numericOptions[0] ?? 100;
   const maximum = numericOptions[numericOptions.length - 1] ?? 900;
-  const step = numericOptions.length > 1 ? numericOptions[1] - minimum : 100;
   numberInput.min = String(minimum);
   numberInput.max = String(maximum);
-  numberInput.step = String(step);
+  numberInput.step = "any";
   numberInput.placeholder = "Inherit";
+  let syncingFromNumberInput = false;
 
   const syncFromSelect = (): void => {
+    if (syncingFromNumberInput) return;
     numberInput.value = parseFiniteNumber(select.value) === null ? "" : select.value;
   };
   const syncToSelect = (): boolean => {
@@ -151,21 +172,36 @@ function configureNumericSelectInput(
       numberInput,
       numberInput.min,
       numberInput.max,
-      numberInput.step,
     );
-    if (
-      value === null ||
-      !Array.from(select.options).some((option) => option.value === value)
-    ) return false;
+    if (value === null) return false;
 
-    select.value = value;
-    const EventConstructor = ownerDocument.defaultView?.Event ?? Event;
-    select.dispatchEvent(new EventConstructor("input", { bubbles: true }));
-    select.dispatchEvent(new EventConstructor("change", { bubbles: true }));
+    ensureNumericSelectOption(select, value);
+    syncingFromNumberInput = true;
+    try {
+      select.value = value;
+      const EventConstructor = ownerDocument.defaultView?.Event ?? Event;
+      select.dispatchEvent(new EventConstructor("input", { bubbles: true }));
+      select.dispatchEvent(new EventConstructor("change", { bubbles: true }));
+    } finally {
+      syncingFromNumberInput = false;
+    }
     return true;
   };
 
-  syncFromSelect();
+  const persistedValue = getPersistedNumericSelectValue(
+    select,
+    ownerDocument,
+    settingId,
+    numberInput.min,
+    numberInput.max,
+  );
+  if (persistedValue) {
+    ensureNumericSelectOption(select, persistedValue);
+    select.value = persistedValue;
+    numberInput.value = persistedValue;
+  } else {
+    syncFromSelect();
+  }
   select.addEventListener("input", syncFromSelect);
   select.addEventListener("change", syncFromSelect);
   numberInput.addEventListener("input", syncToSelect);
@@ -187,11 +223,11 @@ function getValidNumberValue(
   numberInput: HTMLInputElement,
   minimumValue: string,
   maximumValue: string,
-  stepValue: string,
 ): string | null {
   const rawValue = numberInput.value.trim();
-  const numericValue = numberInput.valueAsNumber;
-  if (rawValue === "" || !Number.isFinite(numericValue)) return null;
+  if (!isCompleteNumber(rawValue)) return null;
+  const numericValue = Number(rawValue);
+  if (!Number.isFinite(numericValue)) return null;
 
   const minimum = parseFiniteNumber(minimumValue);
   const maximum = parseFiniteNumber(maximumValue);
@@ -200,14 +236,50 @@ function getValidNumberValue(
     (maximum !== null && numericValue > maximum)
   ) return null;
 
-  const step = stepValue === "any" ? null : parseFiniteNumber(stepValue);
-  if (step !== null && step > 0) {
-    const stepBase = minimum ?? 0;
-    const stepsFromBase = (numericValue - stepBase) / step;
-    const tolerance = Number.EPSILON * 16 * Math.max(1, Math.abs(stepsFromBase));
-    if (Math.abs(stepsFromBase - Math.round(stepsFromBase)) > tolerance) return null;
-  }
   return rawValue;
+}
+
+function isCompleteNumber(value: string): boolean {
+  return /^[+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?$/u.test(value);
+}
+
+function ensureNumericSelectOption(select: HTMLSelectElement, value: string): void {
+  if (Array.from(select.options).some((option) => option.value === value)) return;
+  // Style Settings persists variable-select values from the native change
+  // event. Supplying a temporary option lets its existing handler retain an
+  // arbitrary weight without replacing the default Inherit dropdown.
+  const option = select.createEl("option", {
+    text: value,
+    attr: { value },
+  });
+  option.dataset.extendedHeadingsDynamic = "true";
+}
+
+function getPersistedNumericSelectValue(
+  select: HTMLSelectElement,
+  ownerDocument: Document,
+  settingId: string,
+  minimumValue: string,
+  maximumValue: string,
+): string | null {
+  if (parseFiniteNumber(select.value) !== null) return select.value;
+  if (!ownerDocument.body) return null;
+  // A persisted custom option is not part of the declarative option list when
+  // the settings UI is rebuilt. Its generated CSS variable remains available.
+  const computedValue = ownerDocument.defaultView
+    ?.getComputedStyle(ownerDocument.body)
+    .getPropertyValue(`--${settingId}`)
+    .trim() ?? "";
+  if (!isCompleteNumber(computedValue)) return null;
+  const numericValue = Number(computedValue);
+  const minimum = parseFiniteNumber(minimumValue);
+  const maximum = parseFiniteNumber(maximumValue);
+  if (
+    !Number.isFinite(numericValue) ||
+    (minimum !== null && numericValue < minimum) ||
+    (maximum !== null && numericValue > maximum)
+  ) return null;
+  return computedValue;
 }
 
 function parseFiniteNumber(value: string): number | null {
@@ -252,11 +324,11 @@ function addSettingRow(marker: Element, rows: Set<Element>): void {
   if (row) rows.add(row);
 }
 
-function isNumericSelectRow(row: Element): boolean {
+function getNumericSelectId(row: Element): string | null {
   const rawId = row.getAttribute("data-id")
     ?? row.querySelector<Element>("[data-id]")?.getAttribute("data-id")
     ?? "";
   const parts = rawId.split("@@");
   const settingId = parts[parts.length - 1] ?? rawId;
-  return NUMERIC_SELECT_IDS.has(settingId);
+  return NUMERIC_SELECT_IDS.has(settingId) ? settingId : null;
 }
