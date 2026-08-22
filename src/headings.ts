@@ -60,7 +60,8 @@ export function scanHeadings(
   const lines = text.split("\n");
   let offset = 0;
   let fence: Fence | null = null;
-  let frontmatter = lines.length > 0 && lines[0].replace(/^\uFEFF/, "").trimEnd() === "---";
+  const firstLine = lines[0] ?? "";
+  let frontmatter = firstLine.replace(/^\uFEFF/, "").trimEnd() === "---";
 
   for (let lineNumber = 0; lineNumber < lines.length; lineNumber += 1) {
     const rawLine = lines[lineNumber];

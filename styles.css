@@ -11,6 +11,114 @@ settings:
     default-light: '#3b3b3b'
     default-dark: '#dcddde'
   -
+    id: extended-heading-level-marker-typography
+    title: Heading level markers
+    type: heading
+    level: 2
+    collapsed: true
+  -
+    id: extended-heading-level-marker-size
+    title: Heading level marker font size
+    description: Relative to the current editor-gutter marker size; 1 matches the current size
+    type: variable-number-slider
+    default: 1
+    min: 0.5
+    max: 2
+    step: 0.05
+    format: em
+  -
+    id: extended-heading-level-marker-weight
+    title: Heading level marker font weight
+    description: Inherit retains the current editor-gutter marker weight
+    type: variable-select
+    allowEmpty: false
+    default: inherit
+    options:
+      -
+        label: Inherit
+        value: inherit
+      -
+        label: 100
+        value: '100'
+      -
+        label: 200
+        value: '200'
+      -
+        label: 300
+        value: '300'
+      -
+        label: 400
+        value: '400'
+      -
+        label: 500
+        value: '500'
+      -
+        label: 600
+        value: '600'
+      -
+        label: 700
+        value: '700'
+      -
+        label: 800
+        value: '800'
+      -
+        label: 900
+        value: '900'
+  -
+    id: extended-hash-marker-typography
+    title: Hash markers
+    type: heading
+    level: 2
+    collapsed: true
+  -
+    id: extended-hash-marker-size
+    title: Hash marker font size
+    description: Relative to the corresponding H7–H12 heading size; 1 matches the heading
+    type: variable-number-slider
+    default: 1
+    min: 0.5
+    max: 2
+    step: 0.05
+    format: em
+  -
+    id: extended-hash-marker-weight
+    title: Hash marker font weight
+    description: Inherit matches the corresponding H7–H12 heading weight
+    type: variable-select
+    allowEmpty: false
+    default: inherit
+    options:
+      -
+        label: Inherit
+        value: inherit
+      -
+        label: 100
+        value: '100'
+      -
+        label: 200
+        value: '200'
+      -
+        label: 300
+        value: '300'
+      -
+        label: 400
+        value: '400'
+      -
+        label: 500
+        value: '500'
+      -
+        label: 600
+        value: '600'
+      -
+        label: 700
+        value: '700'
+      -
+        label: 800
+        value: '800'
+      -
+        label: 900
+        value: '900'
+  -
     id: extended-level-7-headings
     title: Level 7 Headings
     type: heading
@@ -403,6 +511,10 @@ settings:
 */
 
 body {
+  --extended-heading-level-marker-size: 1em;
+  --extended-heading-level-marker-weight: inherit;
+  --extended-hash-marker-size: 1em;
+  --extended-hash-marker-weight: inherit;
   --extended-h7-size: 0.9em;
   --extended-h8-size: 0.9em;
   --extended-h9-size: 0.9em;
@@ -510,10 +622,10 @@ body {
 
 .extended-heading-marker {
   color: var(--text-faint);
-  font-size: inherit;
+  font-size: var(--extended-hash-marker-size);
   font-style: inherit;
   font-variant: inherit;
-  font-weight: inherit;
+  font-weight: var(--extended-hash-marker-weight);
 }
 
 /* Inline MarkdownRenderer fallback for heading-subpath links on H7+ lines. */
@@ -558,6 +670,8 @@ body:not(.extended-headings-markers-before) .cm-extended-heading-gutter { order:
 .cm-heading-marker {
   color: var(--text-faint);
   display: inline-block;
+  font-size: var(--extended-heading-level-marker-size);
+  font-weight: var(--extended-heading-level-marker-weight);
 }
 
 .cm-heading-marker-spacer { visibility: hidden; }
@@ -574,6 +688,19 @@ body:not(.extended-headings-markers-before) .cm-extended-heading-gutter { order:
 .cm-heading-marker[data-level="11"] { --heading-marker: "H11"; }
 .cm-heading-marker[data-level="12"] { --heading-marker: "H12"; }
 .cm-heading-marker::before { content: var(--heading-marker); }
+
+.extended-heading-outline-svg {
+  align-items: center;
+  display: inline-flex;
+  margin-inline-start: 0.3em;
+  vertical-align: -0.125em;
+}
+
+.extended-heading-outline-svg > svg {
+  flex: 0 0 auto;
+  height: 1em;
+  width: 1em;
+}
 
 .extended-heading-reading {
   align-items: center;

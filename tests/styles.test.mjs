@@ -29,6 +29,25 @@ test("uses the requested typography defaults for every extended level", () => {
   assert.match(styles, /id: extended-h7-style\n[\s\S]*?default: normal\n/);
 });
 
+test("exposes global marker typography controls with inheritance-preserving defaults", () => {
+  assert.match(
+    styles,
+    /id: extended-heading-level-marker-size\n[\s\S]*?type: variable-number-slider\n[\s\S]*?default: 1\n/,
+  );
+  assert.match(
+    styles,
+    /id: extended-heading-level-marker-weight\n[\s\S]*?type: variable-select\n[\s\S]*?default: inherit\n/,
+  );
+  assert.match(
+    styles,
+    /id: extended-hash-marker-size\n[\s\S]*?type: variable-number-slider\n[\s\S]*?default: 1\n/,
+  );
+  assert.match(
+    styles,
+    /id: extended-hash-marker-weight\n[\s\S]*?type: variable-select\n[\s\S]*?default: inherit\n/,
+  );
+});
+
 test("applies each level's typography variables and divider class", () => {
   for (let level = 7; level <= 12; level += 1) {
     assert.match(styles, new RegExp(`color: var\\(--extended-h${level}-color\\)`));
@@ -56,12 +75,29 @@ test("supports marker placement and Source Mode visibility settings", () => {
 test("keeps H7+ ATX markers aligned with their heading typography", () => {
   const markerRule = styles.match(/\.extended-heading-marker\s*\{([^}]*)\}/s);
   assert.ok(markerRule);
-  assert.match(markerRule[1], /font-size:\s*inherit;/);
+  assert.match(markerRule[1], /font-size:\s*var\(--extended-hash-marker-size\);/);
   assert.match(markerRule[1], /font-style:\s*inherit;/);
   assert.match(markerRule[1], /font-variant:\s*inherit;/);
-  assert.match(markerRule[1], /font-weight:\s*inherit;/);
+  assert.match(markerRule[1], /font-weight:\s*var\(--extended-hash-marker-weight\);/);
+  assert.match(styles, /--extended-hash-marker-size:\s*1em;/);
+  assert.match(styles, /--extended-hash-marker-weight:\s*inherit;/);
   assert.doesNotMatch(markerRule[1], /font-size:\s*0\.8em;/);
   assert.doesNotMatch(markerRule[1], /font-weight:\s*400;/);
+});
+
+test("applies global typography controls to H1-H12 gutter markers", () => {
+  const markerRule = styles.match(/\.cm-heading-marker\s*\{([^}]*)\}/s);
+  assert.ok(markerRule);
+  assert.match(
+    markerRule[1],
+    /font-size:\s*var\(--extended-heading-level-marker-size\);/,
+  );
+  assert.match(
+    markerRule[1],
+    /font-weight:\s*var\(--extended-heading-level-marker-weight\);/,
+  );
+  assert.match(styles, /--extended-heading-level-marker-size:\s*1em;/);
+  assert.match(styles, /--extended-heading-level-marker-weight:\s*inherit;/);
 });
 
 test("keeps the H7+ heading-link fallback inline", () => {
