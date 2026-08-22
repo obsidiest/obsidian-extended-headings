@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.13
+
+- Added global Style Settings controls for heading level marker size and weight and H7–H12 hash marker size and weight, while preserving the current inherited appearance by default.
+- Added the default-on **Render inline SVGs in default Outline** setting for sanitized inline SVGs in H1–H12 headings; H7–H12 headings require the core integration bridge.
+- Changed the **Show heading markers** description to remove the obsolete Lapel-compatibility wording.
+- Made the production-build banner derive its version from `manifest.json`.
+- Resolved the Community-directory scorecard's unsafe-call warning with a typed first-line fallback in the heading scanner.
+- Retained Obsidian 1.13.7 as the latest audited compatibility target.
+
 ## 0.4.12
 
 - Changed copied heading links and embeds to include the complete ancestor-heading path, allowing repeated heading names in separate sections to resolve to the heading at the cursor.

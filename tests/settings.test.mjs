@@ -42,8 +42,16 @@ test("uses the user's current Lapel marker preferences as defaults", () => {
   assert.match(settings, /showMarkersInSourceMode:\s*true/);
 });
 
+test("describes heading markers without Lapel compatibility wording", () => {
+  assert.match(
+    settings,
+    /desc: "Show H1–H12 heading markers in the editor gutter\."/,
+  );
+  assert.doesNotMatch(settings, /desc: "[^"]*Lapel-compatible[^"]*"/);
+});
+
 test("manifest describes the plugin's overall purpose", () => {
-  assert.equal(manifest.version, "0.4.12");
+  assert.equal(manifest.version, "0.4.13");
   assert.equal(
     manifest.description,
     "Extends ATX heading support through H12 with consistent editing, styling, folding, outlines, links, navigation, and heading-level markers.",
@@ -64,4 +72,16 @@ test("uses searchable declarative settings without a legacy display renderer", (
   assert.match(settings, /setControlValue\(key: string, value: unknown\)/);
   assert.doesNotMatch(settings, /\bdisplay\(\): void/);
   assert.doesNotMatch(settings, /setDynamicTooltip/);
+});
+
+test("documents marker typography and default Outline SVG rendering", () => {
+  assert.match(readme, /heading level marker size and weight/i);
+  assert.match(readme, /hash marker size and weight/i);
+  assert.match(readme, /Render inline SVGs in default Outline/);
+  assert.match(readme, /sanitizeHTMLToDom/);
+  assert.match(readme, /non-public DOM structure/);
+  assert.doesNotMatch(
+    readme,
+    /Shows Lapel-compatible H1–H12 markers in the editor gutter\./,
+  );
 });

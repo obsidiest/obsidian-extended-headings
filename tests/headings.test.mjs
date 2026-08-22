@@ -32,6 +32,18 @@ test("ignores YAML frontmatter and fenced code", () => {
   assert.equal(headings[0].line, 7);
 });
 
+test("uses a typed first-line fallback while recognizing BOM-prefixed frontmatter", () => {
+  assert.match(source, /const firstLine = lines\[0\] \?\? "";/);
+  assert.match(source, /let frontmatter = firstLine\.replace\(/);
+  assert.doesNotMatch(source, /lines\[0\]\.replace\(/);
+
+  const text = "\uFEFF---\nkey: value\n####### Not heading\n---\n####### Real";
+  const headings = scanHeadings(text, 7, 12);
+  assert.equal(headings.length, 1);
+  assert.equal(headings[0].rawBody, "Real");
+  assert.deepEqual(Array.from(scanHeadings("", 7, 12)), []);
+});
+
 test("removes optional closing hashes", () => {
   const heading = parseHeadingLine("  ####### Title ###  ", 3, 20, 7, 9);
   assert.equal(heading?.rawBody, "Title");

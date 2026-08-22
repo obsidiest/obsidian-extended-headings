@@ -19,7 +19,7 @@ The default maximum is H12. It can be lowered to H7 under **Settings → Communi
 
 The compatibility target records the newest Obsidian base-program version audited and tested when this release was prepared. Version 0.4.9 deliberately raises the minimum from 1.7.2 to 1.13.0 so the plugin can use Obsidian's searchable declarative settings API without retaining a second legacy settings renderer. Earlier releases remain mapped to their historical minimum versions in `versions.json`.
 
-Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 0.4.12 has not been device-tested on Obsidian Mobile.
+Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 0.4.13 has not been device-tested on Obsidian Mobile.
 
 ## Features
 
@@ -30,6 +30,7 @@ Extended Headings declares mobile compatibility because its runtime uses Obsidia
 - A supported-API **Extended Outline** side pane.
 - An experimental bridge for the core Outline, `[[Note#Heading]]` links, link suggestions, and heading navigation.
 - True H7–H12 levels in Obsidian's default Outline, preserving the complete unflattened hierarchy.
+- Optional sanitized rendering of inline SVGs from H1–H12 heading source in Obsidian's default Outline, enabled by default.
 - Immediate active-note injection at workspace readiness, followed by a background vault-wide reindex after metadata resolution.
 - Punctuation-preserving H7–H12 labels in the default Outline, including parentheses and colons.
 - An independent Live Preview rendering fallback for heading-subpath links placed directly on H7–H12 lines.
@@ -41,6 +42,7 @@ Extended Headings declares mobile compatibility because its runtime uses Obsidia
 - H1–H12-aware rename, copy-link, and copy-embed commands.
 - Heading- or block-specific copy actions in the editor context menu.
 - Minimal-style typography controls for every extended level from H7 through H12.
+- Global Style Settings controls for heading level marker size and weight and for H7–H12 hash marker size and weight.
 - H7–H12 ATX hash markers that track the size, weight, style, and variant selected for their heading level.
 - Searchable plugin settings through Obsidian 1.13's declarative settings API.
 
@@ -58,10 +60,11 @@ This representative Live Preview shows every extended level. H8 is active, so it
 | Hide hashes on inactive Live Preview lines | On | Conceals H7+ hashes when their line is inactive. |
 | Reading View folding | On | Shows a folding control beside extended headings in Reading View. |
 | Core Outline and heading-link bridge | On | Adds H7+ entries to Obsidian's in-memory heading cache for the core Outline, heading links, and navigation. |
+| Render inline SVGs in default Outline | On | Renders sanitized inline SVGs from H1–H12 heading source beside their labels in Obsidian's default Outline. |
 | Copy fully nested heading paths | On | Includes every ancestor heading in copied heading links and embeds; disable it to copy only the shorter target-heading link. |
 | Lower limit of heading | `1` | Sets the shallowest level that **Decrease headings** may reach; `0` permits conversion to a paragraph. |
 | Enable override Tab behavior | Off | Makes Tab and Shift+Tab shift headings when the active selection contains a heading. |
-| Show heading level markers | On | Shows Lapel-compatible H1–H12 markers in the editor gutter. |
+| Show heading level markers | On | Shows H1–H12 heading markers in the editor gutter. |
 | Show before line numbers | On | Places heading markers before the line-number gutter. |
 | Show in source mode | On | Shows heading markers in Source mode as well as Live Preview. |
 | Unordered list | On | Removes a leading unordered-list marker when a non-heading line becomes a heading. |
@@ -73,7 +76,7 @@ This representative Live Preview shows every extended level. H8 is active, so it
 | Children behavior | `Outdent to 0` | Controls how a contiguous child list is re-indented when its preceding line becomes a heading. |
 | Tab size | `4` | Sets the spaces per indentation level for child-list operations. |
 
-With the **Style Settings** community plugin enabled, open **Settings → Style Settings → Extended Headings**. H7 through H12 each have a collapsible section with font size, weight, individual light/dark color, variant, style, and divider controls. The default size and weight for every extended level are `0.9em` and `500`; H7 also defaults to the `normal` font variant and style. A shared H7+ color remains the fallback until an individual level color is set. ATX hashes inherit the selected font size, weight, style, and variant for their H7–H12 level.
+With the **Style Settings** community plugin enabled, open **Settings → Style Settings → Extended Headings**. Global controls set the heading level marker size and weight and the H7–H12 hash marker size and weight. Both marker-size controls default to `1em`, relative to their existing context, and both marker-weight controls default to `inherit`, so enabling the new controls does not change the current appearance. H7 through H12 each also have a collapsible section with font size, weight, individual light/dark color, variant, style, and divider controls. The default size and weight for every extended level are `0.9em` and `500`; H7 also defaults to the `normal` font variant and style. A shared H7+ color remains the fallback until an individual level color is set. Unless overridden by the global controls, ATX hashes inherit the selected font size, weight, style, and variant for their H7–H12 level.
 
 ## Commands and hotkeys
 
@@ -124,6 +127,8 @@ Markdown and HTML officially stop at H6. Other Markdown applications therefore t
 
 The editor, Reading View, folding service, Live Preview link fallback, and Extended Outline use supported Obsidian and CodeMirror APIs. The optional **Core Outline and heading-link bridge** adds H7+ objects with their true levels to Obsidian's in-memory metadata cache so the default Outline remains unflattened through H12. Obsidian's public type documentation describes cached heading levels as 1–6, so this bridge is intentionally outside that documented range and is the plugin's most fragile compatibility surface.
 
+The default-on **Render inline SVGs in default Outline** integration reads raw inline SVG fragments from H1–H12 headings, sanitizes each fragment through Obsidian's `sanitizeHTMLToDom`, and appends only the resulting SVG elements beside the matching Outline label. It never assigns raw source to `innerHTML`. Because Obsidian does not expose a public API for decorating core Outline rows, this feature observes the core Outline's non-public DOM structure. H7–H12 Outline rows also require the **Core Outline and heading-link bridge**. If an Obsidian update changes that structure, disable SVG rendering until the plugin is updated; the headings and their text remain unchanged.
+
 The separate Live Preview link fallback does not alter cache levels or the default Outline hierarchy. If an Obsidian update disrupts the bridge, disable it and use Extended Outline until the plugin is updated; note content is not migrated by enabling or disabling the bridge.
 
 ## Syntax boundaries
@@ -169,6 +174,7 @@ If you received the combined distribution ZIP, the contents of `_source` are the
 - Startup and manual reindexing enumerate Markdown file paths inside the active vault and read those notes through Obsidian's Vault API to index H7–H12 headings. No files outside the vault are examined.
 - Copy-link and copy-embed commands write the generated reference to the system clipboard only when explicitly invoked. The plugin does not read clipboard contents.
 - The experimental core bridge changes only Obsidian's in-memory metadata cache and does not rewrite note content.
+- Default Outline SVG rendering reads inline SVG source from headings, sanitizes it with Obsidian's HTML sanitizer, and changes only the Outline pane's transient DOM; it does not rewrite note content or inject unsanitized HTML.
 - Heading-shift, set-heading, and contextual-insert commands modify only the active editor selection or cursor line when explicitly invoked.
 - Copying a reference to an ordinary block may append a block ID to that block when none exists.
 - Renaming an H7–H12 heading may update matching heading links and embeds in Markdown files throughout the vault after explicit confirmation through the command.
@@ -205,6 +211,7 @@ I had hoped someone capable and sufficiently ambitious might create a plugin lik
 - Version 0.4.10 marker-size correction, typography-default update, regression coverage, documentation, and release packaging generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 - Version 0.4.11 complete marker-typography correction, README visual replacement, regression coverage, documentation, and release packaging generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 - Version 0.4.12 nested heading-path references, compatibility toggle, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
+- Version 0.4.13 marker typography controls, core Outline SVG rendering, Community-scorecard remediation, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 
 Incorporates features inspired by the following Obsidian community plugins:
 

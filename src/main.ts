@@ -1,5 +1,6 @@
 import { MarkdownView, Notice, Plugin } from "obsidian";
 import { CoreIntegration } from "./core-integration";
+import { CoreOutlineSvgRenderer } from "./core-outline-svg";
 import {
   insertHeadingAtContext,
   selectionContainsHeading,
@@ -20,6 +21,7 @@ import {
 export default class ExtendedHeadingsPlugin extends Plugin {
   settings: ExtendedHeadingsSettings = DEFAULT_SETTINGS;
   private coreIntegration: CoreIntegration | null = null;
+  private coreOutlineSvgRenderer: CoreOutlineSvgRenderer | null = null;
 
   async onload(): Promise<void> {
     await this.loadSettings();
@@ -229,9 +231,13 @@ export default class ExtendedHeadingsPlugin extends Plugin {
 
     this.coreIntegration = new CoreIntegration(this);
     this.coreIntegration.start();
+    this.coreOutlineSvgRenderer = new CoreOutlineSvgRenderer(this);
+    this.coreOutlineSvgRenderer.start();
+    this.coreOutlineSvgRenderer.setEnabled(this.settings.renderInlineSvgsInDefaultOutline);
   }
 
   onunload(): void {
+    this.coreOutlineSvgRenderer?.destroy();
     this.coreIntegration?.stop();
     void this.coreIntegration?.removeAll(false);
     for (const className of [
@@ -247,6 +253,7 @@ export default class ExtendedHeadingsPlugin extends Plugin {
     this.app.workspace.updateOptions();
     this.syncBodyClasses();
     if (reindex) await this.coreIntegration?.reindexAll();
+    this.coreOutlineSvgRenderer?.setEnabled(this.settings.renderInlineSvgsInDefaultOutline);
     for (const leaf of this.app.workspace.getLeavesOfType(EXTENDED_OUTLINE_VIEW)) {
       if (leaf.view instanceof ExtendedOutlineView) leaf.view.requestUpdate();
     }

@@ -1,10 +1,14 @@
 import esbuild from "esbuild";
+import { readFileSync } from "node:fs";
 import { builtinModules } from "node:module";
 
 const production = globalThis.process.argv[2] === "production";
+const manifest = JSON.parse(
+  readFileSync(new URL("./manifest.json", import.meta.url), "utf8"),
+);
 
 const context = await esbuild.context({
-  banner: { js: "/* Extended Headings v0.4.11 | MIT | obsidiest */" },
+  banner: { js: `/* Extended Headings v${manifest.version} | MIT | obsidiest */` },
   entryPoints: ["src/main.ts"],
   bundle: true,
   external: ["obsidian", "electron", "@codemirror/autocomplete", "@codemirror/collab", "@codemirror/commands", "@codemirror/language", "@codemirror/lint", "@codemirror/search", "@codemirror/state", "@codemirror/view", "@lezer/common", "@lezer/highlight", "@lezer/lr", ...builtinModules],

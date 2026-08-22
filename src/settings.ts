@@ -11,6 +11,7 @@ export interface ExtendedHeadingsSettings {
   maximumLevel: number;
   hideMarkersInLivePreview: boolean;
   coreIntegration: boolean;
+  renderInlineSvgsInDefaultOutline: boolean;
   readingModeFolding: boolean;
   copyFullyNestedHeadingPaths: boolean;
   lowerHeadingLimit: number;
@@ -32,6 +33,7 @@ export const DEFAULT_SETTINGS: ExtendedHeadingsSettings = {
   maximumLevel: 12,
   hideMarkersInLivePreview: true,
   coreIntegration: true,
+  renderInlineSvgsInDefaultOutline: true,
   readingModeFolding: true,
   copyFullyNestedHeadingPaths: true,
   lowerHeadingLimit: 1,
@@ -113,6 +115,16 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
         },
       },
       {
+        name: "Render inline SVGs in default Outline",
+        desc: "Render sanitized inline SVG elements from H1–H12 headings in Obsidian's default Outline pane. H7–H12 entries require the Core Outline and heading-link bridge.",
+        aliases: ["SVG", "icon", "core Outline"],
+        control: {
+          type: "toggle",
+          key: "renderInlineSvgsInDefaultOutline",
+          defaultValue: DEFAULT_SETTINGS.renderInlineSvgsInDefaultOutline,
+        },
+      },
+      {
         name: "Copy fully nested heading paths",
         desc: "Include every ancestor heading when copying a heading link or embed so repeated heading titles resolve precisely. Disable this to copy only the shorter target-heading link.",
         aliases: ["copy link", "copy embed", "ancestor headings", "duplicate headings"],
@@ -155,7 +167,7 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
         items: [
           {
             name: "Show heading level markers",
-            desc: "Show Lapel-compatible H1–H12 markers in the editor gutter.",
+            desc: "Show H1–H12 heading markers in the editor gutter.",
             aliases: ["Lapel", "gutter"],
             control: {
               type: "toggle",
@@ -341,6 +353,7 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
         break;
       case "hideMarkersInLivePreview":
       case "coreIntegration":
+      case "renderInlineSvgsInDefaultOutline":
       case "readingModeFolding":
       case "copyFullyNestedHeadingPaths":
       case "overrideTabBehavior":
