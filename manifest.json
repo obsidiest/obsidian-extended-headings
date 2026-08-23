@@ -1,7 +1,7 @@
 {
   "id": "extended-headings",
   "name": "Extended Headings",
-  "version": "0.4.15",
+  "version": "0.4.16",
   "minAppVersion": "1.13.0",
   "description": "Extends ATX heading support through H12 with consistent editing, styling, folding, outlines, links, navigation, and heading-level markers.",
   "author": "obsidiest",

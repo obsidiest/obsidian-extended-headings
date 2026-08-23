@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.16
+
+- Restored the exact 0.4.14 shared gutter layout for active and inactive H1–H9 markers, correcting the clipping and indentation regression introduced in 0.4.15.
+- Fixed active and inactive H10–H12 markers being clipped to `H1` by neutralizing Minimal's additional marker padding only for those three-character labels.
+- Added regression coverage that locks H1–H9 to the established four-character gutter and confines the compatibility adjustment to H10–H12.
+- Retained Obsidian 1.13.7 as the latest audited compatibility target.
+
 ## 0.4.15
 
 - Fixed active and inactive H10–H12 editor-gutter markers still appearing as `H1` by replacing Lapel's two-character fixed gutter width with intrinsic sizing for the complete label.

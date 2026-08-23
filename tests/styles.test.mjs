@@ -66,18 +66,31 @@ test("defines Lapel-compatible gutter markers through H12", () => {
   assert.match(extension, /marker\.dataset\.level = String\(this\.level\);/);
 });
 
-test("reserves enough intrinsic gutter width for complete H10-H12 markers", () => {
+test("preserves the 0.4.14 H1-H9 gutter layout and adjusts only H10-H12", () => {
   const gutterRule = styles.match(
     /\.cm-extended-heading-gutter\.cm-lapel\s*\{([^}]*)\}/s,
   );
   assert.ok(gutterRule);
-  assert.match(gutterRule[1], /width:\s*max-content;/);
-  assert.doesNotMatch(gutterRule[1], /(?:^|;)\s*width:\s*4ch;/);
+  assert.match(gutterRule[1], /width:\s*4ch;/);
+  assert.doesNotMatch(gutterRule[1], /min-width:/);
+  assert.doesNotMatch(gutterRule[1], /width:\s*(?:auto|max-content);/);
 
   const markerRule = styles.match(/\.cm-heading-marker\s*\{([^}]*)\}/s);
   assert.ok(markerRule);
-  assert.match(markerRule[1], /min-width:\s*3ch;/);
-  assert.match(markerRule[1], /white-space:\s*nowrap;/);
+  assert.doesNotMatch(markerRule[1], /min-width:/);
+  assert.doesNotMatch(markerRule[1], /padding(?:-inline-start|-left)?:/);
+
+  const multiDigitRule = styles.match(
+    /\.cm-extended-heading-gutter\s+\.cm-heading-marker:is\(\s*\[data-level="10"\],\s*\[data-level="11"\],\s*\[data-level="12"\]\s*\)\s*\{([^}]*)\}/s,
+  );
+  assert.ok(multiDigitRule);
+  assert.match(multiDigitRule[1], /padding-left:\s*0;/);
+  assert.match(multiDigitRule[1], /padding-inline-start:\s*0;/);
+  assert.doesNotMatch(multiDigitRule[0], /data-level="[1-9]"/);
+  assert.match(
+    extension,
+    /initialSpacer:\s*\(\)\s*=>\s*new HeadingLevelMarker\(12, true\)/,
+  );
 });
 
 test("supports marker placement and Source Mode visibility settings", () => {
