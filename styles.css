@@ -674,7 +674,7 @@ body:not(.extended-headings-markers-in-source)
   font-size: var(--font-smallest);
   letter-spacing: 0.015em;
   text-align: end;
-  width: auto;
+  width: 4ch;
 }
 
 .table-cell-wrapper .cm-extended-heading-gutter { display: none; }
@@ -687,7 +687,18 @@ body:not(.extended-headings-markers-before) .cm-extended-heading-gutter { order:
   display: inline-block;
   font-size: var(--extended-heading-level-marker-size);
   font-weight: var(--extended-heading-level-marker-weight);
-  white-space: nowrap;
+}
+
+/* Minimal adds 10px of left padding to Lapel markers. Preserve its established
+   H1-H9 layout while allowing three-character H10-H12 labels to fit. */
+.cm-extended-heading-gutter
+  .cm-heading-marker:is(
+    [data-level="10"],
+    [data-level="11"],
+    [data-level="12"]
+  ) {
+  padding-left: 0;
+  padding-inline-start: 0;
 }
 
 .cm-heading-marker-spacer { visibility: hidden; }

@@ -38,7 +38,8 @@ test("documents compatibility, disclosures, attribution, and licensing", () => {
   assert.match(readme, /Version 0\.4\.16 has not been device-tested on Obsidian Mobile/);
   assert.match(readme, /\[MIT\]\(LICENSE\)/);
   assert.match(changelog, /## 0\.4\.16/);
-  assert.match(changelog, /H12.*spacer.*gutter/is);
+  assert.match(changelog, /0\.4\.14.*H1–H9.*H10–H12/is);
+  assert.match(changelog, /Minimal.*padding.*H10–H12/is);
   assert.match(changelog, /inline SVG/i);
   assert.match(changelog, /marker.*size.*weight/is);
   assert.match(changelog, /arbitrary.*in-range.*numerical/is);

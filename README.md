@@ -215,7 +215,7 @@ I had hoped someone capable and sufficiently ambitious might create a plugin lik
 - Version 0.4.13 marker typography controls, core Outline SVG rendering, Community-scorecard remediation, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 - Version 0.4.14 H1–H12 marker controls, precise Style Settings inputs, heading-marker and parenthesized-Outline-SVG fixes, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 - Version 0.4.15 intrinsic H10–H12 gutter sizing, arbitrary-value and caret-stable Style Settings inputs, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
-- Version 0.4.16 CodeMirror-spacer-driven H1–H12 gutter sizing, marker-clipping and indentation regression fixes, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
+- Version 0.4.16 targeted H10–H12 Minimal-padding correction, restoration of the 0.4.14 H1–H9 marker layout, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 
 Incorporates features inspired by the following Obsidian community plugins:
 
