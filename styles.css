@@ -673,9 +673,8 @@ body:not(.extended-headings-markers-in-source)
 .cm-extended-heading-gutter.cm-lapel {
   font-size: var(--font-smallest);
   letter-spacing: 0.015em;
-  min-width: 4ch;
   text-align: end;
-  width: max-content;
+  width: auto;
 }
 
 .table-cell-wrapper .cm-extended-heading-gutter { display: none; }
@@ -688,7 +687,6 @@ body:not(.extended-headings-markers-before) .cm-extended-heading-gutter { order:
   display: inline-block;
   font-size: var(--extended-heading-level-marker-size);
   font-weight: var(--extended-heading-level-marker-weight);
-  min-width: 3ch;
   white-space: nowrap;
 }
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.16
+
+- Fixed active and inactive H1–H9 editor-gutter markers being clipped to `H` and H10–H12 markers being clipped to `H1`.
+- Removed the per-marker minimum width introduced in 0.4.15, which caused the broader clipping and indentation regression.
+- Restored CodeMirror's intended sizing path by allowing the invisible `H12` spacer to determine the gutter width, including when the global heading-level marker font size changes.
+- Retained Obsidian 1.13.7 as the latest audited compatibility target.
+
 ## 0.4.15
 
 - Fixed active and inactive H10–H12 editor-gutter markers still appearing as `H1` by replacing Lapel's two-character fixed gutter width with intrinsic sizing for the complete label.
