@@ -11,6 +11,8 @@ const NUMBER_INPUT_CLASS = "extended-headings-style-settings-number-input";
 const NUMERIC_SELECT_IDS = new Set([
   "extended-heading-level-marker-weight",
   "extended-hash-marker-weight",
+  "extended-outline-heading-font-weight",
+  "extended-outline-level-marker-font-weight",
 ]);
 
 type QueryableNode = ParentNode & {

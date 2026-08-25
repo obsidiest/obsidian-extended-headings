@@ -119,6 +119,626 @@ settings:
         label: 900
         value: '900'
   -
+    id: extended-outline-pane
+    title: Default Outline Pane
+    type: heading
+    level: 2
+    collapsed: true
+  -
+    id: extended-outline-heading-appearance
+    title: Heading Typography and Appearance
+    type: heading
+    level: 3
+    collapsed: true
+  -
+    id: extended-outline-heading-font-family
+    title: Heading font family
+    description: Inherit retains the default Outline pane heading font family
+    type: variable-text
+    default: inherit
+  -
+    id: extended-outline-heading-font-size
+    title: Heading font size
+    description: Relative to the default Outline pane heading size; 1 retains the current size
+    type: variable-number-slider
+    default: 1
+    min: 0.5
+    max: 2
+    step: 0.05
+    format: em
+  -
+    id: extended-outline-heading-font-weight
+    title: Heading font weight
+    description: Inherit retains the default Outline pane heading weight
+    type: variable-select
+    allowEmpty: false
+    default: inherit
+    options:
+      -
+        label: Inherit
+        value: inherit
+      -
+        label: 100
+        value: '100'
+      -
+        label: 200
+        value: '200'
+      -
+        label: 300
+        value: '300'
+      -
+        label: 400
+        value: '400'
+      -
+        label: 500
+        value: '500'
+      -
+        label: 600
+        value: '600'
+      -
+        label: 700
+        value: '700'
+      -
+        label: 800
+        value: '800'
+      -
+        label: 900
+        value: '900'
+  -
+    id: extended-outline-heading-color
+    title: Heading text color
+    description: Blank retains the default Outline pane heading color
+    type: variable-themed-color
+    format: hex
+    default-light: '#'
+    default-dark: '#'
+  -
+    id: extended-outline-heading-font-style
+    title: Heading font style
+    type: variable-select
+    allowEmpty: false
+    default: inherit
+    options:
+      -
+        label: Inherit
+        value: inherit
+      -
+        label: Normal
+        value: normal
+      -
+        label: Italic
+        value: italic
+  -
+    id: extended-outline-heading-font-variant
+    title: Heading font variant
+    type: variable-select
+    allowEmpty: false
+    default: inherit
+    options:
+      -
+        label: Inherit
+        value: inherit
+      -
+        label: Normal
+        value: normal
+      -
+        label: Small caps
+        value: small-caps
+      -
+        label: All small caps
+        value: all-small-caps
+  -
+    id: extended-outline-heading-letter-spacing
+    title: Heading letter spacing
+    type: variable-number-slider
+    default: 0
+    min: -0.1
+    max: 0.3
+    step: 0.01
+    format: em
+  -
+    id: extended-outline-heading-opacity
+    title: Heading opacity
+    type: variable-number-slider
+    default: 1
+    min: 0.05
+    max: 1
+    step: 0.05
+  -
+    id: extended-outline-heading-row-spacing
+    title: Heading row spacing
+    description: Additional vertical space around each Outline heading row
+    type: variable-number-slider
+    default: 0
+    min: 0
+    max: 16
+    step: 0.5
+    format: px
+  -
+    id: extended-outline-level-marker-appearance
+    title: Heading Level Marker Typography and Appearance
+    type: heading
+    level: 3
+    collapsed: true
+  -
+    id: extended-outline-level-marker-font-size
+    title: Heading level marker font size
+    description: Relative to the Outline heading text; 1 matches its size
+    type: variable-number-slider
+    default: 1
+    min: 0.5
+    max: 2
+    step: 0.05
+    format: em
+  -
+    id: extended-outline-level-marker-font-weight
+    title: Heading level marker font weight
+    description: Inherit matches the Outline heading text weight
+    type: variable-select
+    allowEmpty: false
+    default: inherit
+    options:
+      -
+        label: Inherit
+        value: inherit
+      -
+        label: 100
+        value: '100'
+      -
+        label: 200
+        value: '200'
+      -
+        label: 300
+        value: '300'
+      -
+        label: 400
+        value: '400'
+      -
+        label: 500
+        value: '500'
+      -
+        label: 600
+        value: '600'
+      -
+        label: 700
+        value: '700'
+      -
+        label: 800
+        value: '800'
+      -
+        label: 900
+        value: '900'
+  -
+    id: extended-outline-level-marker-color
+    title: Heading level marker color
+    description: Blank inherits the corresponding Outline heading color
+    type: variable-themed-color
+    format: hex
+    default-light: '#'
+    default-dark: '#'
+  -
+    id: extended-outline-level-marker-font-style
+    title: Heading level marker font style
+    type: variable-select
+    allowEmpty: false
+    default: inherit
+    options:
+      -
+        label: Inherit
+        value: inherit
+      -
+        label: Normal
+        value: normal
+      -
+        label: Italic
+        value: italic
+  -
+    id: extended-outline-level-marker-font-variant
+    title: Heading level marker font variant
+    type: variable-select
+    allowEmpty: false
+    default: inherit
+    options:
+      -
+        label: Inherit
+        value: inherit
+      -
+        label: Normal
+        value: normal
+      -
+        label: Small caps
+        value: small-caps
+      -
+        label: All small caps
+        value: all-small-caps
+  -
+    id: extended-outline-level-marker-letter-spacing
+    title: Heading level marker letter spacing
+    type: variable-number-slider
+    default: 0
+    min: -0.1
+    max: 0.3
+    step: 0.01
+    format: em
+  -
+    id: extended-outline-level-marker-opacity
+    title: Heading level marker opacity
+    type: variable-number-slider
+    default: 1
+    min: 0.05
+    max: 1
+    step: 0.05
+  -
+    id: extended-outline-level-marker-width
+    title: Heading level marker width
+    description: Reserved width for the complete H1–H12 label
+    type: variable-number-slider
+    default: 3
+    min: 2
+    max: 8
+    step: 0.1
+    format: ch
+  -
+    id: extended-outline-level-marker-gap
+    title: Gap after heading level marker
+    type: variable-number-slider
+    default: 0.35
+    min: 0
+    max: 2
+    step: 0.05
+    format: em
+  -
+    id: extended-outline-guide-appearance
+    title: Heading Static Tree Indentation Guide Appearance
+    type: heading
+    level: 3
+    collapsed: true
+  -
+    id: extended-outline-guide-color
+    title: Guide color
+    description: Color of Outline heading-tree vertical spines and horizontal connectors
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#777777'
+    default-dark: '#888888'
+  -
+    id: extended-outline-guide-opacity
+    title: Guide opacity
+    type: variable-number-slider
+    default: 0.72
+    min: 0.05
+    max: 1
+    step: 0.05
+  -
+    id: extended-outline-guide-thickness
+    title: Guide thickness
+    type: variable-number-slider
+    default: 1.5
+    min: 0.5
+    max: 6
+    step: 0.1
+    format: px
+  -
+    id: extended-outline-guide-pattern
+    title: Guide pattern
+    type: class-select
+    allowEmpty: false
+    default: extended-outline-guide-line-solid
+    options:
+      -
+        label: Solid
+        value: extended-outline-guide-line-solid
+      -
+        label: Dashed
+        value: extended-outline-guide-line-dashed
+      -
+        label: Dotted
+        value: extended-outline-guide-line-dotted
+  -
+    id: extended-outline-guide-dash-length
+    title: Dashed-line dash length
+    type: variable-number-slider
+    default: 6
+    min: 0.5
+    max: 24
+    step: 0.5
+    format: px
+  -
+    id: extended-outline-guide-dash-gap
+    title: Dashed-line gap
+    type: variable-number-slider
+    default: 4
+    min: 0.5
+    max: 24
+    step: 0.5
+    format: px
+  -
+    id: extended-outline-guide-dot-gap
+    title: Dotted-line gap
+    type: variable-number-slider
+    default: 4
+    min: 0.5
+    max: 24
+    step: 0.5
+    format: px
+  -
+    id: extended-outline-guide-geometry
+    title: Heading Static Tree Indentation Guide Geometry
+    type: heading
+    level: 4
+    collapsed: true
+  -
+    id: extended-outline-guide-connector-length
+    title: Horizontal connector length
+    type: variable-number-slider
+    default: 18
+    min: 4
+    max: 48
+    step: 1
+    format: px
+  -
+    id: extended-outline-guide-marker-gap
+    title: Gap before heading marker or text
+    type: variable-number-slider
+    default: 4
+    min: 0
+    max: 24
+    step: 1
+    format: px
+  -
+    id: extended-outline-guide-first-branch-rise
+    title: First-branch vertical rise
+    type: variable-number-slider
+    default: 10
+    min: 0
+    max: 40
+    step: 1
+    format: px
+  -
+    id: extended-outline-guide-connector-offset
+    title: Connector vertical offset
+    type: variable-number-slider
+    default: 0
+    min: -12
+    max: 12
+    step: 0.5
+    format: px
+  -
+    id: extended-outline-thread-appearance
+    title: Heading Thread Appearance (All Tree Types)
+    description: Applies to individual H1 trees, the virtual root-level H1 tree, and orphan H2–H12 trees
+    type: heading
+    level: 3
+    collapsed: true
+  -
+    id: extended-outline-thread-opacity
+    title: Thread opacity
+    type: variable-number-slider
+    default: 1
+    min: 0.05
+    max: 1
+    step: 0.05
+  -
+    id: extended-outline-thread-thickness
+    title: Thread thickness
+    type: variable-number-slider
+    default: 4
+    min: 0.5
+    max: 12
+    step: 0.1
+    format: px
+  -
+    id: extended-outline-thread-corner-radius
+    title: Thread corner radius
+    type: variable-number-slider
+    default: 8
+    min: 0
+    max: 32
+    step: 0.5
+    format: px
+  -
+    id: extended-outline-thread-line-cap
+    title: Thread line cap
+    type: class-select
+    allowEmpty: false
+    default: extended-outline-thread-cap-round
+    options:
+      -
+        label: Round
+        value: extended-outline-thread-cap-round
+      -
+        label: Square
+        value: extended-outline-thread-cap-square
+      -
+        label: Flat
+        value: extended-outline-thread-cap-flat
+  -
+    id: extended-outline-thread-geometry
+    title: Heading Thread Geometry (All Tree Types)
+    description: Applies to individual H1 trees, the virtual root-level H1 tree, and orphan H2–H12 trees
+    type: heading
+    level: 4
+    collapsed: true
+  -
+    id: extended-outline-thread-connector-length
+    title: Thread connector length
+    type: variable-number-slider
+    default: 28
+    min: 4
+    max: 96
+    step: 1
+    format: px
+  -
+    id: extended-outline-thread-marker-gap
+    title: Thread marker gap
+    type: variable-number-slider
+    default: 4
+    min: 0
+    max: 32
+    step: 0.5
+    format: px
+  -
+    id: extended-outline-thread-vertical-offset
+    title: Thread vertical offset
+    type: variable-number-slider
+    default: 0
+    min: -16
+    max: 16
+    step: 0.5
+    format: px
+  -
+    id: extended-outline-thread-colors
+    title: Heading Thread Colors (All Tree Types)
+    description: Applies to individual H1 trees, the virtual root-level H1 tree, and orphan H2–H12 trees
+    type: heading
+    level: 4
+    collapsed: true
+  -
+    id: extended-outline-thread-fallback-colors-enabled
+    title: Global Fallback Heading Thread Colors
+    description: Use the fallback color whenever an individual heading thread color is disabled
+    type: class-toggle
+    default: true
+  -
+    id: extended-outline-thread-fallback-color-light
+    title: Global fallback heading thread color (light mode)
+    type: variable-text
+    default: '#777777'
+  -
+    id: extended-outline-thread-fallback-color-dark
+    title: Global fallback heading thread color (dark mode)
+    type: variable-text
+    default: '#888888'
+  -
+    id: extended-outline-thread-override-colors-enabled
+    title: Global Override Heading Thread Colors
+    description: Override every heading thread color regardless of its individual enablement toggle
+    type: class-toggle
+    default: false
+  -
+    id: extended-outline-thread-override-color-light
+    title: Global override heading thread color (light mode)
+    type: variable-text
+    default: '#777777'
+  -
+    id: extended-outline-thread-override-color-dark
+    title: Global override heading thread color (dark mode)
+    type: variable-text
+    default: '#888888'
+  -
+    id: extended-outline-thread-color-1-enabled
+    title: Enable thread color 1
+    type: class-toggle
+    default: true
+  -
+    id: extended-outline-thread-color-1
+    title: Thread color 1
+    description: Highlight color for the first nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#d94f00'
+    default-dark: '#ff5a00'
+  -
+    id: extended-outline-thread-color-2-enabled
+    title: Enable thread color 2
+    type: class-toggle
+    default: true
+  -
+    id: extended-outline-thread-color-2
+    title: Thread color 2
+    description: Highlight color for the second nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#c99a00'
+    default-dark: '#ffc400'
+  -
+    id: extended-outline-thread-color-3-enabled
+    title: Enable thread color 3
+    type: class-toggle
+    default: true
+  -
+    id: extended-outline-thread-color-3
+    title: Thread color 3
+    description: Highlight color for the third nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#79b800'
+    default-dark: '#a8e600'
+  -
+    id: extended-outline-thread-color-4-enabled
+    title: Enable thread color 4
+    type: class-toggle
+    default: true
+  -
+    id: extended-outline-thread-color-4
+    title: Thread color 4
+    description: Highlight color for the fourth nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#008ea3'
+    default-dark: '#00c8df'
+  -
+    id: extended-outline-thread-color-5-enabled
+    title: Enable thread color 5
+    type: class-toggle
+    default: true
+  -
+    id: extended-outline-thread-color-5
+    title: Thread color 5
+    description: Highlight color for the fifth nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#316fd1'
+    default-dark: '#5794ff'
+  -
+    id: extended-outline-thread-color-6-enabled
+    title: Enable thread color 6
+    type: class-toggle
+    default: true
+  -
+    id: extended-outline-thread-color-6
+    title: Thread color 6
+    description: Highlight color for the sixth nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#7547c7'
+    default-dark: '#a66cff'
+  -
+    id: extended-outline-thread-color-7-enabled
+    title: Enable thread color 7
+    type: class-toggle
+    default: true
+  -
+    id: extended-outline-thread-color-7
+    title: Thread color 7
+    description: Highlight color for the seventh nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#b83782'
+    default-dark: '#e64fa3'
+  -
+    id: extended-outline-thread-color-8-enabled
+    title: Enable thread color 8+
+    type: class-toggle
+    default: true
+  -
+    id: extended-outline-thread-color-8
+    title: Thread color 8+
+    description: Highlight color for the eighth and every deeper nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#b83782'
+    default-dark: '#e64fa3'
+  -
     id: extended-level-7-headings
     title: Level 7 Headings
     type: heading
@@ -515,6 +1135,82 @@ body {
   --extended-heading-level-marker-weight: inherit;
   --extended-hash-marker-size: 1em;
   --extended-hash-marker-weight: inherit;
+  --extended-outline-heading-font-family: inherit;
+  --extended-outline-heading-font-size: 1em;
+  --extended-outline-heading-font-weight: inherit;
+  --extended-outline-heading-color: inherit;
+  --extended-outline-heading-font-style: inherit;
+  --extended-outline-heading-font-variant: inherit;
+  --extended-outline-heading-letter-spacing: 0em;
+  --extended-outline-heading-opacity: 1;
+  --extended-outline-heading-row-spacing: 0px;
+  --extended-outline-level-marker-font-size: 1em;
+  --extended-outline-level-marker-font-weight: inherit;
+  --extended-outline-level-marker-color: inherit;
+  --extended-outline-level-marker-font-style: inherit;
+  --extended-outline-level-marker-font-variant: inherit;
+  --extended-outline-level-marker-letter-spacing: 0em;
+  --extended-outline-level-marker-opacity: 1;
+  --extended-outline-level-marker-width: 3ch;
+  --extended-outline-level-marker-gap: 0.35em;
+  --extended-outline-guide-color: var(--text-muted);
+  --extended-outline-guide-opacity: 0.72;
+  --extended-outline-guide-thickness: 1.5px;
+  --extended-outline-guide-dash-length: 6px;
+  --extended-outline-guide-dash-gap: 4px;
+  --extended-outline-guide-dot-gap: 4px;
+  --extended-outline-guide-connector-length: 18px;
+  --extended-outline-guide-marker-gap: 4px;
+  --extended-outline-guide-first-branch-rise: 10px;
+  --extended-outline-guide-connector-offset: 0px;
+  --extended-outline-thread-opacity: 1;
+  --extended-outline-thread-thickness: 4px;
+  --extended-outline-thread-corner-radius: 8px;
+  --extended-outline-thread-connector-length: 28px;
+  --extended-outline-thread-marker-gap: 4px;
+  --extended-outline-thread-vertical-offset: 0px;
+  --extended-outline-thread-color-1: #ff5a00;
+  --extended-outline-thread-color-2: #ffc400;
+  --extended-outline-thread-color-3: #a8e600;
+  --extended-outline-thread-color-4: #00c8df;
+  --extended-outline-thread-color-5: #5794ff;
+  --extended-outline-thread-color-6: #a66cff;
+  --extended-outline-thread-color-7: #e64fa3;
+  --extended-outline-thread-color-8: #e64fa3;
+  --extended-outline-thread-fallback-color-light: #777777;
+  --extended-outline-thread-fallback-color-dark: #888888;
+  --extended-outline-thread-fallback-color: var(
+    --extended-outline-thread-fallback-color-dark
+  );
+  --extended-outline-thread-override-color-light: #777777;
+  --extended-outline-thread-override-color-dark: #888888;
+  --extended-outline-thread-override-color: var(
+    --extended-outline-thread-override-color-dark
+  );
+  --extended-outline-thread-effective-color-1: var(
+    --extended-outline-thread-color-1
+  );
+  --extended-outline-thread-effective-color-2: var(
+    --extended-outline-thread-color-2
+  );
+  --extended-outline-thread-effective-color-3: var(
+    --extended-outline-thread-color-3
+  );
+  --extended-outline-thread-effective-color-4: var(
+    --extended-outline-thread-color-4
+  );
+  --extended-outline-thread-effective-color-5: var(
+    --extended-outline-thread-color-5
+  );
+  --extended-outline-thread-effective-color-6: var(
+    --extended-outline-thread-color-6
+  );
+  --extended-outline-thread-effective-color-7: var(
+    --extended-outline-thread-color-7
+  );
+  --extended-outline-thread-effective-color-8: var(
+    --extended-outline-thread-color-8
+  );
   --extended-h7-size: 0.9em;
   --extended-h8-size: 0.9em;
   --extended-h9-size: 0.9em;
@@ -547,6 +1243,202 @@ body {
   --extended-h11-color: var(--extended-heading-color);
   --extended-h12-color: var(--extended-heading-color);
   --extended-heading-divider-color: var(--divider-color, var(--background-modifier-border));
+}
+
+body.theme-light {
+  --extended-outline-thread-fallback-color: var(
+    --extended-outline-thread-fallback-color-light
+  );
+  --extended-outline-thread-override-color: var(
+    --extended-outline-thread-override-color-light
+  );
+}
+
+body:is(
+    .extended-outline-thread-cap-round,
+    .extended-outline-thread-cap-square,
+    .extended-outline-thread-cap-flat
+  ):not(.extended-outline-thread-color-1-enabled) {
+  --extended-outline-thread-effective-color-1: transparent;
+}
+
+body:is(
+    .extended-outline-thread-cap-round,
+    .extended-outline-thread-cap-square,
+    .extended-outline-thread-cap-flat
+  ):not(.extended-outline-thread-color-2-enabled) {
+  --extended-outline-thread-effective-color-2: transparent;
+}
+
+body:is(
+    .extended-outline-thread-cap-round,
+    .extended-outline-thread-cap-square,
+    .extended-outline-thread-cap-flat
+  ):not(.extended-outline-thread-color-3-enabled) {
+  --extended-outline-thread-effective-color-3: transparent;
+}
+
+body:is(
+    .extended-outline-thread-cap-round,
+    .extended-outline-thread-cap-square,
+    .extended-outline-thread-cap-flat
+  ):not(.extended-outline-thread-color-4-enabled) {
+  --extended-outline-thread-effective-color-4: transparent;
+}
+
+body:is(
+    .extended-outline-thread-cap-round,
+    .extended-outline-thread-cap-square,
+    .extended-outline-thread-cap-flat
+  ):not(.extended-outline-thread-color-5-enabled) {
+  --extended-outline-thread-effective-color-5: transparent;
+}
+
+body:is(
+    .extended-outline-thread-cap-round,
+    .extended-outline-thread-cap-square,
+    .extended-outline-thread-cap-flat
+  ):not(.extended-outline-thread-color-6-enabled) {
+  --extended-outline-thread-effective-color-6: transparent;
+}
+
+body:is(
+    .extended-outline-thread-cap-round,
+    .extended-outline-thread-cap-square,
+    .extended-outline-thread-cap-flat
+  ):not(.extended-outline-thread-color-7-enabled) {
+  --extended-outline-thread-effective-color-7: transparent;
+}
+
+body:is(
+    .extended-outline-thread-cap-round,
+    .extended-outline-thread-cap-square,
+    .extended-outline-thread-cap-flat
+  ):not(.extended-outline-thread-color-8-enabled) {
+  --extended-outline-thread-effective-color-8: transparent;
+}
+
+body:is(
+    .extended-outline-thread-cap-round,
+    .extended-outline-thread-cap-square,
+    .extended-outline-thread-cap-flat
+  ).extended-outline-thread-fallback-colors-enabled:not(
+    .extended-outline-thread-color-1-enabled
+  ) {
+  --extended-outline-thread-effective-color-1: var(
+    --extended-outline-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-outline-thread-cap-round,
+    .extended-outline-thread-cap-square,
+    .extended-outline-thread-cap-flat
+  ).extended-outline-thread-fallback-colors-enabled:not(
+    .extended-outline-thread-color-2-enabled
+  ) {
+  --extended-outline-thread-effective-color-2: var(
+    --extended-outline-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-outline-thread-cap-round,
+    .extended-outline-thread-cap-square,
+    .extended-outline-thread-cap-flat
+  ).extended-outline-thread-fallback-colors-enabled:not(
+    .extended-outline-thread-color-3-enabled
+  ) {
+  --extended-outline-thread-effective-color-3: var(
+    --extended-outline-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-outline-thread-cap-round,
+    .extended-outline-thread-cap-square,
+    .extended-outline-thread-cap-flat
+  ).extended-outline-thread-fallback-colors-enabled:not(
+    .extended-outline-thread-color-4-enabled
+  ) {
+  --extended-outline-thread-effective-color-4: var(
+    --extended-outline-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-outline-thread-cap-round,
+    .extended-outline-thread-cap-square,
+    .extended-outline-thread-cap-flat
+  ).extended-outline-thread-fallback-colors-enabled:not(
+    .extended-outline-thread-color-5-enabled
+  ) {
+  --extended-outline-thread-effective-color-5: var(
+    --extended-outline-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-outline-thread-cap-round,
+    .extended-outline-thread-cap-square,
+    .extended-outline-thread-cap-flat
+  ).extended-outline-thread-fallback-colors-enabled:not(
+    .extended-outline-thread-color-6-enabled
+  ) {
+  --extended-outline-thread-effective-color-6: var(
+    --extended-outline-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-outline-thread-cap-round,
+    .extended-outline-thread-cap-square,
+    .extended-outline-thread-cap-flat
+  ).extended-outline-thread-fallback-colors-enabled:not(
+    .extended-outline-thread-color-7-enabled
+  ) {
+  --extended-outline-thread-effective-color-7: var(
+    --extended-outline-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-outline-thread-cap-round,
+    .extended-outline-thread-cap-square,
+    .extended-outline-thread-cap-flat
+  ).extended-outline-thread-fallback-colors-enabled:not(
+    .extended-outline-thread-color-8-enabled
+  ) {
+  --extended-outline-thread-effective-color-8: var(
+    --extended-outline-thread-fallback-color
+  );
+}
+
+body.extended-outline-thread-override-colors-enabled {
+  --extended-outline-thread-effective-color-1: var(
+    --extended-outline-thread-override-color
+  );
+  --extended-outline-thread-effective-color-2: var(
+    --extended-outline-thread-override-color
+  );
+  --extended-outline-thread-effective-color-3: var(
+    --extended-outline-thread-override-color
+  );
+  --extended-outline-thread-effective-color-4: var(
+    --extended-outline-thread-override-color
+  );
+  --extended-outline-thread-effective-color-5: var(
+    --extended-outline-thread-override-color
+  );
+  --extended-outline-thread-effective-color-6: var(
+    --extended-outline-thread-override-color
+  );
+  --extended-outline-thread-effective-color-7: var(
+    --extended-outline-thread-override-color
+  );
+  --extended-outline-thread-effective-color-8: var(
+    --extended-outline-thread-override-color
+  );
 }
 
 .extended-heading-line,
@@ -702,6 +1594,127 @@ body:not(.extended-headings-markers-before) .cm-extended-heading-gutter { order:
 }
 
 .cm-heading-marker-spacer { visibility: hidden; }
+
+.extended-heading-outline-decoration-host {
+  isolation: isolate;
+  position: relative;
+}
+
+.extended-heading-outline-row {
+  margin-block: calc(var(--extended-outline-heading-row-spacing) / 2);
+  position: relative;
+}
+
+.extended-heading-outline-row > .tree-item-inner {
+  align-items: center;
+  color: var(--extended-outline-heading-color);
+  display: flex;
+  font-family: var(--extended-outline-heading-font-family);
+  font-size: var(--extended-outline-heading-font-size);
+  font-style: var(--extended-outline-heading-font-style);
+  font-variant: var(--extended-outline-heading-font-variant);
+  font-weight: var(--extended-outline-heading-font-weight);
+  letter-spacing: var(--extended-outline-heading-letter-spacing);
+  opacity: var(--extended-outline-heading-opacity);
+}
+
+.extended-heading-outline-level-marker {
+  box-sizing: border-box;
+  color: var(--extended-outline-level-marker-color);
+  flex: 0 0 var(--extended-outline-level-marker-width);
+  font-family: inherit;
+  font-size: var(--extended-outline-level-marker-font-size);
+  font-style: var(--extended-outline-level-marker-font-style);
+  font-variant: var(--extended-outline-level-marker-font-variant);
+  font-weight: var(--extended-outline-level-marker-font-weight);
+  letter-spacing: var(--extended-outline-level-marker-letter-spacing);
+  margin-inline-end: var(--extended-outline-level-marker-gap);
+  opacity: var(--extended-outline-level-marker-opacity);
+  text-align: end;
+  white-space: nowrap;
+  width: var(--extended-outline-level-marker-width);
+}
+
+.extended-heading-outline-overlay {
+  display: block;
+  height: 100%;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  z-index: 5;
+}
+
+.extended-heading-outline-guide-path {
+  fill: none;
+  stroke: var(--extended-outline-guide-color);
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  stroke-opacity: var(--extended-outline-guide-opacity);
+  stroke-width: var(--extended-outline-guide-thickness);
+  vector-effect: non-scaling-stroke;
+}
+
+.extended-outline-guide-line-dashed .extended-heading-outline-guide-path {
+  stroke-dasharray: var(--extended-outline-guide-dash-length)
+    var(--extended-outline-guide-dash-gap);
+}
+
+.extended-outline-guide-line-dotted .extended-heading-outline-guide-path {
+  stroke-dasharray: 0.01 var(--extended-outline-guide-dot-gap);
+  stroke-linecap: round;
+}
+
+.extended-heading-outline-thread-path {
+  fill: none;
+  opacity: var(--extended-outline-thread-opacity);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: var(--extended-outline-thread-thickness);
+  vector-effect: non-scaling-stroke;
+}
+
+.extended-outline-thread-cap-square .extended-heading-outline-thread-path {
+  stroke-linecap: square;
+}
+
+.extended-outline-thread-cap-flat .extended-heading-outline-thread-path {
+  stroke-linecap: butt;
+}
+
+.extended-heading-outline-thread-depth-1 {
+  stroke: var(--extended-outline-thread-effective-color-1);
+}
+
+.extended-heading-outline-thread-depth-2 {
+  stroke: var(--extended-outline-thread-effective-color-2);
+}
+
+.extended-heading-outline-thread-depth-3 {
+  stroke: var(--extended-outline-thread-effective-color-3);
+}
+
+.extended-heading-outline-thread-depth-4 {
+  stroke: var(--extended-outline-thread-effective-color-4);
+}
+
+.extended-heading-outline-thread-depth-5 {
+  stroke: var(--extended-outline-thread-effective-color-5);
+}
+
+.extended-heading-outline-thread-depth-6 {
+  stroke: var(--extended-outline-thread-effective-color-6);
+}
+
+.extended-heading-outline-thread-depth-7 {
+  stroke: var(--extended-outline-thread-effective-color-7);
+}
+
+.extended-heading-outline-thread-depth-8 {
+  stroke: var(--extended-outline-thread-effective-color-8);
+}
+
 .extended-heading-outline-svg {
   align-items: center;
   display: inline-flex;

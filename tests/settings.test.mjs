@@ -36,22 +36,61 @@ test("includes Heading Shifter-compatible command settings", () => {
   assert.match(settings, /tabSize:\s*4/);
 });
 
-test("uses the user's current Lapel marker preferences as defaults", () => {
-  assert.match(settings, /showHeadingMarkers:\s*true/);
+test("distinguishes editor-gutter and default Outline heading markers", () => {
+  assert.match(settings, /showEditorGutterHeadingLevelMarkers:\s*true/);
+  assert.match(settings, /showOutlinePaneHeadingLevelMarkers:\s*true/);
   assert.match(settings, /showMarkersBeforeLineNumbers:\s*true/);
   assert.match(settings, /showMarkersInSourceMode:\s*true/);
+  assert.match(settings, /name: "Show Editor Gutter heading level markers"/);
+  assert.match(settings, /name: "Show Outline pane heading level markers"/);
+  assert.match(settings, /showHeadingMarkers\?: boolean/);
 });
 
 test("describes heading markers without Lapel compatibility wording", () => {
   assert.match(
     settings,
-    /desc: "Show H1–H12 heading markers in the editor gutter\."/,
+    /desc: "Show H1–H12 heading level markers in the editor gutter\."/,
   );
   assert.doesNotMatch(settings, /desc: "[^"]*Lapel-compatible[^"]*"/);
 });
 
+test("enables Outline static guides and path threading with requested defaults", () => {
+  assert.match(settings, /enableOutlinePaneHeadingStaticTreeIndentationGuides:\s*true/);
+  assert.match(settings, /enableOutlinePaneHeadingThreading:\s*true/);
+  assert.match(settings, /activeOutlinePaneHeadingThreading:\s*true/);
+  assert.match(settings, /allBranchesOfActiveOutlinePaneHeadingTreeThreading:\s*false/);
+  assert.match(settings, /activeRootLevelOutlinePaneHeadingTreeThreading:\s*true/);
+  assert.match(settings, /activeRootLevelOutlinePaneHeadingThreading:\s*true/);
+  assert.match(
+    settings,
+    /allBranchesOfActiveRootLevelOutlinePaneHeadingTreeThreading:\s*false/,
+  );
+  assert.match(settings, /activeOrphanOutlinePaneHeadingTreeThreading:\s*true/);
+  assert.match(settings, /activeOrphanOutlinePaneHeadingThreading:\s*true/);
+  assert.match(
+    settings,
+    /allBranchesOfActiveOrphanOutlinePaneHeadingTreeThreading:\s*false/,
+  );
+  assert.match(settings, /heading: "Outline Pane Heading Static Tree Indentation Guides"/);
+  assert.match(settings, /heading: "Outline Pane Heading Threading"/);
+  assert.match(settings, /name: "Active Heading Threading"/);
+  assert.match(settings, /name: "All Branches of an Active Heading Tree Threading"/);
+  assert.match(settings, /name: "Active Root-Level Heading Tree Threading"/);
+  assert.match(settings, /name: "Active Root-Level Heading Threading"/);
+  assert.match(
+    settings,
+    /name: "All Branches of an Active Root-Level Tree Threading"/,
+  );
+  assert.match(settings, /name: "Active Orphan Heading Tree Threading"/);
+  assert.match(settings, /name: "Active Orphan Heading Threading"/);
+  assert.match(
+    settings,
+    /name: "All Branches of an Active Orphan Heading Tree Threading"/,
+  );
+});
+
 test("manifest describes the plugin's overall purpose", () => {
-  assert.equal(manifest.version, "0.4.16");
+  assert.equal(manifest.version, "0.4.17");
   assert.equal(
     manifest.description,
     "Extends ATX heading support through H12 with consistent editing, styling, folding, outlines, links, navigation, and heading-level markers.",
@@ -89,4 +128,14 @@ test("documents marker typography and default Outline SVG rendering", () => {
     readme,
     /Shows Lapel-compatible H1–H12 markers in the editor gutter\./,
   );
+});
+
+test("documents default Outline markers, guides, and all threading scopes", () => {
+  assert.match(readme, /Show Outline pane heading level markers/);
+  assert.match(readme, /Outline Pane Heading Static Tree Indentation Guides/);
+  assert.match(readme, /Active Root-Level Heading Tree Threading/);
+  assert.match(readme, /All Branches of an Active Root-Level Tree Threading/);
+  assert.match(readme, /Active Orphan Heading Tree Threading/);
+  assert.match(readme, /individual H1 trees, the virtual root-level H1 tree, and orphan H2–H12 trees/);
+  assert.match(readme, /List Tree Indentation Guides/);
 });

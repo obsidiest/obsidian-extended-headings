@@ -140,3 +140,74 @@ test("keeps the H7+ heading-link fallback inline", () => {
   assert.match(styles, /\.extended-heading-link-widget/);
   assert.match(styles, /display: inline/);
 });
+
+test("exposes default Outline heading and marker appearance controls", () => {
+  for (const id of [
+    "extended-outline-heading-font-family",
+    "extended-outline-heading-font-size",
+    "extended-outline-heading-font-weight",
+    "extended-outline-heading-color",
+    "extended-outline-heading-font-style",
+    "extended-outline-heading-font-variant",
+    "extended-outline-heading-letter-spacing",
+    "extended-outline-heading-opacity",
+    "extended-outline-heading-row-spacing",
+    "extended-outline-level-marker-font-size",
+    "extended-outline-level-marker-font-weight",
+    "extended-outline-level-marker-color",
+    "extended-outline-level-marker-font-style",
+    "extended-outline-level-marker-font-variant",
+    "extended-outline-level-marker-letter-spacing",
+    "extended-outline-level-marker-opacity",
+    "extended-outline-level-marker-width",
+    "extended-outline-level-marker-gap",
+  ]) assert.match(styles, new RegExp(`id: ${id}\\n`));
+
+  assert.match(styles, /--extended-outline-heading-font-size:\s*1em;/);
+  assert.match(styles, /--extended-outline-heading-font-weight:\s*inherit;/);
+  assert.match(styles, /--extended-outline-level-marker-font-size:\s*1em;/);
+  assert.match(styles, /--extended-outline-level-marker-font-weight:\s*inherit;/);
+});
+
+test("adapts every applicable static-guide appearance and geometry control", () => {
+  for (const id of [
+    "extended-outline-guide-color",
+    "extended-outline-guide-opacity",
+    "extended-outline-guide-thickness",
+    "extended-outline-guide-pattern",
+    "extended-outline-guide-dash-length",
+    "extended-outline-guide-dash-gap",
+    "extended-outline-guide-dot-gap",
+    "extended-outline-guide-connector-length",
+    "extended-outline-guide-marker-gap",
+    "extended-outline-guide-first-branch-rise",
+    "extended-outline-guide-connector-offset",
+  ]) assert.match(styles, new RegExp(`id: ${id}\\n`));
+  assert.match(styles, /\.extended-heading-outline-guide-path/);
+});
+
+test("adapts thread appearance, geometry, fallback, override, and eight depth colors", () => {
+  assert.match(styles, /Heading Thread Appearance \(All Tree Types\)/);
+  assert.match(styles, /virtual root-level H1 tree/);
+  for (const id of [
+    "extended-outline-thread-opacity",
+    "extended-outline-thread-thickness",
+    "extended-outline-thread-corner-radius",
+    "extended-outline-thread-line-cap",
+    "extended-outline-thread-connector-length",
+    "extended-outline-thread-marker-gap",
+    "extended-outline-thread-vertical-offset",
+    "extended-outline-thread-fallback-colors-enabled",
+    "extended-outline-thread-fallback-color-light",
+    "extended-outline-thread-fallback-color-dark",
+    "extended-outline-thread-override-colors-enabled",
+    "extended-outline-thread-override-color-light",
+    "extended-outline-thread-override-color-dark",
+  ]) assert.match(styles, new RegExp(`id: ${id}\\n`));
+  for (let depth = 1; depth <= 8; depth += 1) {
+    assert.match(styles, new RegExp(`id: extended-outline-thread-color-${depth}-enabled\\n`));
+    assert.match(styles, new RegExp(`id: extended-outline-thread-color-${depth}\\n`));
+    assert.match(styles, new RegExp(`\\.extended-heading-outline-thread-depth-${depth}`));
+  }
+  assert.match(styles, /\.extended-heading-outline-thread-path/);
+});
