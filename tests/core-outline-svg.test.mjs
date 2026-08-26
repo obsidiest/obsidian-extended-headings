@@ -256,6 +256,73 @@ test("matches embedded links and Markdown-formatted headings in partial Outlines
   );
 });
 
+test("matches aliased embeds by either their alias or compact target label", () => {
+  assert.equal(typeof outlineSvg.outlineLabelCandidatesFromHeadingBody, "function");
+  const raw =
+    "![[Plot (or Plot Line) (Narrative)#Narrative Reality Creation Tips|Narrative Reality Creation Tips]]";
+  assert.deepEqual(
+    Array.from(outlineSvg.outlineLabelCandidatesFromHeadingBody(raw)),
+    [
+      "Narrative Reality Creation Tips",
+      "Plot (or Plot Line) (Narrative) > Narrative Reality Creation Tips",
+    ],
+  );
+
+  assert.deepEqual(
+    JSON.parse(
+      JSON.stringify(
+        outlineSvg.matchOutlineHeadingSpecs(
+          [
+            "Story",
+            "Plot (or Plot Line) (Narrative)#Narrative Reality Creation Tips",
+          ],
+          [
+            { label: "Story", level: 3 },
+            {
+              alternateLabels: [
+                "Plot (or Plot Line) (Narrative) > Narrative Reality Creation Tips",
+              ],
+              label: "Narrative Reality Creation Tips",
+              level: 4,
+            },
+            { label: "Collapsed descendant", level: 5 },
+          ],
+        ),
+      ),
+    ),
+    [
+      { itemIndex: 0, specIndex: 0 },
+      { itemIndex: 1, specIndex: 1 },
+    ],
+  );
+});
+
+test("matches a visible repeated short heading without requiring every occurrence", () => {
+  const specs = [
+    { label: "Non-Penetrative Sex", level: 1 },
+    { label: "n.", level: 2 },
+    { label: "Chest Stimulation", level: 2 },
+    { label: "n.", level: 4 },
+    { label: "Later unique heading", level: 4 },
+    { label: "n.", level: 7 },
+  ];
+  assert.deepEqual(
+    JSON.parse(
+      JSON.stringify(
+        outlineSvg.matchOutlineHeadingSpecs(
+          ["Non-Penetrative Sex", "n.", "Chest Stimulation"],
+          specs,
+        ),
+      ),
+    ),
+    [
+      { itemIndex: 0, specIndex: 0 },
+      { itemIndex: 1, specIndex: 1 },
+      { itemIndex: 2, specIndex: 2 },
+    ],
+  );
+});
+
 test("prepares compact, reversible Markdown for default Outline labels", () => {
   assert.equal(typeof outlineSvg.outlineMarkdownFromHeadingBody, "function");
   assert.equal(
@@ -269,6 +336,14 @@ test("prepares compact, reversible Markdown for default Outline labels", () => {
   assert.match(source, /OUTLINE_MARKDOWN_RENDERED_CLASS/);
   assert.match(source, /markdownComponent\?\.unload\(\)/);
   assert.match(styles, /\.extended-heading-outline-markdown-rendered/);
+  assert.match(
+    styles,
+    /\.extended-heading-outline-markdown-rendered\s*\{[^}]*flex:\s*1 1 auto;[^}]*min-width:\s*0;[^}]*overflow:\s*hidden;[^}]*text-overflow:\s*ellipsis;[^}]*white-space:\s*nowrap;/s,
+  );
+  assert.doesNotMatch(
+    styles,
+    /\.extended-heading-outline-markdown-rendered[^,{]*,[^{]*\{\s*display:\s*contents;/s,
+  );
 });
 
 test("integrates a sanitized, reversible renderer with Obsidian's default Outline", () => {
@@ -342,6 +417,32 @@ test("targets an Outline heading across the full pane width by measured row heig
   assert.equal(outlineSvg.findOutlineRowAtClientY(rows, 128), null);
   assert.equal(outlineSvg.findOutlineRowAtClientY(rows, Number.NaN), null);
   assert.match(source, /event\.clientY/);
+});
+
+test("excludes row centers clipped above or below the Outline content viewport", () => {
+  assert.equal(typeof outlineSvg.visibleOutlineRowCenter, "function");
+  assert.equal(
+    outlineSvg.visibleOutlineRowCenter(
+      { bottom: 120, top: 96 },
+      [{ bottom: 900, top: 140 }],
+    ),
+    null,
+  );
+  assert.equal(
+    outlineSvg.visibleOutlineRowCenter(
+      { bottom: 164, top: 140 },
+      [{ bottom: 900, top: 140 }],
+    ),
+    152,
+  );
+  assert.equal(
+    outlineSvg.visibleOutlineRowCenter(
+      { bottom: 924, top: 900 },
+      [{ bottom: 900, top: 140 }],
+    ),
+    null,
+  );
+  assert.match(source, /overflowY/);
 });
 
 test("recognizes Obsidian's selected Outline row states", () => {

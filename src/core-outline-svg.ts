@@ -39,6 +39,7 @@ export interface OutlineSvgMatch {
 }
 
 export interface OutlineHeadingSpec {
+  alternateLabels?: string[];
   label: string;
   level: number;
   markdown?: string;
@@ -87,6 +88,11 @@ export interface OutlineRootThreadPathGeometry {
 }
 
 export interface OutlineRowHitBox {
+  bottom: number;
+  top: number;
+}
+
+export interface OutlineVerticalBounds {
   bottom: number;
   top: number;
 }
@@ -188,6 +194,22 @@ export function normalizeOutlineLabel(value: string): string {
     .replace(/\s+/gu, " ")
     .replace(/\(\s+\)/gu, "()")
     .trim();
+}
+
+export function outlineLabelCandidatesFromHeadingBody(rawBody: string): string[] {
+  const aliasLabel = normalizeOutlineLabel(rawBody);
+  const targetLabel = normalizeOutlineLabel(
+    rawBody.replace(/!?\[\[([^\]]+)\]\]/gu, (_match, rawTarget: string) => {
+      const aliasSeparator = rawTarget.lastIndexOf("|");
+      return rawTarget
+        .slice(0, aliasSeparator >= 0 ? aliasSeparator : undefined)
+        .replace(/\\([#|\]])/gu, "$1")
+        .replace(/\.md(?=#|$)/giu, "");
+    }),
+  );
+  return Array.from(
+    new Set([aliasLabel, targetLabel].filter((label) => label.length > 0)),
+  );
 }
 
 export function isSelectedOutlineRowState(
@@ -314,7 +336,13 @@ export function matchOutlineHeadingSpecs(
   specs: OutlineHeadingSpec[],
 ): OutlineHeadingMatch[] {
   const normalizedItems = outlineLabels.map(normalizeOutlineLabel);
-  const normalizedSpecs = specs.map((spec) => normalizeOutlineLabel(spec.label));
+  const normalizedSpecs = specs.map(
+    (spec) => new Set(
+      [spec.label, ...(spec.alternateLabels ?? [])]
+        .map(normalizeOutlineLabel)
+        .filter((label) => label.length > 0),
+    ),
+  );
 
   if (normalizedItems.length === normalizedSpecs.length) {
     return normalizedItems.map((_label, index) => ({
@@ -323,29 +351,85 @@ export function matchOutlineHeadingSpecs(
     }));
   }
 
-  const itemIndexesByLabel = new Map<string, number[]>();
-  const specIndexesByLabel = new Map<string, number[]>();
-  normalizedItems.forEach((label, itemIndex) => {
-    const indexes = itemIndexesByLabel.get(label) ?? [];
-    indexes.push(itemIndex);
-    itemIndexesByLabel.set(label, indexes);
-  });
-  normalizedSpecs.forEach((label, specIndex) => {
-    const indexes = specIndexesByLabel.get(label) ?? [];
-    indexes.push(specIndex);
-    specIndexesByLabel.set(label, indexes);
-  });
+  // A collapsed or filtered Outline is only a subsequence of the source
+  // headings. Longest-common-subsequence matching keeps document order while
+  // still mapping one visible occurrence of a repeated title (for example
+  // `n.`) without requiring every source occurrence to be present.
+  const scores = Array.from(
+    { length: normalizedItems.length + 1 },
+    () => new Uint32Array(normalizedSpecs.length + 1),
+  );
+  for (let itemIndex = 1; itemIndex <= normalizedItems.length; itemIndex += 1) {
+    const itemLabel = normalizedItems[itemIndex - 1] ?? "";
+    for (let specIndex = 1; specIndex <= normalizedSpecs.length; specIndex += 1) {
+      const withoutItem = scores[itemIndex - 1]?.[specIndex] ?? 0;
+      const withoutSpec = scores[itemIndex]?.[specIndex - 1] ?? 0;
+      const withMatch = normalizedSpecs[specIndex - 1]?.has(itemLabel)
+        ? (scores[itemIndex - 1]?.[specIndex - 1] ?? 0) + 1
+        : 0;
+      const row = scores[itemIndex];
+      if (row) row[specIndex] = Math.max(withoutItem, withoutSpec, withMatch);
+    }
+  }
 
   const matches: OutlineHeadingMatch[] = [];
-  for (const [label, specIndexes] of specIndexesByLabel) {
-    const itemIndexes = itemIndexesByLabel.get(label) ?? [];
-    if (itemIndexes.length !== specIndexes.length) continue;
-    itemIndexes.forEach((itemIndex, index) => {
-      const specIndex = specIndexes[index];
-      matches.push({ itemIndex, specIndex });
-    });
+  let itemIndex = normalizedItems.length;
+  let specIndex = normalizedSpecs.length;
+  while (itemIndex > 0 && specIndex > 0) {
+    const score = scores[itemIndex]?.[specIndex] ?? 0;
+    const itemLabel = normalizedItems[itemIndex - 1] ?? "";
+    const matchesHere = normalizedSpecs[specIndex - 1]?.has(itemLabel) ?? false;
+    const diagonal = (scores[itemIndex - 1]?.[specIndex - 1] ?? 0) + 1;
+    const withoutSpec = scores[itemIndex]?.[specIndex - 1] ?? 0;
+    const withoutItem = scores[itemIndex - 1]?.[specIndex] ?? 0;
+
+    // Prefer skipping an equivalent later source candidate. This makes a
+    // partially rendered first occurrence deterministic while surrounding
+    // unique headings still anchor later duplicate occurrences correctly.
+    if (withoutSpec === score) {
+      specIndex -= 1;
+    } else if (withoutItem === score) {
+      itemIndex -= 1;
+    } else if (matchesHere && diagonal === score) {
+      matches.push({ itemIndex: itemIndex - 1, specIndex: specIndex - 1 });
+      itemIndex -= 1;
+      specIndex -= 1;
+    } else {
+      specIndex -= 1;
+    }
   }
-  return matches.sort((left, right) => left.itemIndex - right.itemIndex);
+  const orderedMatches = matches.reverse();
+  return orderedMatches.filter((match, index) => {
+    const itemLabel = normalizedItems[match.itemIndex] ?? "";
+    const candidateIndexes = normalizedSpecs.flatMap((labels, candidateIndex) =>
+      labels.has(itemLabel) ? [candidateIndex] : []
+    );
+    if (candidateIndexes.length <= 1) return true;
+
+    const previousSpecIndex = orderedMatches[index - 1]?.specIndex ?? -1;
+    const nextSpecIndex =
+      orderedMatches[index + 1]?.specIndex ?? normalizedSpecs.length;
+    return candidateIndexes.filter(
+      (candidateIndex) =>
+        candidateIndex > previousSpecIndex && candidateIndex < nextSpecIndex,
+    ).length === 1;
+  });
+}
+
+export function visibleOutlineRowCenter(
+  row: OutlineVerticalBounds,
+  clippingBounds: readonly OutlineVerticalBounds[],
+): number | null {
+  const top = Math.min(row.top, row.bottom);
+  const bottom = Math.max(row.top, row.bottom);
+  if (bottom <= top) return null;
+  const center = top + (bottom - top) / 2;
+  for (const clippingBound of clippingBounds) {
+    const clipTop = Math.min(clippingBound.top, clippingBound.bottom);
+    const clipBottom = Math.max(clippingBound.top, clippingBound.bottom);
+    if (clipBottom <= clipTop || center < clipTop || center > clipBottom) return null;
+  }
+  return finiteNumber(center);
 }
 
 export function buildOutlineTreeModel(levels: number[]): OutlineTreeModelItem[] {
@@ -915,23 +999,29 @@ export class CoreOutlineRenderer {
   }
 
   private buildSpecs(text: string, file: TFile): OutlineHeadingSpec[] {
-    const labelsByLine = new Map<number, string>();
+    const labelsByLine = new Map<number, string[]>();
     const cachedHeadings: HeadingCache[] =
       this.plugin.app.metadataCache.getFileCache(file)?.headings ?? [];
     for (const heading of cachedHeadings) {
       labelsByLine.set(
         heading.position.start.line,
-        outlineLabelFromHeadingBody(heading.heading),
+        outlineLabelCandidatesFromHeadingBody(heading.heading),
       );
     }
 
     return scanHeadings(text, 1, this.plugin.settings.maximumLevel).map((heading) => {
       const extracted = extractInlineSvgFragments(heading.rawBody);
+      const labels = Array.from(
+        new Set([
+          ...(labelsByLine.get(heading.line) ?? []),
+          ...outlineLabelCandidatesFromHeadingBody(heading.rawBody),
+        ]),
+      );
+      const label = labels[0] ?? extracted?.label ?? "";
+      const alternateLabels = labels.filter((candidate) => candidate !== label);
       return {
-        label:
-          labelsByLine.get(heading.line) ??
-          extracted?.label ??
-          outlineLabelFromHeadingBody(heading.rawBody),
+        ...(alternateLabels.length > 0 ? { alternateLabels } : {}),
+        label,
         level: heading.level,
         ...(hasRenderableOutlineMarkdown(heading.rawBody)
           ? { markdown: outlineMarkdownFromHeadingBody(heading.rawBody) }
@@ -1040,7 +1130,27 @@ export class CoreOutlineRenderer {
       const rowRect = decorated.row.getBoundingClientRect();
       const itemRect = decorated.item.getBoundingClientRect();
       if (rowRect.height <= 0 || itemRect.width <= 0) continue;
-      const y = clamp(rowRect.top + rowRect.height / 2 - hostRect.top, 0, height);
+      const clippingBounds: OutlineVerticalBounds[] = [hostRect];
+      const view = decorated.row.ownerDocument.defaultView;
+      for (
+        let ancestor = decorated.row.parentElement;
+        ancestor && ancestor !== attachment.container;
+        ancestor = ancestor.parentElement
+      ) {
+        const overflowY = view?.getComputedStyle(ancestor).overflowY ?? "visible";
+        if (
+          ancestor.classList.contains("view-content") ||
+          overflowY === "auto" ||
+          overflowY === "scroll" ||
+          overflowY === "hidden" ||
+          overflowY === "clip"
+        ) {
+          clippingBounds.push(ancestor.getBoundingClientRect());
+        }
+      }
+      const visibleCenter = visibleOutlineRowCenter(rowRect, clippingBounds);
+      if (visibleCenter === null) continue;
+      const y = visibleCenter - hostRect.top;
       const endX = clamp(itemRect.left - hostRect.left, 0, width);
       measured.set(specIndex, {
         ...decorated,

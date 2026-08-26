@@ -1685,13 +1685,19 @@ body:not(.extended-headings-markers-before) .cm-extended-heading-gutter { order:
   width: var(--extended-outline-level-marker-width);
 }
 
-.extended-heading-outline-markdown-rendered,
-.extended-heading-outline-markdown-rendered > p {
-  display: contents;
+.extended-heading-outline-markdown-rendered {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  pointer-events: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.extended-heading-outline-markdown-rendered {
-  pointer-events: none;
+.extended-heading-outline-markdown-rendered > p {
+  display: inline;
+  margin: 0;
 }
 
 .extended-heading-outline-overlay {
