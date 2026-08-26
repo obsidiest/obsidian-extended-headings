@@ -11,10 +11,16 @@ settings:
     default-light: '#3b3b3b'
     default-dark: '#dcddde'
   -
+    id: extended-editor-gutter
+    title: Editor Gutter
+    type: heading
+    level: 2
+    collapsed: true
+  -
     id: extended-heading-level-marker-typography
     title: Heading level markers
     type: heading
-    level: 2
+    level: 3
     collapsed: true
   -
     id: extended-heading-level-marker-size
@@ -65,10 +71,30 @@ settings:
         label: 900
         value: '900'
   -
+    id: extended-heading-level-marker-font-variant
+    title: Heading level marker font variant
+    description: Inherit retains the current editor-gutter marker font variant
+    type: variable-select
+    allowEmpty: false
+    default: inherit
+    options:
+      -
+        label: Inherit
+        value: inherit
+      -
+        label: Normal
+        value: normal
+      -
+        label: Small caps
+        value: small-caps
+      -
+        label: All small caps
+        value: all-small-caps
+  -
     id: extended-hash-marker-typography
     title: Hash markers
     type: heading
-    level: 2
+    level: 3
     collapsed: true
   -
     id: extended-hash-marker-size
@@ -118,6 +144,26 @@ settings:
       -
         label: 900
         value: '900'
+  -
+    id: extended-hash-marker-font-variant
+    title: Hash marker font variant
+    description: Inherit matches the corresponding H1–H12 heading font variant
+    type: variable-select
+    allowEmpty: false
+    default: inherit
+    options:
+      -
+        label: Inherit
+        value: inherit
+      -
+        label: Normal
+        value: normal
+      -
+        label: Small caps
+        value: small-caps
+      -
+        label: All small caps
+        value: all-small-caps
   -
     id: extended-outline-pane
     title: Default Outline Pane
@@ -337,7 +383,7 @@ settings:
     title: Heading level marker font variant
     type: variable-select
     allowEmpty: false
-    default: inherit
+    default: all-small-caps
     options:
       -
         label: Inherit
@@ -507,7 +553,7 @@ settings:
   -
     id: extended-outline-thread-appearance
     title: Heading Thread Appearance (All Tree Types)
-    description: Applies to individual H1 trees, the virtual root-level H1 tree, and orphan H2–H12 trees
+    description: Applies to individual H1 trees, the virtual root-level H1 tree, orphan H2–H12 trees, and the combined root-level ⟺ orphan tree
     type: heading
     level: 3
     collapsed: true
@@ -556,7 +602,7 @@ settings:
   -
     id: extended-outline-thread-geometry
     title: Heading Thread Geometry (All Tree Types)
-    description: Applies to individual H1 trees, the virtual root-level H1 tree, and orphan H2–H12 trees
+    description: Applies to individual H1 trees, the virtual root-level H1 tree, orphan H2–H12 trees, and the combined root-level ⟺ orphan tree
     type: heading
     level: 4
     collapsed: true
@@ -590,7 +636,7 @@ settings:
   -
     id: extended-outline-thread-colors
     title: Heading Thread Colors (All Tree Types)
-    description: Applies to individual H1 trees, the virtual root-level H1 tree, and orphan H2–H12 trees
+    description: Applies to individual H1 trees, the virtual root-level H1 tree, orphan H2–H12 trees, and the combined root-level ⟺ orphan tree
     type: heading
     level: 4
     collapsed: true
@@ -1133,8 +1179,10 @@ settings:
 body {
   --extended-heading-level-marker-size: 1em;
   --extended-heading-level-marker-weight: inherit;
+  --extended-heading-level-marker-font-variant: inherit;
   --extended-hash-marker-size: 1em;
   --extended-hash-marker-weight: inherit;
+  --extended-hash-marker-font-variant: inherit;
   --extended-outline-heading-font-family: inherit;
   --extended-outline-heading-font-size: 1em;
   --extended-outline-heading-font-weight: inherit;
@@ -1148,7 +1196,7 @@ body {
   --extended-outline-level-marker-font-weight: inherit;
   --extended-outline-level-marker-color: inherit;
   --extended-outline-level-marker-font-style: inherit;
-  --extended-outline-level-marker-font-variant: inherit;
+  --extended-outline-level-marker-font-variant: all-small-caps;
   --extended-outline-level-marker-letter-spacing: 0em;
   --extended-outline-level-marker-opacity: 1;
   --extended-outline-level-marker-width: 3ch;
@@ -1516,7 +1564,7 @@ body.extended-outline-thread-override-colors-enabled {
   color: var(--text-faint);
   font-size: var(--extended-hash-marker-size);
   font-style: inherit;
-  font-variant: inherit;
+  font-variant: var(--extended-hash-marker-font-variant);
   font-weight: var(--extended-hash-marker-weight);
 }
 
@@ -1532,6 +1580,7 @@ body.extended-outline-thread-override-colors-enabled {
   )
   .cm-formatting-header {
   font-size: var(--extended-hash-marker-size);
+  font-variant: var(--extended-hash-marker-font-variant);
   font-weight: var(--extended-hash-marker-weight);
 }
 
@@ -1578,6 +1627,7 @@ body:not(.extended-headings-markers-before) .cm-extended-heading-gutter { order:
   color: var(--text-faint);
   display: inline-block;
   font-size: var(--extended-heading-level-marker-size);
+  font-variant: var(--extended-heading-level-marker-font-variant);
   font-weight: var(--extended-heading-level-marker-weight);
 }
 

@@ -4,8 +4,12 @@
 
 - Renamed the editor setting to **Show Editor Gutter heading level markers**, preserved existing preferences through migration, and added the default-on **Show Outline pane heading level markers** toggle for H1–H12 labels.
 - Added default-on measured static tree indentation guides to Obsidian's default Outline, with root, nested, and orphan connectors.
-- Added default-on Outline heading threading with independent active-path and all-branches behavior for individual H1 trees, the virtual root-level H1 tree, and orphan H2–H12 trees. Root-level and orphan active paths default on; their all-branches modes default off.
-- Added default Outline heading and marker typography/appearance controls plus complete static-guide and thread appearance, geometry, pattern, depth-color, fallback, and override controls to Style Settings.
+- Added default-on Outline heading threading with independent active-path and all-branches behavior for individual H1 trees, the virtual root-level H1 tree, orphan H2–H12 trees, and a combined root-level ⟺ orphan tree. Active paths default on; all-branches modes default off.
+- Added the default-off **Active Selected Heading Threading** override, which activates every enabled threading submode from Obsidian's selected Outline heading instead of pointer hover.
+- Expanded each Outline heading's threading hover target across the full pane width by adapting the measured vertical-row hit testing proven in List Tree Indentation Guides 1.0.6.
+- Fixed missing Outline heading-level markers and related decorations for headings made entirely from internal links by normalizing rendered link labels and retaining a source-order mapping fallback for complete Outlines.
+- Added an **Editor Gutter** Style Settings section with independently configurable heading-level-marker and hash-marker font variants, both preserving their inherited appearance by default.
+- Added default Outline heading and marker typography/appearance controls plus complete static-guide and thread appearance, geometry, pattern, depth-color, fallback, and override controls to Style Settings. Outline heading-level markers default to **All small caps**.
 - Extended precise numerical input support to all 38 Style Settings sliders and all four inherited numerical weight selectors.
 - Consolidated core Outline SVGs, markers, guides, and threads into one sanitized, reversible, animation-frame-coalesced renderer.
 - Retained Obsidian 1.13.7 as the latest audited compatibility target.

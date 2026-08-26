@@ -57,6 +57,7 @@ test("describes heading markers without Lapel compatibility wording", () => {
 test("enables Outline static guides and path threading with requested defaults", () => {
   assert.match(settings, /enableOutlinePaneHeadingStaticTreeIndentationGuides:\s*true/);
   assert.match(settings, /enableOutlinePaneHeadingThreading:\s*true/);
+  assert.match(settings, /activeSelectedOutlinePaneHeadingThreading:\s*false/);
   assert.match(settings, /activeOutlinePaneHeadingThreading:\s*true/);
   assert.match(settings, /allBranchesOfActiveOutlinePaneHeadingTreeThreading:\s*false/);
   assert.match(settings, /activeRootLevelOutlinePaneHeadingTreeThreading:\s*true/);
@@ -71,8 +72,21 @@ test("enables Outline static guides and path threading with requested defaults",
     settings,
     /allBranchesOfActiveOrphanOutlinePaneHeadingTreeThreading:\s*false/,
   );
+  assert.match(
+    settings,
+    /activeRootLevelOrphanOutlinePaneHeadingTreeThreading:\s*true/,
+  );
+  assert.match(
+    settings,
+    /activeRootLevelOrphanOutlinePaneHeadingThreading:\s*true/,
+  );
+  assert.match(
+    settings,
+    /allBranchesOfActiveRootLevelOrphanOutlinePaneHeadingTreeThreading:\s*false/,
+  );
   assert.match(settings, /heading: "Outline Pane Heading Static Tree Indentation Guides"/);
   assert.match(settings, /heading: "Outline Pane Heading Threading"/);
+  assert.match(settings, /name: "Active Selected Heading Threading"/);
   assert.match(settings, /name: "Active Heading Threading"/);
   assert.match(settings, /name: "All Branches of an Active Heading Tree Threading"/);
   assert.match(settings, /name: "Active Root-Level Heading Tree Threading"/);
@@ -86,6 +100,18 @@ test("enables Outline static guides and path threading with requested defaults",
   assert.match(
     settings,
     /name: "All Branches of an Active Orphan Heading Tree Threading"/,
+  );
+  assert.match(
+    settings,
+    /name: "Active Root-Level ⟺ Orphan Heading Tree Threading"/,
+  );
+  assert.match(
+    settings,
+    /name: "Active Root-Level ⟺ Orphan Heading Threading"/,
+  );
+  assert.match(
+    settings,
+    /name: "All Branches of an Active Root-Level ⟺ Orphan Heading Tree Threading"/,
   );
 });
 
@@ -114,8 +140,9 @@ test("uses searchable declarative settings without a legacy display renderer", (
 });
 
 test("documents marker typography and default Outline SVG rendering", () => {
-  assert.match(readme, /heading level marker size and weight/i);
-  assert.match(readme, /hash marker size and weight/i);
+  assert.match(readme, /Editor Gutter/);
+  assert.match(readme, /heading.level.marker.*size, weight, and font variant/is);
+  assert.match(readme, /hash.marker.*size, weight, and font variant/is);
   assert.match(readme, /all H1.H12 heading levels/i);
   assert.match(readme, /precise number input/i);
   assert.match(readme, /arbitrary in-range values/i);
@@ -136,6 +163,9 @@ test("documents default Outline markers, guides, and all threading scopes", () =
   assert.match(readme, /Active Root-Level Heading Tree Threading/);
   assert.match(readme, /All Branches of an Active Root-Level Tree Threading/);
   assert.match(readme, /Active Orphan Heading Tree Threading/);
-  assert.match(readme, /individual H1 trees, the virtual root-level H1 tree, and orphan H2–H12 trees/);
+  assert.match(readme, /Active Root-Level ⟺ Orphan Heading Tree Threading/);
+  assert.match(readme, /Active Selected Heading Threading/);
+  assert.match(readme, /headings made entirely from internal links/);
+  assert.match(readme, /individual H1 trees, the virtual root-level H1 tree, orphan H2–H12 trees, and the combined root-level ⟺ orphan tree/);
   assert.match(readme, /List Tree Indentation Guides/);
 });

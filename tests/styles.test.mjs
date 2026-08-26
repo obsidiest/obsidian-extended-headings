@@ -33,6 +33,18 @@ test("uses the requested typography defaults for every extended level", () => {
 test("exposes global marker typography controls with inheritance-preserving defaults", () => {
   assert.match(
     styles,
+    /id: extended-editor-gutter\n[\s\S]*?title: Editor Gutter\n[\s\S]*?level: 2\n/,
+  );
+  assert.match(
+    styles,
+    /id: extended-heading-level-marker-typography\n[\s\S]*?level: 3\n/,
+  );
+  assert.match(
+    styles,
+    /id: extended-hash-marker-typography\n[\s\S]*?level: 3\n/,
+  );
+  assert.match(
+    styles,
     /id: extended-heading-level-marker-size\n[\s\S]*?type: variable-number-slider\n[\s\S]*?default: 1\n/,
   );
   assert.match(
@@ -46,6 +58,14 @@ test("exposes global marker typography controls with inheritance-preserving defa
   assert.match(
     styles,
     /id: extended-hash-marker-weight\n[\s\S]*?type: variable-select\n[\s\S]*?default: inherit\n/,
+  );
+  assert.match(
+    styles,
+    /id: extended-heading-level-marker-font-variant\n[\s\S]*?default: inherit\n/,
+  );
+  assert.match(
+    styles,
+    /id: extended-hash-marker-font-variant\n[\s\S]*?default: inherit\n/,
   );
 });
 
@@ -104,10 +124,14 @@ test("keeps H7+ ATX markers aligned with their heading typography", () => {
   assert.ok(markerRule);
   assert.match(markerRule[1], /font-size:\s*var\(--extended-hash-marker-size\);/);
   assert.match(markerRule[1], /font-style:\s*inherit;/);
-  assert.match(markerRule[1], /font-variant:\s*inherit;/);
+  assert.match(
+    markerRule[1],
+    /font-variant:\s*var\(--extended-hash-marker-font-variant\);/,
+  );
   assert.match(markerRule[1], /font-weight:\s*var\(--extended-hash-marker-weight\);/);
   assert.match(styles, /--extended-hash-marker-size:\s*1em;/);
   assert.match(styles, /--extended-hash-marker-weight:\s*inherit;/);
+  assert.match(styles, /--extended-hash-marker-font-variant:\s*inherit;/);
   assert.doesNotMatch(markerRule[1], /font-size:\s*0\.8em;/);
   assert.doesNotMatch(markerRule[1], /font-weight:\s*400;/);
 });
@@ -118,6 +142,10 @@ test("applies global hash typography controls to native H1-H6 markers", () => {
   );
   assert.ok(nativeMarkerRule);
   assert.match(nativeMarkerRule[1], /font-size:\s*var\(--extended-hash-marker-size\);/);
+  assert.match(
+    nativeMarkerRule[1],
+    /font-variant:\s*var\(--extended-hash-marker-font-variant\);/,
+  );
   assert.match(nativeMarkerRule[1], /font-weight:\s*var\(--extended-hash-marker-weight\);/);
 });
 
@@ -132,8 +160,13 @@ test("applies global typography controls to H1-H12 gutter markers", () => {
     markerRule[1],
     /font-weight:\s*var\(--extended-heading-level-marker-weight\);/,
   );
+  assert.match(
+    markerRule[1],
+    /font-variant:\s*var\(--extended-heading-level-marker-font-variant\);/,
+  );
   assert.match(styles, /--extended-heading-level-marker-size:\s*1em;/);
   assert.match(styles, /--extended-heading-level-marker-weight:\s*inherit;/);
+  assert.match(styles, /--extended-heading-level-marker-font-variant:\s*inherit;/);
 });
 
 test("keeps the H7+ heading-link fallback inline", () => {
@@ -167,6 +200,14 @@ test("exposes default Outline heading and marker appearance controls", () => {
   assert.match(styles, /--extended-outline-heading-font-weight:\s*inherit;/);
   assert.match(styles, /--extended-outline-level-marker-font-size:\s*1em;/);
   assert.match(styles, /--extended-outline-level-marker-font-weight:\s*inherit;/);
+  assert.match(
+    styles,
+    /id: extended-outline-level-marker-font-variant\n[\s\S]*?default: all-small-caps\n/,
+  );
+  assert.match(
+    styles,
+    /--extended-outline-level-marker-font-variant:\s*all-small-caps;/,
+  );
 });
 
 test("adapts every applicable static-guide appearance and geometry control", () => {
@@ -189,6 +230,7 @@ test("adapts every applicable static-guide appearance and geometry control", () 
 test("adapts thread appearance, geometry, fallback, override, and eight depth colors", () => {
   assert.match(styles, /Heading Thread Appearance \(All Tree Types\)/);
   assert.match(styles, /virtual root-level H1 tree/);
+  assert.match(styles, /combined root-level ⟺ orphan tree/);
   for (const id of [
     "extended-outline-thread-opacity",
     "extended-outline-thread-thickness",

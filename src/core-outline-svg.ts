@@ -81,6 +81,17 @@ export interface OutlineRootThreadPathGeometry {
   startY: number;
 }
 
+export interface OutlineRowHitBox {
+  bottom: number;
+  top: number;
+}
+
+export interface OutlineRowSelectionState {
+  ariaCurrent?: string | null;
+  ariaSelected?: string | null;
+  classNames: readonly string[];
+}
+
 interface DecoratedOutlineRow {
   item: HTMLElement;
   model: OutlineTreeModelItem;
@@ -89,7 +100,9 @@ interface DecoratedOutlineRow {
 }
 
 interface MeasuredOutlineRow extends DecoratedOutlineRow {
+  bottom: number;
   endX: number;
+  top: number;
   y: number;
 }
 
@@ -98,6 +111,7 @@ interface OutlineAttachment {
   container: HTMLElement;
   guideLayer: SVGGElement | null;
   hoveredSpecIndex: number | null;
+  lastMeasuredRows: MeasuredOutlineRow[];
   leaf: WorkspaceLeaf;
   model: OutlineTreeModelItem[];
   observer: MutationObserver;
@@ -130,7 +144,43 @@ function formatPoint(value: number): string {
 }
 
 export function normalizeOutlineLabel(value: string): string {
-  return value.replace(/\s+/gu, " ").replace(/\(\s+\)/gu, "()").trim();
+  return value
+    .replace(/!?\[\[([^\]]+)\]\]/gu, (_match, rawTarget: string) => {
+      const aliasSeparator = rawTarget.lastIndexOf("|");
+      if (aliasSeparator >= 0) {
+        const alias = rawTarget.slice(aliasSeparator + 1).trim();
+        if (alias) return alias;
+      }
+
+      return rawTarget
+        .slice(0, aliasSeparator >= 0 ? aliasSeparator : undefined)
+        .replace(/\\([#|\]])/gu, "$1")
+        .replace(/\.md(?=#|$)/giu, "")
+        .split("#")
+        .map((part) => part.trim())
+        .filter(Boolean)
+        .join(" > ");
+    })
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/gu, "$1")
+    .replace(/\s+/gu, " ")
+    .replace(/\(\s+\)/gu, "()")
+    .trim();
+}
+
+export function isSelectedOutlineRowState(
+  state: OutlineRowSelectionState,
+): boolean {
+  return (
+    state.classNames.some((className) =>
+      className === "is-active" ||
+      className === "is-selected" ||
+      className === "mod-active"
+    ) ||
+    state.ariaSelected === "true" ||
+    state.ariaCurrent === "true" ||
+    state.ariaCurrent === "location" ||
+    state.ariaCurrent === "page"
+  );
 }
 
 export function outlineLabelFromHeadingBody(rawBody: string): string {
@@ -225,10 +275,7 @@ export function matchOutlineHeadingSpecs(
   const normalizedItems = outlineLabels.map(normalizeOutlineLabel);
   const normalizedSpecs = specs.map((spec) => normalizeOutlineLabel(spec.label));
 
-  if (
-    normalizedItems.length === normalizedSpecs.length &&
-    normalizedItems.every((label, index) => label === normalizedSpecs[index])
-  ) {
+  if (normalizedItems.length === normalizedSpecs.length) {
     return normalizedItems.map((_label, index) => ({
       itemIndex: index,
       specIndex: index,
@@ -291,6 +338,37 @@ export function buildOutlineTreeModel(levels: number[]): OutlineTreeModelItem[] 
   });
 
   return model;
+}
+
+export function findOutlineRowAtClientY(
+  rows: readonly OutlineRowHitBox[],
+  clientY: number,
+): number | null {
+  if (!Number.isFinite(clientY)) return null;
+  for (let index = 0; index < rows.length; index += 1) {
+    const row = rows[index];
+    if (
+      row &&
+      clientY >= Math.min(row.top, row.bottom) &&
+      clientY <= Math.max(row.top, row.bottom)
+    ) return index;
+  }
+  return null;
+}
+
+export function collectRootLevelOrphanTreeRootIndexes(
+  model: readonly OutlineTreeModelItem[],
+): number[] {
+  const rootIndexes: number[] = [];
+  let hasRootLevelHeading = false;
+  let hasOrphanHeading = false;
+  model.forEach((entry, index) => {
+    if (entry.parentIndex !== null) return;
+    rootIndexes.push(index);
+    if (entry.orphan) hasOrphanHeading = true;
+    else hasRootLevelHeading = true;
+  });
+  return hasRootLevelHeading && hasOrphanHeading ? rootIndexes : [];
 }
 
 export function buildOutlineGuidePath(geometry: OutlineGuidePathGeometry): string {
@@ -457,17 +535,22 @@ export class CoreOutlineRenderer {
         this.handlePointerMove(attachment, event);
       };
       const pointerLeave = (): void => {
+        if (this.plugin.settings.activeSelectedOutlinePaneHeadingThreading) return;
         if (attachment.hoveredSpecIndex === null) return;
         attachment.hoveredSpecIndex = null;
         this.scheduleVisualPass(attachment);
       };
-      const scroll = (): void => this.scheduleVisualPass(attachment);
+      const scroll = (): void => {
+        attachment.lastMeasuredRows = [];
+        this.scheduleVisualPass(attachment);
+      };
 
       attachment = {
         animationFrame: 0,
         container,
         guideLayer: null,
         hoveredSpecIndex: null,
+        lastMeasuredRows: [],
         leaf,
         model: [],
         observer,
@@ -742,6 +825,9 @@ export class CoreOutlineRenderer {
     overlay.setAttribute("height", String(height));
 
     const measured = this.measureRows(attachment, width, height);
+    attachment.lastMeasuredRows = Array.from(measured.values()).sort(
+      (left, right) => left.top - right.top,
+    );
     if (this.plugin.settings.enableOutlinePaneHeadingStaticTreeIndentationGuides) {
       this.renderStaticGuides(attachment, measured, guideLayer, width, height);
     }
@@ -763,7 +849,13 @@ export class CoreOutlineRenderer {
       if (rowRect.height <= 0 || itemRect.width <= 0) continue;
       const y = clamp(rowRect.top + rowRect.height / 2 - hostRect.top, 0, height);
       const endX = clamp(itemRect.left - hostRect.left, 0, width);
-      measured.set(specIndex, { ...decorated, endX, y });
+      measured.set(specIndex, {
+        ...decorated,
+        bottom: rowRect.bottom,
+        endX,
+        top: rowRect.top,
+        y,
+      });
     }
     return measured;
   }
@@ -894,10 +986,12 @@ export class CoreOutlineRenderer {
     width: number,
     height: number,
   ): void {
-    const hoveredIndex = attachment.hoveredSpecIndex;
-    if (hoveredIndex === null || !measured.has(hoveredIndex)) return;
-    const hovered = attachment.model[hoveredIndex];
-    if (!hovered) return;
+    const activeIndex = this.plugin.settings.activeSelectedOutlinePaneHeadingThreading
+      ? this.findSelectedSpecIndex(attachment)
+      : attachment.hoveredSpecIndex;
+    if (activeIndex === null || !measured.has(activeIndex)) return;
+    const active = attachment.model[activeIndex];
+    if (!active) return;
 
     const connectorLength = this.readStyleNumber(
       attachment.container,
@@ -950,7 +1044,7 @@ export class CoreOutlineRenderer {
 
     const appendAncestorEdges = (depthOffset: number): void => {
       const indexes: number[] = [];
-      let currentIndex: number | null = hoveredIndex;
+      let currentIndex: number | null = activeIndex;
       while (currentIndex !== null) {
         const current: OutlineTreeModelItem | undefined =
           attachment.model[currentIndex];
@@ -976,7 +1070,40 @@ export class CoreOutlineRenderer {
       });
     };
 
-    if (hovered.orphan) {
+    const combinedRootIndexes = collectRootLevelOrphanTreeRootIndexes(
+      attachment.model,
+    );
+    const combinedTreeEnabled =
+      combinedRootIndexes.length > 0 &&
+      this.plugin.settings.activeRootLevelOrphanOutlinePaneHeadingTreeThreading;
+    const combinedTreeAll =
+      combinedTreeEnabled &&
+      this.plugin.settings
+        .allBranchesOfActiveRootLevelOrphanOutlinePaneHeadingTreeThreading;
+    const combinedTreeActive =
+      combinedTreeEnabled &&
+      this.plugin.settings.activeRootLevelOrphanOutlinePaneHeadingThreading;
+    if (combinedTreeAll || combinedTreeActive) {
+      const combinedRoots = combinedRootIndexes
+        .map((index) => measured.get(index))
+        .filter((entry): entry is MeasuredOutlineRow => entry !== undefined);
+      this.appendRootThread(
+        layer,
+        combinedRoots,
+        null,
+        connectorLength,
+        markerGap,
+        verticalOffset,
+        radius,
+        width,
+        height,
+      );
+      if (combinedTreeAll) appendBranchEdges(() => true, 1);
+      else appendAncestorEdges(1);
+      return;
+    }
+
+    if (active.orphan) {
       if (!this.plugin.settings.activeOrphanOutlinePaneHeadingTreeThreading) return;
       const showAll =
         this.plugin.settings.allBranchesOfActiveOrphanOutlinePaneHeadingTreeThreading;
@@ -985,7 +1112,7 @@ export class CoreOutlineRenderer {
       const orphanRoots = Array.from(measured.values()).filter(
         (entry) => entry.model.orphan && entry.model.parentIndex === null,
       );
-      const activeRootIndex = hovered.rootIndex;
+      const activeRootIndex = active.rootIndex;
       this.appendRootThread(
         layer,
         orphanRoots,
@@ -1020,7 +1147,7 @@ export class CoreOutlineRenderer {
       this.appendRootThread(
         layer,
         roots,
-        rootLevelAll ? null : hovered.rootIndex,
+        rootLevelAll ? null : active.rootIndex,
         connectorLength,
         markerGap,
         verticalOffset,
@@ -1038,7 +1165,7 @@ export class CoreOutlineRenderer {
     const individualDepthOffset = rootLevelAll || rootLevelActive ? 1 : 0;
     if (this.plugin.settings.allBranchesOfActiveOutlinePaneHeadingTreeThreading) {
       appendBranchEdges(
-        (entry) => !entry.orphan && entry.rootIndex === hovered.rootIndex,
+        (entry) => !entry.orphan && entry.rootIndex === active.rootIndex,
         individualDepthOffset,
       );
     } else if (this.plugin.settings.activeOutlinePaneHeadingThreading) {
@@ -1098,17 +1225,29 @@ export class CoreOutlineRenderer {
   }
 
   private handlePointerMove(attachment: OutlineAttachment, event: PointerEvent): void {
-    const ElementConstructor = attachment.container.ownerDocument.defaultView?.Element;
-    const target = event.target;
-    const row = ElementConstructor && target instanceof ElementConstructor
-      ? target.closest<HTMLElement>(`.${OUTLINE_ROW_CLASS}`)
-      : null;
-    const indexText = row?.dataset.extendedHeadingSpecIndex;
-    let specIndex = indexText === undefined ? null : Number(indexText);
-    if (specIndex !== null && !Number.isInteger(specIndex)) specIndex = null;
+    if (this.plugin.settings.activeSelectedOutlinePaneHeadingThreading) return;
+    const rowIndex = findOutlineRowAtClientY(
+      attachment.lastMeasuredRows,
+      event.clientY,
+    );
+    const specIndex = rowIndex === null
+      ? null
+      : (attachment.lastMeasuredRows[rowIndex]?.specIndex ?? null);
     if (specIndex === attachment.hoveredSpecIndex) return;
     attachment.hoveredSpecIndex = specIndex;
     this.scheduleVisualPass(attachment);
+  }
+
+  private findSelectedSpecIndex(attachment: OutlineAttachment): number | null {
+    for (const [specIndex, decorated] of attachment.rowsBySpecIndex) {
+      const state: OutlineRowSelectionState = {
+        ariaCurrent: decorated.row.getAttribute("aria-current"),
+        ariaSelected: decorated.row.getAttribute("aria-selected"),
+        classNames: Array.from(decorated.row.classList),
+      };
+      if (isSelectedOutlineRowState(state)) return specIndex;
+    }
+    return null;
   }
 
   private clearDecorations(attachment: OutlineAttachment): void {
@@ -1136,13 +1275,20 @@ export class CoreOutlineRenderer {
     attachment.guideLayer = null;
     attachment.threadLayer = null;
     attachment.hoveredSpecIndex = null;
+    attachment.lastMeasuredRows = [];
     attachment.rowsBySpecIndex.clear();
     attachment.model = [];
   }
 
   private observeMutations(attachment: OutlineAttachment): void {
     attachment.observer.observe(attachment.container, {
-      attributeFilter: ["aria-expanded", "class", "style"],
+      attributeFilter: [
+        "aria-current",
+        "aria-expanded",
+        "aria-selected",
+        "class",
+        "style",
+      ],
       attributes: true,
       characterData: true,
       childList: true,

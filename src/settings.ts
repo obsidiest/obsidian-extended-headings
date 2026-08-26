@@ -20,6 +20,7 @@ export interface ExtendedHeadingsSettings {
   showOutlinePaneHeadingLevelMarkers: boolean;
   enableOutlinePaneHeadingStaticTreeIndentationGuides: boolean;
   enableOutlinePaneHeadingThreading: boolean;
+  activeSelectedOutlinePaneHeadingThreading: boolean;
   activeOutlinePaneHeadingThreading: boolean;
   allBranchesOfActiveOutlinePaneHeadingTreeThreading: boolean;
   activeRootLevelOutlinePaneHeadingTreeThreading: boolean;
@@ -28,6 +29,9 @@ export interface ExtendedHeadingsSettings {
   activeOrphanOutlinePaneHeadingTreeThreading: boolean;
   activeOrphanOutlinePaneHeadingThreading: boolean;
   allBranchesOfActiveOrphanOutlinePaneHeadingTreeThreading: boolean;
+  activeRootLevelOrphanOutlinePaneHeadingTreeThreading: boolean;
+  activeRootLevelOrphanOutlinePaneHeadingThreading: boolean;
+  allBranchesOfActiveRootLevelOrphanOutlinePaneHeadingTreeThreading: boolean;
   showMarkersBeforeLineNumbers: boolean;
   showMarkersInSourceMode: boolean;
   removeUnorderedListMarker: boolean;
@@ -53,6 +57,7 @@ export const DEFAULT_SETTINGS: ExtendedHeadingsSettings = {
   showOutlinePaneHeadingLevelMarkers: true,
   enableOutlinePaneHeadingStaticTreeIndentationGuides: true,
   enableOutlinePaneHeadingThreading: true,
+  activeSelectedOutlinePaneHeadingThreading: false,
   activeOutlinePaneHeadingThreading: true,
   allBranchesOfActiveOutlinePaneHeadingTreeThreading: false,
   activeRootLevelOutlinePaneHeadingTreeThreading: true,
@@ -61,6 +66,9 @@ export const DEFAULT_SETTINGS: ExtendedHeadingsSettings = {
   activeOrphanOutlinePaneHeadingTreeThreading: true,
   activeOrphanOutlinePaneHeadingThreading: true,
   allBranchesOfActiveOrphanOutlinePaneHeadingTreeThreading: false,
+  activeRootLevelOrphanOutlinePaneHeadingTreeThreading: true,
+  activeRootLevelOrphanOutlinePaneHeadingThreading: true,
+  allBranchesOfActiveRootLevelOrphanOutlinePaneHeadingTreeThreading: false,
   showMarkersBeforeLineNumbers: true,
   showMarkersInSourceMode: true,
   removeUnorderedListMarker: true,
@@ -260,7 +268,7 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
         items: [
           {
             name: "Enable Outline Pane Heading Threading",
-            desc: "Enable Logseq-style hover highlighting for H1–H12 heading-tree branches in Obsidian's default Outline pane.",
+            desc: "Enable Logseq-style active-path highlighting for H1–H12 heading-tree branches in Obsidian's default Outline pane.",
             aliases: ["Outline hover path", "heading tree highlight"],
             control: {
               type: "toggle",
@@ -269,8 +277,24 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
             },
           },
           {
+            name: "Active Selected Heading Threading",
+            desc: "Use the selected Outline heading instead of the heading under the pointer to activate every enabled regular, root-level, orphan, and combined threading mode.",
+            aliases: [
+              "selected heading path",
+              "selection threading",
+              "click heading threading",
+            ],
+            control: {
+              type: "toggle",
+              key: "activeSelectedOutlinePaneHeadingThreading",
+              defaultValue:
+                DEFAULT_SETTINGS.activeSelectedOutlinePaneHeadingThreading,
+              disabled: () => !this.plugin.settings.enableOutlinePaneHeadingThreading,
+            },
+          },
+          {
             name: "Active Heading Threading",
-            desc: "Highlight the complete nested path from an H1 tree root to the heading currently hovered over.",
+            desc: "Highlight the complete nested path from an H1 tree root to the currently active heading.",
             aliases: ["active heading path", "hovered heading ancestors"],
             control: {
               type: "toggle",
@@ -281,7 +305,7 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
           },
           {
             name: "All Branches of an Active Heading Tree Threading",
-            desc: "Highlight every branch in the H1-rooted heading tree containing the heading currently hovered over.",
+            desc: "Highlight every branch in the H1-rooted heading tree containing the currently active heading.",
             aliases: ["whole heading tree", "all active Outline branches"],
             control: {
               type: "toggle",
@@ -305,7 +329,7 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
           },
           {
             name: "Active Root-Level Heading Threading",
-            desc: "Highlight the root-level H1 path and nested ancestor path to the heading currently hovered over.",
+            desc: "Highlight the root-level H1 path and nested ancestor path to the currently active heading.",
             aliases: ["active root heading path", "hovered H1 branch"],
             control: {
               type: "toggle",
@@ -319,7 +343,7 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
           },
           {
             name: "All Branches of an Active Root-Level Tree Threading",
-            desc: "Highlight all sibling H1 roots and every descendant branch when a heading in the root-level tree is hovered.",
+            desc: "Highlight all sibling H1 roots and every descendant branch when a heading in the root-level tree is active.",
             aliases: ["all root heading branches", "whole note heading tree"],
             control: {
               type: "toggle",
@@ -345,7 +369,7 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
           },
           {
             name: "Active Orphan Heading Threading",
-            desc: "Highlight the nested path to the hovered heading in an orphan H2–H12 heading tree.",
+            desc: "Highlight the nested path to the active heading in an orphan H2–H12 heading tree.",
             aliases: ["active orphan heading path"],
             control: {
               type: "toggle",
@@ -359,7 +383,7 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
           },
           {
             name: "All Branches of an Active Orphan Heading Tree Threading",
-            desc: "Highlight every branch in the orphan H2–H12 heading tree containing the heading currently hovered over.",
+            desc: "Highlight every branch in the orphan H2–H12 heading tree containing the currently active heading.",
             aliases: ["all orphan heading branches"],
             control: {
               type: "toggle",
@@ -369,6 +393,56 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
               disabled: () =>
                 !this.plugin.settings.enableOutlinePaneHeadingThreading ||
                 !this.plugin.settings.activeOrphanOutlinePaneHeadingTreeThreading,
+            },
+          },
+          {
+            name: "Active Root-Level ⟺ Orphan Heading Tree Threading",
+            desc: "Allow threading across the combined top-level sequence of orphan H2–H12 roots, sibling H1 roots, and all of their descendant branches.",
+            aliases: [
+              "root orphan heading bridge",
+              "bidirectional heading tree",
+              "combined top level headings",
+            ],
+            control: {
+              type: "toggle",
+              key: "activeRootLevelOrphanOutlinePaneHeadingTreeThreading",
+              defaultValue:
+                DEFAULT_SETTINGS.activeRootLevelOrphanOutlinePaneHeadingTreeThreading,
+              disabled: () => !this.plugin.settings.enableOutlinePaneHeadingThreading,
+            },
+          },
+          {
+            name: "Active Root-Level ⟺ Orphan Heading Threading",
+            desc: "Highlight the combined top-level root/orphan spine and the nested ancestor path to the currently active heading.",
+            aliases: ["active root orphan heading path", "bidirectional active path"],
+            control: {
+              type: "toggle",
+              key: "activeRootLevelOrphanOutlinePaneHeadingThreading",
+              defaultValue:
+                DEFAULT_SETTINGS.activeRootLevelOrphanOutlinePaneHeadingThreading,
+              disabled: () =>
+                !this.plugin.settings.enableOutlinePaneHeadingThreading ||
+                !this.plugin.settings
+                  .activeRootLevelOrphanOutlinePaneHeadingTreeThreading,
+            },
+          },
+          {
+            name: "All Branches of an Active Root-Level ⟺ Orphan Heading Tree Threading",
+            desc: "Highlight every orphan root, H1 root, and descendant branch in the combined top-level heading tree.",
+            aliases: [
+              "all root orphan heading branches",
+              "whole bidirectional heading tree",
+            ],
+            control: {
+              type: "toggle",
+              key: "allBranchesOfActiveRootLevelOrphanOutlinePaneHeadingTreeThreading",
+              defaultValue:
+                DEFAULT_SETTINGS
+                  .allBranchesOfActiveRootLevelOrphanOutlinePaneHeadingTreeThreading,
+              disabled: () =>
+                !this.plugin.settings.enableOutlinePaneHeadingThreading ||
+                !this.plugin.settings
+                  .activeRootLevelOrphanOutlinePaneHeadingTreeThreading,
             },
           },
         ],
@@ -538,6 +612,7 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
       case "showOutlinePaneHeadingLevelMarkers":
       case "enableOutlinePaneHeadingStaticTreeIndentationGuides":
       case "enableOutlinePaneHeadingThreading":
+      case "activeSelectedOutlinePaneHeadingThreading":
       case "activeOutlinePaneHeadingThreading":
       case "allBranchesOfActiveOutlinePaneHeadingTreeThreading":
       case "activeRootLevelOutlinePaneHeadingTreeThreading":
@@ -546,6 +621,9 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
       case "activeOrphanOutlinePaneHeadingTreeThreading":
       case "activeOrphanOutlinePaneHeadingThreading":
       case "allBranchesOfActiveOrphanOutlinePaneHeadingTreeThreading":
+      case "activeRootLevelOrphanOutlinePaneHeadingTreeThreading":
+      case "activeRootLevelOrphanOutlinePaneHeadingThreading":
+      case "allBranchesOfActiveRootLevelOrphanOutlinePaneHeadingTreeThreading":
       case "showMarkersBeforeLineNumbers":
       case "showMarkersInSourceMode":
       case "removeUnorderedListMarker":

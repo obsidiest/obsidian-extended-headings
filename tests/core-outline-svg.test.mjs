@@ -156,6 +156,61 @@ test("maps every repeated heading to its source level when the Outline is comple
   );
 });
 
+test("normalizes internal-link-only headings to their rendered Outline labels", () => {
+  assert.equal(typeof outlineSvg.normalizeOutlineLabel, "function");
+  assert.equal(
+    outlineSvg.normalizeOutlineLabel(
+      "[[General Keyboard Shortcuts (or General Hotkeys)#Cycle Through Screen Elements in a Window or on the Desktop]]",
+    ),
+    "General Keyboard Shortcuts (or General Hotkeys) > Cycle Through Screen Elements in a Window or on the Desktop",
+  );
+  assert.equal(
+    outlineSvg.normalizeOutlineLabel("[[Reference Note#Target heading|Visible alias]]"),
+    "Visible alias",
+  );
+  assert.equal(
+    outlineSvg.normalizeOutlineLabel("[Visible Markdown link](Reference.md#Target)"),
+    "Visible Markdown link",
+  );
+
+  const matches = outlineSvg.matchOutlineHeadingSpecs(
+    [
+      "Plain heading",
+      "General Keyboard Shortcuts (or General Hotkeys) > Cycle Through Screen Elements in a Window or on the Desktop",
+    ],
+    [
+      { label: "Plain heading", level: 3 },
+      {
+        label:
+          "[[General Keyboard Shortcuts (or General Hotkeys)#Cycle Through Screen Elements in a Window or on the Desktop]]",
+        level: 4,
+      },
+    ],
+  );
+  assert.deepEqual(JSON.parse(JSON.stringify(matches)), [
+    { itemIndex: 0, specIndex: 0 },
+    { itemIndex: 1, specIndex: 1 },
+  ]);
+
+  assert.deepEqual(
+    JSON.parse(
+      JSON.stringify(
+        outlineSvg.matchOutlineHeadingSpecs(
+          ["Rendered first", "Rendered internal link"],
+          [
+            { label: "Source first", level: 2 },
+            { label: "[[Source#Internal link]]", level: 4 },
+          ],
+        ),
+      ),
+    ),
+    [
+      { itemIndex: 0, specIndex: 0 },
+      { itemIndex: 1, specIndex: 1 },
+    ],
+  );
+});
+
 test("integrates a sanitized, reversible renderer with Obsidian's default Outline", () => {
   assert.match(source, /export class CoreOutlineRenderer/);
   assert.match(source, /sanitizeHTMLToDom\(/);
@@ -209,6 +264,73 @@ test("models normal H1 trees and top-level H2-H12 orphan trees", () => {
   );
 });
 
+test("targets an Outline heading across the full pane width by measured row height", () => {
+  assert.equal(typeof outlineSvg.findOutlineRowAtClientY, "function");
+  const rows = [
+    { top: 100, bottom: 124 },
+    { top: 132, bottom: 156 },
+  ];
+  assert.equal(outlineSvg.findOutlineRowAtClientY(rows, 112), 0);
+  assert.equal(outlineSvg.findOutlineRowAtClientY(rows, 145), 1);
+  assert.equal(outlineSvg.findOutlineRowAtClientY(rows, 128), null);
+  assert.equal(outlineSvg.findOutlineRowAtClientY(rows, Number.NaN), null);
+  assert.match(source, /event\.clientY/);
+});
+
+test("recognizes Obsidian's selected Outline row states", () => {
+  assert.equal(typeof outlineSvg.isSelectedOutlineRowState, "function");
+  assert.equal(
+    outlineSvg.isSelectedOutlineRowState({
+      classNames: ["tree-item-self", "is-active"],
+    }),
+    true,
+  );
+  assert.equal(
+    outlineSvg.isSelectedOutlineRowState({
+      ariaSelected: "true",
+      classNames: ["tree-item-self"],
+    }),
+    true,
+  );
+  assert.equal(
+    outlineSvg.isSelectedOutlineRowState({
+      classNames: ["tree-item-self"],
+    }),
+    false,
+  );
+  assert.match(source, /activeSelectedOutlinePaneHeadingThreading/);
+  assert.match(source, /findSelectedSpecIndex/);
+  assert.match(source, /aria-selected/);
+});
+
+test("combines orphan and H1 roots only when both tree types are present", () => {
+  assert.equal(
+    typeof outlineSvg.collectRootLevelOrphanTreeRootIndexes,
+    "function",
+  );
+  const combined = outlineSvg.buildOutlineTreeModel([6, 7, 1, 2, 1, 3]);
+  assert.deepEqual(
+    Array.from(outlineSvg.collectRootLevelOrphanTreeRootIndexes(combined)),
+    [0, 2, 4],
+  );
+  assert.deepEqual(
+    Array.from(
+      outlineSvg.collectRootLevelOrphanTreeRootIndexes(
+        outlineSvg.buildOutlineTreeModel([1, 2, 1, 3]),
+      ),
+    ),
+    [],
+  );
+  assert.deepEqual(
+    Array.from(
+      outlineSvg.collectRootLevelOrphanTreeRootIndexes(
+        outlineSvg.buildOutlineTreeModel([4, 5, 4, 6]),
+      ),
+    ),
+    [],
+  );
+});
+
 test("builds measured static and rounded threading paths", () => {
   assert.equal(typeof outlineSvg.buildOutlineGuidePath, "function");
   assert.equal(typeof outlineSvg.buildRoundedOutlineThreadPath, "function");
@@ -243,12 +365,14 @@ test("builds measured static and rounded threading paths", () => {
   );
 });
 
-test("decorates only default Outline leaves with markers, guides, and hover threads", () => {
+test("decorates only default Outline leaves with markers, guides, and active threads", () => {
   assert.match(source, /getLeavesOfType\("outline"\)/);
   assert.match(source, /extended-heading-outline-level-marker/);
   assert.match(source, /extended-heading-outline-guide-path/);
   assert.match(source, /extended-heading-outline-thread-path/);
   assert.match(source, /pointermove/);
+  assert.match(source, /findOutlineRowAtClientY/);
+  assert.match(source, /collectRootLevelOrphanTreeRootIndexes/);
   assert.match(source, /ResizeObserver/);
   assert.match(source, /requestAnimationFrame/);
   assert.match(source, /marker\.dataset\.level/);
