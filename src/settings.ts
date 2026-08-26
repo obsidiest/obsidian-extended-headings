@@ -11,6 +11,7 @@ export interface ExtendedHeadingsSettings {
   maximumLevel: number;
   hideMarkersInLivePreview: boolean;
   coreIntegration: boolean;
+  renderMarkdownInDefaultOutline: boolean;
   renderInlineSvgsInDefaultOutline: boolean;
   readingModeFolding: boolean;
   copyFullyNestedHeadingPaths: boolean;
@@ -48,6 +49,7 @@ export const DEFAULT_SETTINGS: ExtendedHeadingsSettings = {
   maximumLevel: 12,
   hideMarkersInLivePreview: true,
   coreIntegration: true,
+  renderMarkdownInDefaultOutline: true,
   renderInlineSvgsInDefaultOutline: true,
   readingModeFolding: true,
   copyFullyNestedHeadingPaths: true,
@@ -146,6 +148,16 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
           type: "toggle",
           key: "coreIntegration",
           defaultValue: DEFAULT_SETTINGS.coreIntegration,
+        },
+      },
+      {
+        name: "Outline Pane Markdown Rendering",
+        desc: "Render inline Markdown formatting from H1–H12 headings in Obsidian's default Outline pane. Embedded links remain compact links instead of transcluding their content.",
+        aliases: ["Markdown", "formatted headings", "core Outline"],
+        control: {
+          type: "toggle",
+          key: "renderMarkdownInDefaultOutline",
+          defaultValue: DEFAULT_SETTINGS.renderMarkdownInDefaultOutline,
         },
       },
       {
@@ -604,6 +616,7 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
         break;
       case "hideMarkersInLivePreview":
       case "coreIntegration":
+      case "renderMarkdownInDefaultOutline":
       case "renderInlineSvgsInDefaultOutline":
       case "readingModeFolding":
       case "copyFullyNestedHeadingPaths":

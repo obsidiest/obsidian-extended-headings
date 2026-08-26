@@ -18,12 +18,15 @@ function loadOutlineSvgModule() {
   const module = { exports: {} };
   class MarkdownView {}
   class TFile {}
+  class Component {}
   vm.runInNewContext(compiled, {
     module,
     exports: module.exports,
     require(specifier) {
       if (specifier === "obsidian") {
         return {
+          Component,
+          MarkdownRenderer: { render: async () => {} },
           MarkdownView,
           TFile,
           sanitizeHTMLToDom() {
@@ -211,6 +214,63 @@ test("normalizes internal-link-only headings to their rendered Outline labels", 
   );
 });
 
+test("matches embedded links and Markdown-formatted headings in partial Outlines", () => {
+  assert.equal(
+    outlineSvg.normalizeOutlineLabel("![[Art#Aesthetic Unity]]"),
+    "Art > Aesthetic Unity",
+  );
+  assert.equal(
+    outlineSvg.normalizeOutlineLabel("Art#Aesthetic Unity"),
+    "Art > Aesthetic Unity",
+  );
+  assert.equal(
+    outlineSvg.normalizeOutlineLabel(
+      "*Amatorifrictio* (Lit. English: **Romantic Rubbing**) and ==highlight==",
+    ),
+    "Amatorifrictio (Lit. English: Romantic Rubbing) and highlight",
+  );
+
+  assert.deepEqual(
+    JSON.parse(
+      JSON.stringify(
+        outlineSvg.matchOutlineHeadingSpecs(
+          [
+            "Amatorifrictio (Lit. English: Romantic Rubbing)",
+            "A non-heading tree item",
+            "Art#Aesthetic Unity",
+          ],
+          [
+            {
+              label: "*Amatorifrictio* (Lit. English: *Romantic Rubbing*)",
+              level: 2,
+            },
+            { label: "![[Art#Aesthetic Unity]]", level: 3 },
+          ],
+        ),
+      ),
+    ),
+    [
+      { itemIndex: 0, specIndex: 0 },
+      { itemIndex: 2, specIndex: 1 },
+    ],
+  );
+});
+
+test("prepares compact, reversible Markdown for default Outline labels", () => {
+  assert.equal(typeof outlineSvg.outlineMarkdownFromHeadingBody, "function");
+  assert.equal(
+    outlineSvg.outlineMarkdownFromHeadingBody(
+      '![[Art#Aesthetic Unity]] (<svg viewBox="0 0 24 24"></svg>)',
+    ),
+    "[[Art#Aesthetic Unity]] ()",
+  );
+  assert.match(source, /MarkdownRenderer\.render\(/);
+  assert.match(source, /OUTLINE_MARKDOWN_SOURCE_CLASS/);
+  assert.match(source, /OUTLINE_MARKDOWN_RENDERED_CLASS/);
+  assert.match(source, /markdownComponent\?\.unload\(\)/);
+  assert.match(styles, /\.extended-heading-outline-markdown-rendered/);
+});
+
 test("integrates a sanitized, reversible renderer with Obsidian's default Outline", () => {
   assert.match(source, /export class CoreOutlineRenderer/);
   assert.match(source, /sanitizeHTMLToDom\(/);
@@ -230,6 +290,13 @@ test("enables core Outline inline SVG rendering by default", () => {
   assert.match(settings, /renderInlineSvgsInDefaultOutline:\s*true/);
   assert.match(settings, /name: "Render inline SVGs in default Outline"/);
   assert.match(settings, /key: "renderInlineSvgsInDefaultOutline"/);
+});
+
+test("enables default Outline Markdown rendering by default", () => {
+  assert.match(settings, /renderMarkdownInDefaultOutline:\s*boolean/);
+  assert.match(settings, /renderMarkdownInDefaultOutline:\s*true/);
+  assert.match(settings, /name: "Outline Pane Markdown Rendering"/);
+  assert.match(settings, /key: "renderMarkdownInDefaultOutline"/);
 });
 
 test("sizes core Outline SVGs without overriding their source colors", () => {

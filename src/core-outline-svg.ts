@@ -1,4 +1,6 @@
 import {
+  Component,
+  MarkdownRenderer,
   MarkdownView,
   TFile,
   sanitizeHTMLToDom,
@@ -19,6 +21,8 @@ const OUTLINE_GUIDE_PATH_CLASS = "extended-heading-outline-guide-path";
 const OUTLINE_THREAD_PATH_CLASS = "extended-heading-outline-thread-path";
 const OUTLINE_SVG_CLASS = "extended-heading-outline-svg";
 const OUTLINE_SVG_PARENTHESIZED_CLASS = "extended-heading-outline-svg-parenthesized";
+const OUTLINE_MARKDOWN_SOURCE_CLASS = "extended-heading-outline-markdown-source";
+const OUTLINE_MARKDOWN_RENDERED_CLASS = "extended-heading-outline-markdown-rendered";
 
 export interface InlineSvgFragments {
   label: string;
@@ -37,6 +41,7 @@ export interface OutlineSvgMatch {
 export interface OutlineHeadingSpec {
   label: string;
   level: number;
+  markdown?: string;
   placement?: "inside-trailing-parentheses";
   svgMarkup?: string[];
 }
@@ -113,6 +118,9 @@ interface OutlineAttachment {
   hoveredSpecIndex: number | null;
   lastMeasuredRows: MeasuredOutlineRow[];
   leaf: WorkspaceLeaf;
+  markdownCacheSignature: string;
+  markdownComponent: Component | null;
+  markdownTemplates: Map<string, HTMLElement>;
   model: OutlineTreeModelItem[];
   observer: MutationObserver;
   overlay: SVGSVGElement | null;
@@ -144,7 +152,9 @@ function formatPoint(value: number): string {
 }
 
 export function normalizeOutlineLabel(value: string): string {
-  return value
+  let normalized = value
+    .replace(inlineSvgPattern(), " ")
+    .replace(/<\/?[A-Za-z][^>]*>/gu, " ")
     .replace(/!?\[\[([^\]]+)\]\]/gu, (_match, rawTarget: string) => {
       const aliasSeparator = rawTarget.lastIndexOf("|");
       if (aliasSeparator >= 0) {
@@ -162,6 +172,19 @@ export function normalizeOutlineLabel(value: string): string {
         .join(" > ");
     })
     .replace(/!?\[([^\]]*)\]\([^)]*\)/gu, "$1")
+    .replace(/(`+)([\s\S]*?)\1/gu, "$2");
+
+  let previous = "";
+  while (normalized !== previous) {
+    previous = normalized;
+    normalized = normalized
+      .replace(/(\*\*|__|~~|==)(?=\S)([\s\S]*?\S)\1/gu, "$2")
+      .replace(/([*_])(?=\S)([\s\S]*?\S)\1/gu, "$2");
+  }
+
+  return normalized
+    .replace(/\\([\\`*_[\]{}()#+\-.!|>~=])/gu, "$1")
+    .replace(/\s*#\s*/gu, " > ")
     .replace(/\s+/gu, " ")
     .replace(/\(\s+\)/gu, "()")
     .trim();
@@ -184,10 +207,28 @@ export function isSelectedOutlineRowState(
 }
 
 export function outlineLabelFromHeadingBody(rawBody: string): string {
-  return normalizeOutlineLabel(
-    rawBody
-      .replace(inlineSvgPattern(), " ")
-      .replace(/<\/?[A-Za-z][^>]*>/gu, " "),
+  return normalizeOutlineLabel(rawBody);
+}
+
+export function outlineMarkdownFromHeadingBody(rawBody: string): string {
+  return rawBody
+    .replace(inlineSvgPattern(), " ")
+    // An Outline label must stay compact. Render embeds as ordinary links so
+    // Markdown formatting is retained without transcluding an entire note.
+    .replace(/!\[\[/gu, "[[")
+    .replace(/!\[([^\]]*)\]\(/gu, "[$1](")
+    .replace(/\s+/gu, " ")
+    .replace(/\(\s+\)/gu, "()")
+    .trim();
+}
+
+function hasRenderableOutlineMarkdown(rawBody: string): boolean {
+  const withoutSvg = rawBody.replace(inlineSvgPattern(), " ");
+  return (
+    /!?\[\[[^\]]+\]\]/u.test(withoutSvg) ||
+    /!?\[[^\]]*\]\([^)]*\)/u.test(withoutSvg) ||
+    /(?:\*\*|__|~~|==|[*_`])/u.test(withoutSvg) ||
+    /<\/?[A-Za-z][^>]*>/u.test(withoutSvg)
   );
 }
 
@@ -469,7 +510,10 @@ export class CoreOutlineRenderer {
       this.plugin.app.workspace.on("editor-change", () => this.refreshAll()),
     );
     this.plugin.registerEvent(
-      this.plugin.app.metadataCache.on("changed", () => this.refreshAll()),
+      this.plugin.app.metadataCache.on("changed", () => {
+        this.invalidateMarkdownCaches();
+        this.refreshAll();
+      }),
     );
     this.plugin.registerEvent(
       this.plugin.app.workspace.on("css-change", () => {
@@ -501,6 +545,7 @@ export class CoreOutlineRenderer {
     const settings = this.plugin.settings;
     return (
       settings.renderInlineSvgsInDefaultOutline ||
+      settings.renderMarkdownInDefaultOutline ||
       settings.showOutlinePaneHeadingLevelMarkers ||
       settings.enableOutlinePaneHeadingStaticTreeIndentationGuides ||
       settings.enableOutlinePaneHeadingThreading
@@ -552,6 +597,9 @@ export class CoreOutlineRenderer {
         hoveredSpecIndex: null,
         lastMeasuredRows: [],
         leaf,
+        markdownCacheSignature: "",
+        markdownComponent: null,
+        markdownTemplates: new Map(),
         model: [],
         observer,
         overlay: null,
@@ -598,6 +646,7 @@ export class CoreOutlineRenderer {
       win.cancelAnimationFrame(attachment.visualAnimationFrame);
     }
     this.clearDecorations(attachment);
+    this.clearMarkdownCache(attachment);
     this.attachments.delete(leaf);
   }
 
@@ -626,7 +675,10 @@ export class CoreOutlineRenderer {
     const revision = ++attachment.revision;
     const file = this.getOutlineFile(attachment.leaf);
     if (!file) {
-      this.mutateWithoutObserving(attachment, () => this.clearDecorations(attachment));
+      this.mutateWithoutObserving(attachment, () => {
+        this.clearDecorations(attachment);
+        this.clearMarkdownCache(attachment);
+      });
       return;
     }
 
@@ -646,15 +698,72 @@ export class CoreOutlineRenderer {
 
     const specs = this.buildSpecs(text, file);
     const model = buildOutlineTreeModel(specs.map((spec) => spec.level));
+    let items: HTMLElement[] = [];
+    let matches: OutlineHeadingMatch[] = [];
     this.mutateWithoutObserving(attachment, () => {
       this.clearDecorations(attachment);
-      const items = Array.from(
+      items = Array.from(
         attachment.container.querySelectorAll<HTMLElement>(OUTLINE_ITEM_SELECTOR),
       );
       const labels = items.map((item) => item.textContent ?? "");
+      matches = matchOutlineHeadingSpecs(labels, specs);
       attachment.model = model;
+    });
 
-      for (const match of matchOutlineHeadingSpecs(labels, specs)) {
+    const markdownEnabled = this.plugin.settings.renderMarkdownInDefaultOutline;
+    const markdownCacheSignature = JSON.stringify([
+      file.path,
+      specs.map((spec) => spec.markdown ?? null),
+    ]);
+    let replacementMarkdownComponent: Component | null = null;
+    let replacementMarkdownTemplates: Map<string, HTMLElement> | null = null;
+    let renderedMarkdown = new Map<number, HTMLElement>();
+    if (markdownEnabled && matches.length > 0) {
+      if (attachment.markdownCacheSignature === markdownCacheSignature) {
+        renderedMarkdown = this.cloneMarkdownLabels(
+          specs,
+          matches,
+          attachment.markdownTemplates,
+        );
+      } else {
+        replacementMarkdownComponent = new Component();
+        replacementMarkdownComponent.load();
+        replacementMarkdownTemplates = await this.renderMarkdownTemplates(
+          attachment.container.ownerDocument,
+          file.path,
+          specs,
+          matches,
+          replacementMarkdownComponent,
+        );
+        renderedMarkdown = this.cloneMarkdownLabels(
+          specs,
+          matches,
+          replacementMarkdownTemplates,
+        );
+      }
+    }
+
+    if (
+      revision !== attachment.revision ||
+      !this.started ||
+      !this.hasEnabledFeature() ||
+      !attachment.container.isConnected ||
+      this.attachments.get(attachment.leaf) !== attachment
+    ) {
+      replacementMarkdownComponent?.unload();
+      return;
+    }
+
+    this.mutateWithoutObserving(attachment, () => {
+      if (!markdownEnabled) {
+        this.clearMarkdownCache(attachment);
+      } else if (replacementMarkdownComponent && replacementMarkdownTemplates) {
+        this.clearMarkdownCache(attachment);
+        attachment.markdownCacheSignature = markdownCacheSignature;
+        attachment.markdownComponent = replacementMarkdownComponent;
+        attachment.markdownTemplates = replacementMarkdownTemplates;
+      }
+      for (const match of matches) {
         const item = items[match.itemIndex];
         const spec = specs[match.specIndex];
         const modelItem = model[match.specIndex];
@@ -675,6 +784,9 @@ export class CoreOutlineRenderer {
           specIndex: match.specIndex,
         };
         attachment.rowsBySpecIndex.set(match.specIndex, decorated);
+
+        const rendered = renderedMarkdown.get(match.specIndex);
+        if (rendered) this.applyRenderedMarkdown(item, rendered);
 
         if (this.plugin.settings.showOutlinePaneHeadingLevelMarkers) {
           const marker = item.createSpan({
@@ -706,6 +818,84 @@ export class CoreOutlineRenderer {
       }
       this.renderVisuals(attachment);
     });
+  }
+
+  private async renderMarkdownTemplates(
+    ownerDocument: Document,
+    sourcePath: string,
+    specs: OutlineHeadingSpec[],
+    matches: OutlineHeadingMatch[],
+    component: Component,
+  ): Promise<Map<string, HTMLElement>> {
+    const templates = new Map<string, HTMLElement>();
+    const markdownItems = Array.from(
+      new Set(
+        matches.flatMap(({ specIndex }) => {
+          const markdown = specs[specIndex]?.markdown;
+          return markdown ? [markdown] : [];
+        }),
+      ),
+    );
+    await Promise.all(
+      markdownItems.map(async (markdown) => {
+        const rendered = (
+          ownerDocument.win as Window & { createSpan(): HTMLSpanElement }
+        ).createSpan();
+        try {
+          await MarkdownRenderer.render(
+            this.plugin.app,
+            markdown,
+            rendered,
+            sourcePath,
+            component,
+          );
+        } catch {
+          return;
+        }
+
+        const paragraph = rendered.querySelector(":scope > p");
+        if (paragraph && rendered.children.length === 1) {
+          paragraph.replaceWith(...Array.from(paragraph.childNodes));
+        }
+        if (!rendered.textContent?.trim() && rendered.childElementCount === 0) return;
+        for (const interactive of Array.from(
+          rendered.querySelectorAll<HTMLElement>(
+            "a, button, input, select, textarea, [tabindex]",
+          ),
+        )) interactive.setAttribute("tabindex", "-1");
+        templates.set(markdown, rendered);
+      }),
+    );
+    return templates;
+  }
+
+  private cloneMarkdownLabels(
+    specs: OutlineHeadingSpec[],
+    matches: OutlineHeadingMatch[],
+    templates: Map<string, HTMLElement>,
+  ): Map<number, HTMLElement> {
+    const renderedBySpecIndex = new Map<number, HTMLElement>();
+    for (const { specIndex } of matches) {
+      const markdown = specs[specIndex]?.markdown;
+      const template = markdown ? templates.get(markdown) : undefined;
+      if (template) {
+        renderedBySpecIndex.set(specIndex, template.cloneNode(true) as HTMLElement);
+      }
+    }
+    return renderedBySpecIndex;
+  }
+
+  private applyRenderedMarkdown(item: HTMLElement, rendered: HTMLElement): void {
+    const source = (
+      item.ownerDocument.win as Window & { createSpan(): HTMLSpanElement }
+    ).createSpan();
+    source.classList.add(OUTLINE_MARKDOWN_SOURCE_CLASS);
+    source.hidden = true;
+    source.setAttribute("aria-hidden", "true");
+    while (item.firstChild) source.append(item.firstChild);
+
+    rendered.classList.add(OUTLINE_MARKDOWN_RENDERED_CLASS);
+    item.append(source, rendered);
   }
 
   private getOutlineFile(leaf: WorkspaceLeaf): TFile | null {
@@ -743,6 +933,9 @@ export class CoreOutlineRenderer {
           extracted?.label ??
           outlineLabelFromHeadingBody(heading.rawBody),
         level: heading.level,
+        ...(hasRenderableOutlineMarkdown(heading.rawBody)
+          ? { markdown: outlineMarkdownFromHeadingBody(heading.rawBody) }
+          : {}),
         ...(extracted?.placement ? { placement: extracted.placement } : {}),
         ...(extracted ? { svgMarkup: extracted.svgMarkup } : {}),
       };
@@ -1260,6 +1453,20 @@ export class CoreOutlineRenderer {
       decoration.remove();
       parent?.normalize();
     }
+    for (const source of Array.from(
+      attachment.container.querySelectorAll<HTMLElement>(
+        `${OUTLINE_ITEM_SELECTOR} > .${OUTLINE_MARKDOWN_SOURCE_CLASS}`,
+      ),
+    )) {
+      const item = source.parentElement;
+      if (!item) continue;
+      item.querySelector<HTMLElement>(
+        `:scope > .${OUTLINE_MARKDOWN_RENDERED_CLASS}`,
+      )?.remove();
+      while (source.firstChild) item.insertBefore(source.firstChild, source);
+      source.remove();
+      item.normalize();
+    }
     for (const row of Array.from(
       attachment.container.querySelectorAll<HTMLElement>(`.${OUTLINE_ROW_CLASS}`),
     )) {
@@ -1278,6 +1485,19 @@ export class CoreOutlineRenderer {
     attachment.lastMeasuredRows = [];
     attachment.rowsBySpecIndex.clear();
     attachment.model = [];
+  }
+
+  private clearMarkdownCache(attachment: OutlineAttachment): void {
+    attachment.markdownComponent?.unload();
+    attachment.markdownCacheSignature = "";
+    attachment.markdownComponent = null;
+    attachment.markdownTemplates.clear();
+  }
+
+  private invalidateMarkdownCaches(): void {
+    for (const attachment of this.attachments.values()) {
+      this.clearMarkdownCache(attachment);
+    }
   }
 
   private observeMutations(attachment: OutlineAttachment): void {

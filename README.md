@@ -19,7 +19,7 @@ The default maximum is H12. It can be lowered to H7 under **Settings → Communi
 
 The compatibility target records the newest Obsidian base-program version audited and tested when this release was prepared. Version 0.4.9 deliberately raises the minimum from 1.7.2 to 1.13.0 so the plugin can use Obsidian's searchable declarative settings API without retaining a second legacy settings renderer. Earlier releases remain mapped to their historical minimum versions in `versions.json`.
 
-Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 0.4.17 has not been device-tested on Obsidian Mobile.
+Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 1.0.0 has not been device-tested on Obsidian Mobile.
 
 ## Features
 
@@ -30,11 +30,12 @@ Extended Headings declares mobile compatibility because its runtime uses Obsidia
 - A supported-API **Extended Outline** side pane.
 - An experimental bridge for the core Outline, `[[Note#Heading]]` links, link suggestions, and heading navigation.
 - True H7–H12 levels in Obsidian's default Outline, preserving the complete unflattened hierarchy.
+- Default-on reversible inline Markdown rendering for H1–H12 labels in Obsidian's default Outline; embedded links remain compact instead of transcluding note contents.
 - Optional sanitized rendering of inline SVGs from H1–H12 heading source in Obsidian's default Outline, enabled by default.
 - Default-on H1–H12 heading-level markers beside labels in Obsidian's default Outline.
 - Default-on static Outline heading-tree indentation guides with measured spines and branch connectors.
 - Default-on full-row Outline heading threading for active ancestor paths, virtual root-level H1 trees, orphan H2–H12 trees, and combined root-level ⟺ orphan trees, with optional all-branches modes and a default-off selected-heading activation override.
-- Reliable H1–H12 Outline decoration for headings made entirely from internal links as well as plain text.
+- Reliable H1–H12 Outline decoration for plain, Markdown-formatted, internal-link-only, and embedded-internal-link-only headings.
 - Immediate active-note injection at workspace readiness, followed by a background vault-wide reindex after metadata resolution.
 - Punctuation-preserving H7–H12 labels in the default Outline, including parentheses and colons.
 - An independent Live Preview rendering fallback for heading-subpath links placed directly on H7–H12 lines.
@@ -65,6 +66,7 @@ This representative Live Preview shows every extended level. H8 is active, so it
 | Hide hashes on inactive Live Preview lines | On | Conceals H7+ hashes when their line is inactive. |
 | Reading View folding | On | Shows a folding control beside extended headings in Reading View. |
 | Core Outline and heading-link bridge | On | Adds H7+ entries to Obsidian's in-memory heading cache for the core Outline, heading links, and navigation. |
+| Outline Pane Markdown Rendering | On | Renders inline Markdown formatting in H1–H12 default-Outline labels while keeping embedded links compact. |
 | Render inline SVGs in default Outline | On | Renders sanitized inline SVGs from H1–H12 heading source beside their labels in Obsidian's default Outline. |
 | Copy fully nested heading paths | On | Includes every ancestor heading in copied heading links and embeds; disable it to copy only the shorter target-heading link. |
 | Lower limit of heading | `1` | Sets the shallowest level that **Decrease headings** may reach; `0` permits conversion to a paragraph. |
@@ -151,7 +153,7 @@ Markdown and HTML officially stop at H6. Other Markdown applications therefore t
 
 The editor, Reading View, folding service, Live Preview link fallback, and Extended Outline use supported Obsidian and CodeMirror APIs. The optional **Core Outline and heading-link bridge** adds H7+ objects with their true levels to Obsidian's in-memory metadata cache so the default Outline remains unflattened through H12. Obsidian's public type documentation describes cached heading levels as 1–6, so this bridge is intentionally outside that documented range and is the plugin's most fragile compatibility surface.
 
-The unified default-Outline renderer matches H1–H12 source headings—including headings made entirely from internal links—to their transient Outline rows, then adds the enabled heading-level markers, measured static guides, active threads, and sanitized SVG elements. Pointer activation uses each measured row's vertical bounds, so its active area spans the Outline pane width rather than only the label or connector beneath the pointer. Enabling **Active Selected Heading Threading** instead derives that same active heading from Obsidian's selected Outline row and suppresses hover activation for every threading submode. Raw inline SVG fragments pass through Obsidian's `sanitizeHTMLToDom`, and only the resulting SVG elements are attached; SVGs enclosed inside trailing parentheses retain that placement. The renderer never assigns raw source to `innerHTML`, coalesces source and geometry refreshes to animation frames, and removes all of its decorations when disabled or unloaded. Because Obsidian does not expose a public API for decorating core Outline rows, these features observe the core Outline's non-public DOM structure. H7–H12 Outline rows also require the **Core Outline and heading-link bridge**. If an Obsidian update changes that structure, disable the affected default-Outline toggles until the plugin is updated; headings and note text remain unchanged.
+The unified default-Outline renderer canonicalizes plain text, inline Markdown, ordinary internal links, and embedded internal links before matching H1–H12 source headings to their transient Outline rows. This accounts for Obsidian's rendered emphasis text and both its `Note > Heading` and compact `Note#Heading` link-label forms, then adds the enabled heading-level markers, measured static guides, active threads, Markdown output, and sanitized SVG elements. **Outline Pane Markdown Rendering** uses Obsidian's renderer inside a reversible wrapper; embedded links are converted to ordinary links for the Outline so they cannot transclude an entire note. Pointer activation uses each measured row's vertical bounds, so its active area spans the Outline pane width rather than only the label or connector beneath the pointer. Enabling **Active Selected Heading Threading** instead derives that same active heading from Obsidian's selected Outline row and suppresses hover activation for every threading submode. Raw inline SVG fragments pass through Obsidian's `sanitizeHTMLToDom`, and only the resulting SVG elements are attached; SVGs enclosed inside trailing parentheses retain that placement. The renderer never assigns raw source to `innerHTML`, coalesces source and geometry refreshes to animation frames, unloads Markdown-rendering components, and restores the original Outline DOM when disabled or unloaded. Because Obsidian does not expose a public API for decorating core Outline rows, these features observe the core Outline's non-public DOM structure. H7–H12 Outline rows also require the **Core Outline and heading-link bridge**. If an Obsidian update changes that structure, disable the affected default-Outline toggles until the plugin is updated; headings and note text remain unchanged.
 
 The separate Live Preview link fallback does not alter cache levels or the default Outline hierarchy. If an Obsidian update disrupts the bridge, disable it and use Extended Outline until the plugin is updated; note content is not migrated by enabling or disabling the bridge.
 
@@ -239,7 +241,7 @@ I had hoped someone capable and sufficiently ambitious might create a plugin lik
 - Version 0.4.14 H1–H12 marker controls, precise Style Settings inputs, heading-marker and parenthesized-Outline-SVG fixes, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 - Version 0.4.15 intrinsic H10–H12 gutter sizing, arbitrary-value and caret-stable Style Settings inputs, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 - Version 0.4.16 targeted H10–H12 Minimal-padding correction, restoration of the 0.4.14 H1–H9 marker layout, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
-- Version 0.4.17 default-Outline markers, static guides, full-row individual/root-level/orphan/combined threading, Outline and Editor Gutter Style Settings, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
+- Version 1.0.0 default-Outline Markdown rendering, robust formatted/link/embed heading matching, markers, static guides, full-row individual/root-level/orphan/combined threading, Outline and Editor Gutter Style Settings, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 
 Incorporates features inspired by the following Obsidian community plugins:
 
