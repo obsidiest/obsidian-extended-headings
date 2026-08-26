@@ -344,6 +344,12 @@ test("prepares compact, reversible Markdown for default Outline labels", () => {
     styles,
     /\.extended-heading-outline-markdown-rendered[^,{]*,[^{]*\{\s*display:\s*contents;/s,
   );
+  assert.match(
+    styles,
+    /\.extended-heading-outline-expand-long-titles[^{]*\.extended-heading-outline-markdown-rendered\s*\{[^}]*overflow:\s*visible;[^}]*text-overflow:\s*clip;[^}]*white-space:\s*normal;/s,
+  );
+  assert.match(source, /OUTLINE_EXPAND_LONG_TITLES_CLASS/);
+  assert.match(source, /expandLongOutlinePaneHeadingTitles/);
 });
 
 test("integrates a sanitized, reversible renderer with Obsidian's default Outline", () => {
@@ -370,8 +376,12 @@ test("enables core Outline inline SVG rendering by default", () => {
 test("enables default Outline Markdown rendering by default", () => {
   assert.match(settings, /renderMarkdownInDefaultOutline:\s*boolean/);
   assert.match(settings, /renderMarkdownInDefaultOutline:\s*true/);
+  assert.match(settings, /expandLongOutlinePaneHeadingTitles:\s*boolean/);
+  assert.match(settings, /expandLongOutlinePaneHeadingTitles:\s*true/);
   assert.match(settings, /name: "Outline Pane Markdown Rendering"/);
   assert.match(settings, /key: "renderMarkdownInDefaultOutline"/);
+  assert.match(settings, /name: "Outline Pane – Expand Long Heading Titles"/);
+  assert.match(settings, /key: "expandLongOutlinePaneHeadingTitles"/);
 });
 
 test("sizes core Outline SVGs without overriding their source colors", () => {
@@ -419,8 +429,9 @@ test("targets an Outline heading across the full pane width by measured row heig
   assert.match(source, /event\.clientY/);
 });
 
-test("excludes row centers clipped above or below the Outline content viewport", () => {
+test("measures visible row portions and excludes rows outside the Outline viewport", () => {
   assert.equal(typeof outlineSvg.visibleOutlineRowCenter, "function");
+  assert.equal(typeof outlineSvg.visibleOutlineRowMeasurement, "function");
   assert.equal(
     outlineSvg.visibleOutlineRowCenter(
       { bottom: 120, top: 96 },
@@ -442,7 +453,41 @@ test("excludes row centers clipped above or below the Outline content viewport",
     ),
     null,
   );
+  assert.deepEqual(
+    JSON.parse(
+      JSON.stringify(
+        outlineSvg.visibleOutlineRowMeasurement(
+          { bottom: 164, top: 140 },
+          [
+            { bottom: 1000, top: 0 },
+            { bottom: 900, top: 120 },
+          ],
+        ),
+      ),
+    ),
+    { bottom: 164, center: 152, clipBottom: 900, clipTop: 120, top: 140 },
+  );
+  assert.deepEqual(
+    JSON.parse(
+      JSON.stringify(
+        outlineSvg.visibleOutlineRowMeasurement(
+          { bottom: 180, top: 100 },
+          [{ bottom: 900, top: 140 }],
+        ),
+      ),
+    ),
+    { bottom: 180, center: 160, clipBottom: 900, clipTop: 140, top: 140 },
+  );
   assert.match(source, /overflowY/);
+});
+
+test("continues visible guides and threads when their parent row is clipped above", () => {
+  assert.match(
+    source,
+    /parent\s*\?\s*undefined\s*:\s*Math\.min\(\.\.\.children\.map\(\(entry\) => entry\.clipTop\)\)/s,
+  );
+  assert.match(source, /parent\?\.y \?\? child\.clipTop/);
+  assert.match(source, /clipTop:\s*clamp\(visibleMeasurement\.clipTop - hostRect\.top/);
 });
 
 test("recognizes Obsidian's selected Outline row states", () => {

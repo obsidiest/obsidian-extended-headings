@@ -12,6 +12,7 @@ export interface ExtendedHeadingsSettings {
   hideMarkersInLivePreview: boolean;
   coreIntegration: boolean;
   renderMarkdownInDefaultOutline: boolean;
+  expandLongOutlinePaneHeadingTitles: boolean;
   renderInlineSvgsInDefaultOutline: boolean;
   readingModeFolding: boolean;
   copyFullyNestedHeadingPaths: boolean;
@@ -50,6 +51,7 @@ export const DEFAULT_SETTINGS: ExtendedHeadingsSettings = {
   hideMarkersInLivePreview: true,
   coreIntegration: true,
   renderMarkdownInDefaultOutline: true,
+  expandLongOutlinePaneHeadingTitles: true,
   renderInlineSvgsInDefaultOutline: true,
   readingModeFolding: true,
   copyFullyNestedHeadingPaths: true,
@@ -158,6 +160,17 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
           type: "toggle",
           key: "renderMarkdownInDefaultOutline",
           defaultValue: DEFAULT_SETTINGS.renderMarkdownInDefaultOutline,
+        },
+      },
+      {
+        name: "Outline Pane – Expand Long Heading Titles",
+        desc: "Allow Markdown-rendered Outline heading titles to wrap onto additional lines instead of truncating them with an ellipsis.",
+        aliases: ["long headings", "wrap heading titles", "Outline ellipsis"],
+        control: {
+          type: "toggle",
+          key: "expandLongOutlinePaneHeadingTitles",
+          defaultValue: DEFAULT_SETTINGS.expandLongOutlinePaneHeadingTitles,
+          disabled: () => !this.plugin.settings.renderMarkdownInDefaultOutline,
         },
       },
       {
@@ -617,6 +630,7 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
       case "hideMarkersInLivePreview":
       case "coreIntegration":
       case "renderMarkdownInDefaultOutline":
+      case "expandLongOutlinePaneHeadingTitles":
       case "renderInlineSvgsInDefaultOutline":
       case "readingModeFolding":
       case "copyFullyNestedHeadingPaths":

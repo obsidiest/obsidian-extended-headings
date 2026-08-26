@@ -10,10 +10,11 @@
 - Fixed missing Outline heading-level markers and related decorations for headings made entirely from internal links by normalizing rendered link labels and retaining a source-order mapping fallback for complete Outlines.
 - Fixed missing Outline markers, static guides, and threading for headings made entirely from embedded internal links, including Obsidian's compact `Note#Heading` Outline-label form.
 - Fixed inconsistent Outline decoration in Markdown-heavy notes by canonicalizing emphasis, strong, highlight, strikethrough, code, HTML, internal-link, and embed-label forms before matching source headings to transient Outline rows.
-- Fixed long mixed-format Markdown headings spreading across the Outline row by keeping rendered inline Markdown in one shrinkable, single-line, ellipsized label wrapper.
+- Added the default-on subordinate **Outline Pane – Expand Long Heading Titles** toggle, which wraps Markdown-rendered long titles while retaining the previous single-line ellipsis behavior when disabled.
 - Fixed missing decorations and threading for repeated short labels such as `n.` in partial or collapsed Outlines by replacing all-or-nothing occurrence matching with source-ordered subsequence matching bounded by surrounding headings.
 - Fixed aliased embedded-link headings whose Outline label changes between the visible alias and compact `Note#Heading` target by matching both canonical forms.
 - Prevented offscreen headings from being clamped into the Outline toolbar, eliminating stray overdrawn static-guide segments at the viewport edge.
+- Fixed static guides and active threads disappearing from visible headings whenever their parent row was scrolled above the Outline viewport; clipped branches now continue from the content boundary.
 - Added the default-on **Outline Pane Markdown Rendering** setting for reversible inline Markdown rendering across H1–H12 labels. Embedded links render as compact links rather than transcluded note contents.
 - Added an **Editor Gutter** Style Settings section with independently configurable heading-level-marker and hash-marker font variants, both preserving their inherited appearance by default.
 - Added default Outline heading and marker typography/appearance controls plus complete static-guide and thread appearance, geometry, pattern, depth-color, fallback, and override controls to Style Settings. Outline heading-level markers default to **All small caps**.

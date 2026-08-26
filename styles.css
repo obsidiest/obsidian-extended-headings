@@ -1700,6 +1700,13 @@ body:not(.extended-headings-markers-before) .cm-extended-heading-gutter { order:
   margin: 0;
 }
 
+.extended-heading-outline-expand-long-titles
+  .extended-heading-outline-markdown-rendered {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}
+
 .extended-heading-outline-overlay {
   display: block;
   height: 100%;

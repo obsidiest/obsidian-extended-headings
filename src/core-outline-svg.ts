@@ -23,6 +23,8 @@ const OUTLINE_SVG_CLASS = "extended-heading-outline-svg";
 const OUTLINE_SVG_PARENTHESIZED_CLASS = "extended-heading-outline-svg-parenthesized";
 const OUTLINE_MARKDOWN_SOURCE_CLASS = "extended-heading-outline-markdown-source";
 const OUTLINE_MARKDOWN_RENDERED_CLASS = "extended-heading-outline-markdown-rendered";
+const OUTLINE_EXPAND_LONG_TITLES_CLASS =
+  "extended-heading-outline-expand-long-titles";
 
 export interface InlineSvgFragments {
   label: string;
@@ -97,6 +99,14 @@ export interface OutlineVerticalBounds {
   top: number;
 }
 
+export interface OutlineVisibleRowMeasurement {
+  bottom: number;
+  center: number;
+  clipBottom: number;
+  clipTop: number;
+  top: number;
+}
+
 export interface OutlineRowSelectionState {
   ariaCurrent?: string | null;
   ariaSelected?: string | null;
@@ -112,6 +122,7 @@ interface DecoratedOutlineRow {
 
 interface MeasuredOutlineRow extends DecoratedOutlineRow {
   bottom: number;
+  clipTop: number;
   endX: number;
   top: number;
   y: number;
@@ -420,16 +431,38 @@ export function visibleOutlineRowCenter(
   row: OutlineVerticalBounds,
   clippingBounds: readonly OutlineVerticalBounds[],
 ): number | null {
+  return visibleOutlineRowMeasurement(row, clippingBounds)?.center ?? null;
+}
+
+export function visibleOutlineRowMeasurement(
+  row: OutlineVerticalBounds,
+  clippingBounds: readonly OutlineVerticalBounds[],
+): OutlineVisibleRowMeasurement | null {
   const top = Math.min(row.top, row.bottom);
   const bottom = Math.max(row.top, row.bottom);
   if (bottom <= top) return null;
-  const center = top + (bottom - top) / 2;
+  let clipTop = Number.NEGATIVE_INFINITY;
+  let clipBottom = Number.POSITIVE_INFINITY;
   for (const clippingBound of clippingBounds) {
-    const clipTop = Math.min(clippingBound.top, clippingBound.bottom);
-    const clipBottom = Math.max(clippingBound.top, clippingBound.bottom);
-    if (clipBottom <= clipTop || center < clipTop || center > clipBottom) return null;
+    const boundTop = Math.min(clippingBound.top, clippingBound.bottom);
+    const boundBottom = Math.max(clippingBound.top, clippingBound.bottom);
+    if (boundBottom <= boundTop) return null;
+    clipTop = Math.max(clipTop, boundTop);
+    clipBottom = Math.min(clipBottom, boundBottom);
   }
-  return finiteNumber(center);
+  if (!Number.isFinite(clipTop)) clipTop = top;
+  if (!Number.isFinite(clipBottom)) clipBottom = bottom;
+  const visibleTop = Math.max(top, clipTop);
+  const visibleBottom = Math.min(bottom, clipBottom);
+  if (visibleBottom <= visibleTop) return null;
+  const center = visibleTop + (visibleBottom - visibleTop) / 2;
+  return {
+    bottom: finiteNumber(visibleBottom),
+    center: finiteNumber(center),
+    clipBottom: finiteNumber(clipBottom),
+    clipTop: finiteNumber(clipTop),
+    top: finiteNumber(visibleTop),
+  };
 }
 
 export function buildOutlineTreeModel(levels: number[]): OutlineTreeModelItem[] {
@@ -847,6 +880,11 @@ export class CoreOutlineRenderer {
         attachment.markdownComponent = replacementMarkdownComponent;
         attachment.markdownTemplates = replacementMarkdownTemplates;
       }
+      attachment.container.classList.toggle(
+        OUTLINE_EXPAND_LONG_TITLES_CLASS,
+        markdownEnabled &&
+          this.plugin.settings.expandLongOutlinePaneHeadingTitles,
+      );
       for (const match of matches) {
         const item = items[match.itemIndex];
         const spec = specs[match.specIndex];
@@ -1148,15 +1186,19 @@ export class CoreOutlineRenderer {
           clippingBounds.push(ancestor.getBoundingClientRect());
         }
       }
-      const visibleCenter = visibleOutlineRowCenter(rowRect, clippingBounds);
-      if (visibleCenter === null) continue;
-      const y = visibleCenter - hostRect.top;
+      const visibleMeasurement = visibleOutlineRowMeasurement(
+        rowRect,
+        clippingBounds,
+      );
+      if (visibleMeasurement === null) continue;
+      const y = visibleMeasurement.center - hostRect.top;
       const endX = clamp(itemRect.left - hostRect.left, 0, width);
       measured.set(specIndex, {
         ...decorated,
-        bottom: rowRect.bottom,
+        bottom: visibleMeasurement.bottom,
+        clipTop: clamp(visibleMeasurement.clipTop - hostRect.top, 0, height),
         endX,
-        top: rowRect.top,
+        top: visibleMeasurement.top,
         y,
       });
     }
@@ -1228,7 +1270,6 @@ export class CoreOutlineRenderer {
 
     for (const [parentIndex, children] of childrenByParent) {
       const parent = measured.get(parentIndex);
-      if (!parent) continue;
       this.appendStaticGuideForRows(
         layer,
         children,
@@ -1240,6 +1281,9 @@ export class CoreOutlineRenderer {
         height,
         false,
         parent,
+        parent
+          ? undefined
+          : Math.min(...children.map((entry) => entry.clipTop)),
       );
     }
   }
@@ -1255,6 +1299,7 @@ export class CoreOutlineRenderer {
     height: number,
     virtualRoot: boolean,
     parent?: MeasuredOutlineRow,
+    clippedParentStartY?: number,
   ): void {
     if (rows.length === 0) return;
     const sortedRows = [...rows].sort((left, right) => left.y - right.y);
@@ -1272,7 +1317,9 @@ export class CoreOutlineRenderer {
     const parentY = parent?.y ?? first.y;
     const startY = virtualRoot
       ? clamp(first.y - firstBranchRise, 0, height)
-      : clamp(parentY + firstBranchRise, 0, height);
+      : parent
+        ? clamp(parentY + firstBranchRise, 0, height)
+        : clamp(clippedParentStartY ?? first.y - firstBranchRise, 0, height);
     const path = buildOutlineGuidePath({
       connectors,
       endY: last.y,
@@ -1321,14 +1368,18 @@ export class CoreOutlineRenderer {
     const appendEdge = (childIndex: number, depth: number): void => {
       if (drawnEdges.has(childIndex)) return;
       const child = measured.get(childIndex);
+      if (!child) return;
       const parentIndex = attachment.model[childIndex]?.parentIndex;
       const parent = parentIndex === null || parentIndex === undefined
         ? null
         : measured.get(parentIndex);
-      if (!child || !parent) return;
       const endX = clamp(child.endX - markerGap, 0, width);
       const startX = clamp(endX - connectorLength, 0, width);
-      const startY = clamp(parent.y + verticalOffset, 0, height);
+      const startY = clamp(
+        (parent?.y ?? child.clipTop) + verticalOffset,
+        0,
+        height,
+      );
       const endY = clamp(child.y + verticalOffset, 0, height);
       const path = buildRoundedOutlineThreadPath({
         endX,
@@ -1587,7 +1638,10 @@ export class CoreOutlineRenderer {
       delete row.dataset.extendedHeadingSpecIndex;
     }
     attachment.overlay?.remove();
-    attachment.container.classList.remove(OUTLINE_HOST_CLASS);
+    attachment.container.classList.remove(
+      OUTLINE_HOST_CLASS,
+      OUTLINE_EXPAND_LONG_TITLES_CLASS,
+    );
     attachment.overlay = null;
     attachment.guideLayer = null;
     attachment.threadLayer = null;

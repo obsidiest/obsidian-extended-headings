@@ -48,8 +48,15 @@ test("distinguishes editor-gutter and default Outline heading markers", () => {
 
 test("enables Outline pane Markdown rendering by default", () => {
   assert.match(settings, /renderMarkdownInDefaultOutline:\s*true/);
+  assert.match(settings, /expandLongOutlinePaneHeadingTitles:\s*true/);
   assert.match(settings, /name: "Outline Pane Markdown Rendering"/);
   assert.match(settings, /key: "renderMarkdownInDefaultOutline"/);
+  assert.match(settings, /name: "Outline Pane – Expand Long Heading Titles"/);
+  assert.match(settings, /key: "expandLongOutlinePaneHeadingTitles"/);
+  assert.match(
+    settings,
+    /disabled: \(\) => !this\.plugin\.settings\.renderMarkdownInDefaultOutline/,
+  );
 });
 
 test("describes heading markers without Lapel compatibility wording", () => {
@@ -174,6 +181,7 @@ test("documents default Outline markers, guides, and all threading scopes", () =
   assert.match(readme, /internal-link-only/);
   assert.match(readme, /embedded internal links/i);
   assert.match(readme, /Outline Pane Markdown Rendering/);
+  assert.match(readme, /Outline Pane – Expand Long Heading Titles/);
   assert.match(readme, /individual H1 trees, the virtual root-level H1 tree, orphan H2–H12 trees, and the combined root-level ⟺ orphan tree/);
   assert.match(readme, /List Tree Indentation Guides/);
 });
