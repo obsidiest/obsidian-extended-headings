@@ -255,6 +255,23 @@ export function outlineMarkdownFromHeadingBody(rawBody: string): string {
     .trim();
 }
 
+export function outlineMarkdownItemsFromSpecs(
+  specs: readonly Pick<OutlineHeadingSpec, "markdown">[],
+): string[] {
+  return Array.from(
+    new Set(
+      specs.flatMap((spec) => spec.markdown ? [spec.markdown] : []),
+    ),
+  );
+}
+
+export function outlineMarkdownRequiresLink(markdown: string): boolean {
+  return (
+    /\[\[[^\]]+\]\]/u.test(markdown) ||
+    /\[[^\]]*\]\([^)]*\)/u.test(markdown)
+  );
+}
+
 function hasRenderableOutlineMarkdown(rawBody: string): boolean {
   const withoutSvg = rawBody.replace(inlineSvgPattern(), " ");
   return (
@@ -845,18 +862,25 @@ export class CoreOutlineRenderer {
       } else {
         replacementMarkdownComponent = new Component();
         replacementMarkdownComponent.load();
-        replacementMarkdownTemplates = await this.renderMarkdownTemplates(
+        const replacementMarkdownBatch = await this.renderMarkdownTemplates(
           attachment.container.ownerDocument,
           file.path,
           specs,
-          matches,
           replacementMarkdownComponent,
         );
+        replacementMarkdownTemplates = replacementMarkdownBatch.templates;
+        const replacementMarkdownComplete = replacementMarkdownBatch.complete;
         renderedMarkdown = this.cloneMarkdownLabels(
           specs,
           matches,
           replacementMarkdownTemplates,
         );
+
+        if (!replacementMarkdownComplete) {
+          replacementMarkdownComponent.unload();
+          replacementMarkdownComponent = null;
+          replacementMarkdownTemplates = null;
+        }
       }
     }
 
@@ -946,20 +970,17 @@ export class CoreOutlineRenderer {
     ownerDocument: Document,
     sourcePath: string,
     specs: OutlineHeadingSpec[],
-    matches: OutlineHeadingMatch[],
     component: Component,
-  ): Promise<Map<string, HTMLElement>> {
+  ): Promise<{ complete: boolean; templates: Map<string, HTMLElement> }> {
     const templates = new Map<string, HTMLElement>();
-    const markdownItems = Array.from(
-      new Set(
-        matches.flatMap(({ specIndex }) => {
-          const markdown = specs[specIndex]?.markdown;
-          return markdown ? [markdown] : [];
-        }),
-      ),
-    );
-    await Promise.all(
-      markdownItems.map(async (markdown) => {
+    const markdownItems = outlineMarkdownItemsFromSpecs(specs);
+    // The cache signature covers every heading in the source note, so its
+    // template set must do the same. Rendering only the currently mounted
+    // Outline rows leaves later virtualized/scrolled rows with a permanent
+    // plain-text fallback under an otherwise matching cache signature.
+    for (const markdown of markdownItems) {
+      let template: HTMLElement | null = null;
+      for (let attempt = 0; attempt < 2 && !template; attempt += 1) {
         const rendered = (
           ownerDocument.win as Window & { createSpan(): HTMLSpanElement }
         ).createSpan();
@@ -972,23 +993,30 @@ export class CoreOutlineRenderer {
             component,
           );
         } catch {
-          return;
+          continue;
         }
 
         const paragraph = rendered.querySelector(":scope > p");
         if (paragraph && rendered.children.length === 1) {
           paragraph.replaceWith(...Array.from(paragraph.childNodes));
         }
-        if (!rendered.textContent?.trim() && rendered.childElementCount === 0) return;
+        if (!rendered.textContent?.trim() && rendered.childElementCount === 0) continue;
+        if (outlineMarkdownRequiresLink(markdown) && !rendered.querySelector("a")) {
+          continue;
+        }
         for (const interactive of Array.from(
           rendered.querySelectorAll<HTMLElement>(
             "a, button, input, select, textarea, [tabindex]",
           ),
         )) interactive.setAttribute("tabindex", "-1");
-        templates.set(markdown, rendered);
-      }),
-    );
-    return templates;
+        template = rendered;
+      }
+      if (template) templates.set(markdown, template);
+    }
+    return {
+      complete: templates.size === markdownItems.length,
+      templates,
+    };
   }
 
   private cloneMarkdownLabels(

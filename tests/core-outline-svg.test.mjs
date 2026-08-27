@@ -352,6 +352,41 @@ test("prepares compact, reversible Markdown for default Outline labels", () => {
   assert.match(source, /expandLongOutlinePaneHeadingTitles/);
 });
 
+test("prepares and caches link templates for every source heading, not only visible rows", () => {
+  assert.equal(typeof outlineSvg.outlineMarkdownItemsFromSpecs, "function");
+  assert.equal(typeof outlineSvg.outlineMarkdownRequiresLink, "function");
+
+  const suppliedHeadings = [
+    "[[Non-Penetrative Sex (Neo-Latin - Impenetrativicoitus; or Outercourse {Neo-Latin - Extracursus; or Externicursus}; or External Intercourse {Neo-Latin - Coitus Externus})#Suaviatio or Saviatio or Deep Erotic Kissing]]",
+    "![[Prose]]",
+    "![[Art#Genre Art]]",
+  ];
+  const markdownItems = outlineSvg.outlineMarkdownItemsFromSpecs([
+    { markdown: outlineSvg.outlineMarkdownFromHeadingBody(suppliedHeadings[0]) },
+    {},
+    { markdown: outlineSvg.outlineMarkdownFromHeadingBody(suppliedHeadings[1]) },
+    { markdown: outlineSvg.outlineMarkdownFromHeadingBody(suppliedHeadings[2]) },
+    { markdown: outlineSvg.outlineMarkdownFromHeadingBody(suppliedHeadings[1]) },
+  ]);
+
+  assert.deepEqual(Array.from(markdownItems), [
+    suppliedHeadings[0],
+    "[[Prose]]",
+    "[[Art#Genre Art]]",
+  ]);
+  assert.equal(markdownItems.every(outlineSvg.outlineMarkdownRequiresLink), true);
+  assert.equal(outlineSvg.outlineMarkdownRequiresLink("*Plain emphasis*"), false);
+  assert.match(source, /const markdownItems = outlineMarkdownItemsFromSpecs\(specs\)/);
+  assert.doesNotMatch(
+    source,
+    /Promise\.all\([\s\S]{0,300}MarkdownRenderer\.render/,
+  );
+  assert.match(
+    source,
+    /outlineMarkdownRequiresLink\(markdown\)[\s\S]{0,100}!rendered\.querySelector\("a"\)/,
+  );
+});
+
 test("integrates a sanitized, reversible renderer with Obsidian's default Outline", () => {
   assert.match(source, /export class CoreOutlineRenderer/);
   assert.match(source, /sanitizeHTMLToDom\(/);

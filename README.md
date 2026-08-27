@@ -35,7 +35,7 @@ Extended Headings declares mobile compatibility because its runtime uses Obsidia
 - Default-on H1–H12 heading-level markers beside labels in Obsidian's default Outline.
 - Default-on static Outline heading-tree indentation guides with measured spines and branch connectors.
 - Default-on full-row Outline heading threading for active ancestor paths, virtual root-level H1 trees, orphan H2–H12 trees, and combined root-level ⟺ orphan trees, with optional all-branches modes and a default-off selected-heading activation override.
-- Reliable H1–H12 Outline decoration for plain, Markdown-formatted, internal-link-only, and embedded-internal-link-only headings.
+- Reliable H1–H12 Outline decoration and Markdown link rendering for plain, Markdown-formatted, internal-link-only, and embedded-internal-link-only headings, including rows mounted after scrolling.
 - Immediate active-note injection at workspace readiness, followed by a background vault-wide reindex after metadata resolution.
 - Punctuation-preserving H7–H12 labels in the default Outline, including parentheses and colons.
 - An independent Live Preview rendering fallback for heading-subpath links placed directly on H7–H12 lines.
