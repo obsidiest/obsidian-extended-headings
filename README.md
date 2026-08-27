@@ -30,7 +30,7 @@ Extended Headings declares mobile compatibility because its runtime uses Obsidia
 - A supported-API **Extended Outline** side pane.
 - An experimental bridge for the core Outline, `[[Note#Heading]]` links, link suggestions, and heading navigation.
 - True H7–H12 levels in Obsidian's default Outline, preserving the complete unflattened hierarchy.
-- Default-on reversible inline Markdown rendering for H1–H12 labels in Obsidian's default Outline; embedded links remain compact instead of transcluding note contents.
+- Default-on reversible inline Markdown rendering for H1–H12 labels in Obsidian's default Outline; embedded links remain compact instead of transcluding note contents, and leading numbered labels remain ordinary heading text rather than Markdown lists.
 - Optional sanitized rendering of inline SVGs from H1–H12 heading source in Obsidian's default Outline, enabled by default.
 - Default-on H1–H12 heading-level markers beside labels in Obsidian's default Outline.
 - Default-on static Outline heading-tree indentation guides with measured spines and branch connectors.

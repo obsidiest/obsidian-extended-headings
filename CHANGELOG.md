@@ -16,6 +16,7 @@
 - Prevented offscreen headings from being clamped into the Outline toolbar, eliminating stray overdrawn static-guide segments at the viewport edge.
 - Fixed static guides and active threads disappearing from visible headings whenever their parent row was scrolled above the Outline viewport; clipped branches now continue from the content boundary.
 - Fixed internal-link and embedded-link headings intermittently falling back to plain Outline text by building a complete note-wide Markdown-template cache, rendering templates sequentially, and retrying incomplete link output before caching it.
+- Fixed Markdown-rendered Outline headings beginning with numbered or other block markers being indented as lists or blockquotes; their leading markers now remain literal while inline code and other inline formatting still render.
 - Added the default-on **Outline Pane Markdown Rendering** setting for reversible inline Markdown rendering across H1–H12 labels. Embedded links render as compact links rather than transcluded note contents.
 - Added an **Editor Gutter** Style Settings section with independently configurable heading-level-marker and hash-marker font variants, both preserving their inherited appearance by default.
 - Added default Outline heading and marker typography/appearance controls plus complete static-guide and thread appearance, geometry, pattern, depth-color, fallback, and override controls to Style Settings. Outline heading-level markers default to **All small caps**.

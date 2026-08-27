@@ -352,6 +352,38 @@ test("prepares compact, reversible Markdown for default Outline labels", () => {
   assert.match(source, /expandLongOutlinePaneHeadingTitles/);
 });
 
+test("keeps inline-code headings with numbered titles out of Markdown list blocks", () => {
+  assert.equal(typeof outlineSvg.escapeOutlineMarkdownBlockStart, "function");
+  assert.equal(
+    outlineSvg.outlineMarkdownFromHeadingBody(
+      "2. Test `LATEST VERSION NUMBER` locally first",
+    ),
+    "2\\. Test `LATEST VERSION NUMBER` locally first",
+  );
+  assert.equal(
+    outlineSvg.outlineMarkdownFromHeadingBody(
+      "4. Create the `LATEST VERSION NUMBER` release",
+    ),
+    "4\\. Create the `LATEST VERSION NUMBER` release",
+  );
+  assert.equal(
+    outlineSvg.escapeOutlineMarkdownBlockStart("3) Parenthesized marker"),
+    "3\\) Parenthesized marker",
+  );
+  assert.equal(
+    outlineSvg.escapeOutlineMarkdownBlockStart("- Literal leading hyphen"),
+    "\\- Literal leading hyphen",
+  );
+  assert.equal(
+    outlineSvg.escapeOutlineMarkdownBlockStart("> Literal leading angle bracket"),
+    "\\> Literal leading angle bracket",
+  );
+  assert.equal(
+    outlineSvg.escapeOutlineMarkdownBlockStart("Ordinary `inline code`"),
+    "Ordinary `inline code`",
+  );
+});
+
 test("prepares and caches link templates for every source heading, not only visible rows", () => {
   assert.equal(typeof outlineSvg.outlineMarkdownItemsFromSpecs, "function");
   assert.equal(typeof outlineSvg.outlineMarkdownRequiresLink, "function");

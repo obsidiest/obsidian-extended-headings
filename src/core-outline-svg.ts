@@ -244,7 +244,7 @@ export function outlineLabelFromHeadingBody(rawBody: string): string {
 }
 
 export function outlineMarkdownFromHeadingBody(rawBody: string): string {
-  return rawBody
+  const markdown = rawBody
     .replace(inlineSvgPattern(), " ")
     // An Outline label must stay compact. Render embeds as ordinary links so
     // Markdown formatting is retained without transcluding an entire note.
@@ -253,6 +253,18 @@ export function outlineMarkdownFromHeadingBody(rawBody: string): string {
     .replace(/\s+/gu, " ")
     .replace(/\(\s+\)/gu, "()")
     .trim();
+  return escapeOutlineMarkdownBlockStart(markdown);
+}
+
+export function escapeOutlineMarkdownBlockStart(markdown: string): string {
+  return markdown
+    // MarkdownRenderer parses a numbered heading label containing inline code
+    // as an ordered-list block. Escape only the marker punctuation so the
+    // visible label stays unchanged while its inline Markdown still renders.
+    .replace(/^(\d{1,9})([.)])(?=\s)/u, "$1\\$2")
+    .replace(/^([-+*>])(?=\s)/u, "\\$1")
+    .replace(/^(#{1,6})(?=\s)/u, "\\$1")
+    .replace(/^(`{3,}|~{3,})(?=\s|$)/u, "\\$1");
 }
 
 export function outlineMarkdownItemsFromSpecs(
