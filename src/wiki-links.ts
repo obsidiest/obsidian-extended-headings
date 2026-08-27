@@ -20,12 +20,14 @@ function firstUnescaped(text: string, character: string): number {
 }
 
 /**
- * Finds non-embed wiki links with heading subpaths inside an extended-heading
- * body. Obsidian's Live Preview parser does not currently render this syntax
- * on a line beginning with seven or more hashes, so the editor extension uses
- * these ranges for an isolated MarkdownRenderer fallback.
+ * Finds non-embed wiki links that need an isolated MarkdownRenderer fallback
+ * inside an extended-heading body. Obsidian's Live Preview parser does not
+ * consistently render a wiki link at the beginning of an H7+ body, and it
+ * does not currently render heading-subpath links anywhere on such a line.
+ * Links that Obsidian already renders reliably are intentionally left alone so
+ * the fallback never overlaps the editor's native replacement decorations.
  */
-export function scanHeadingSubpathLinks(
+export function scanHeadingLivePreviewLinks(
   body: string,
   bodyFrom = 0,
 ): ExtendedHeadingWikiLink[] {
@@ -68,7 +70,11 @@ export function scanHeadingSubpathLinks(
     const subpathAt = firstUnescaped(target, "#");
     const subpath = subpathAt >= 0 ? target.slice(subpathAt + 1).trim() : "";
 
-    if (subpathAt >= 0 && subpath.length > 0 && !subpath.startsWith("^")) {
+    const beginsHeadingBody = index === 0;
+    const targetsHeading =
+      subpathAt >= 0 && subpath.length > 0 && !subpath.startsWith("^");
+
+    if (beginsHeadingBody || targetsHeading) {
       links.push({
         from: bodyFrom + index,
         to: bodyFrom + closing + 2,

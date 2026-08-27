@@ -12,11 +12,11 @@ const compiled = ts.transpileModule(source, {
 const module = { exports: {} };
 const require = createRequire(import.meta.url);
 vm.runInNewContext(compiled, { module, exports: module.exports, require });
-const { scanHeadingSubpathLinks } = module.exports;
+const { scanHeadingLivePreviewLinks } = module.exports;
 
 test("finds heading-subpath links and preserves absolute editor ranges", () => {
   const body = "Before [[Testing Document#Test Heading Level 7]] after";
-  const links = scanHeadingSubpathLinks(body, 20);
+  const links = scanHeadingLivePreviewLinks(body, 20);
   assert.equal(links.length, 1);
   assert.equal(links[0].raw, "[[Testing Document#Test Heading Level 7]]");
   assert.equal(links[0].from, 27);
@@ -24,24 +24,38 @@ test("finds heading-subpath links and preserves absolute editor ranges", () => {
 });
 
 test("supports current-file headings and aliases", () => {
-  const links = scanHeadingSubpathLinks("[[#Local heading|Alias]]");
+  const links = scanHeadingLivePreviewLinks("[[#Local heading|Alias]]");
   assert.equal(links.length, 1);
   assert.equal(links[0].raw, "[[#Local heading|Alias]]");
 });
 
-test("leaves ordinary links, block links, embeds, escapes, and code spans alone", () => {
+test("renders ordinary and block links when they begin an extended heading body", () => {
+  const ordinaryOnly = scanHeadingLivePreviewLinks("[[Diagram]]", 8);
+  const ordinary = scanHeadingLivePreviewLinks("[[Diagram]] Extended Heading Level 7", 8);
+  const block = scanHeadingLivePreviewLinks("[[Testing Document#^block-id]]", 30);
+
+  assert.deepEqual(Array.from(ordinaryOnly, (link) => link.raw), ["[[Diagram]]"]);
+  assert.deepEqual(Array.from(ordinary, (link) => link.raw), ["[[Diagram]]"]);
+  assert.equal(ordinary[0].from, 8);
+  assert.deepEqual(
+    Array.from(block, (link) => link.raw),
+    ["[[Testing Document#^block-id]]"],
+  );
+});
+
+test("leaves natively rendered trailing links, embeds, escapes, and code spans alone", () => {
   const body = [
-    "[[Another note]]",
-    "[[Testing Document#^block-id]]",
+    "Before [[Another note]]",
+    "Before [[Testing Document#^block-id]]",
     "![[Testing Document#Heading]]",
     "\\[[Testing Document#Heading]]",
     "`[[Testing Document#Heading]]`",
   ].join(" ");
-  assert.deepEqual(Array.from(scanHeadingSubpathLinks(body)), []);
+  assert.deepEqual(Array.from(scanHeadingLivePreviewLinks(body)), []);
 });
 
 test("finds multiple heading links in source order", () => {
-  const links = scanHeadingSubpathLinks("[[A#Seven]] and [[B#Eight|8]]");
+  const links = scanHeadingLivePreviewLinks("[[A#Seven]] and [[B#Eight|8]]");
   assert.deepEqual(Array.from(links, (link) => link.raw), ["[[A#Seven]]", "[[B#Eight|8]]"]);
   assert.ok(links[0].to < links[1].from);
 });

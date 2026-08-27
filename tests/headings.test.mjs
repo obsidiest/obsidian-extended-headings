@@ -12,7 +12,7 @@ const compiled = ts.transpileModule(source, {
 const module = { exports: {} };
 const require = createRequire(import.meta.url);
 vm.runInNewContext(compiled, { module, exports: module.exports, require });
-const { headingPathAtLine, parseHeadingLine, scanHeadings } = module.exports;
+const { hasHeadingContent, headingPathAtLine, parseHeadingLine, scanHeadings } = module.exports;
 
 test("recognizes H7 through configured maximum", () => {
   const headings = scanHeadings("####### Seven\n######## Eight\n######### Nine\n########## Ten", 7, 9);
@@ -48,6 +48,28 @@ test("removes optional closing hashes", () => {
   const heading = parseHeadingLine("  ####### Title ###  ", 3, 20, 7, 9);
   assert.equal(heading?.rawBody, "Title");
   assert.equal(heading?.markerFrom, 22);
+});
+
+test("distinguishes blank headings from content-bearing headings", () => {
+  const content = parseHeadingLine("####### Heading", 1, 11, 7, 12);
+  const blankWithClosingHashes = parseHeadingLine(
+    "####### #######   ",
+    2,
+    30,
+    7,
+    12,
+  );
+
+  assert.ok(content);
+  assert.ok(blankWithClosingHashes);
+  assert.equal(hasHeadingContent(content), true);
+  assert.equal(blankWithClosingHashes.rawBody, "");
+  assert.equal(hasHeadingContent(blankWithClosingHashes), false);
+  for (let level = 7; level <= 12; level += 1) {
+    const blank = parseHeadingLine(`${"#".repeat(level)}   `, level, 0, 7, 12);
+    assert.ok(blank);
+    assert.equal(hasHeadingContent(blank), false);
+  }
 });
 
 test("preserves punctuation in extended-heading display text", () => {
