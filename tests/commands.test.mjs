@@ -73,7 +73,7 @@ test("reindexes the default Outline after both startup lifecycle signals", () =>
   assert.match(coreIntegration, /metadataCache\.on\("resolved"/);
   assert.match(coreIntegration, /workspace\.onLayoutReady/);
   assert.match(coreIntegration, /runStartupReindex/);
-  assert.match(coreIntegration, /await this\.reindexAll\(true\)/);
+  assert.match(coreIntegration, /await this\.reindexAll\(false, true\)/);
   assert.match(
     coreIntegration,
     /forceNotify && bridged\.length > 0/,
@@ -86,11 +86,18 @@ test("prioritizes the active note before the vault-wide startup reindex", () => 
   assert.match(coreIntegration, /void this\.reindexActiveFile\(true\)/);
   assert.match(
     coreIntegration,
-    /await this\.reindexActiveFile\(true\);\s*\n\s*await this\.reindexAll\(true\)/,
+    /await this\.reindexActiveFile\(true\);\s*\n\s*await this\.reindexAll\(false, true\)/,
   );
   assert.match(coreIntegration, /view\.editor\.getValue\(\)/);
   assert.match(coreIntegration, /getLeavesOfType\("markdown"\)/);
   assert.match(coreIntegration, /files\.findIndex\(\(file\) => file\.path === activeFile\.path\)/);
+});
+
+test("yields during the background startup reindex without slowing manual reindexing", () => {
+  assert.match(coreIntegration, /const concurrency = cooperative \? 2 : 6/);
+  assert.match(coreIntegration, /filesSinceYield >= 8/);
+  assert.match(coreIntegration, /window\.setTimeout\(resolve, 0\)/);
+  assert.match(coreIntegration, /reindexAll\(\s*forceNotify = false,\s*cooperative = false/s);
 });
 
 test("preserves punctuation in default Outline display labels", () => {

@@ -26,6 +26,40 @@ const OUTLINE_MARKDOWN_RENDERED_CLASS = "extended-heading-outline-markdown-rende
 const OUTLINE_EXPAND_LONG_TITLES_CLASS =
   "extended-heading-outline-expand-long-titles";
 
+const OUTLINE_GEOMETRY_STYLE_PROPERTIES = [
+  "--extended-outline-heading-font-family",
+  "--extended-outline-heading-font-size",
+  "--extended-outline-heading-font-style",
+  "--extended-outline-heading-font-variant",
+  "--extended-outline-heading-font-weight",
+  "--extended-outline-heading-letter-spacing",
+  "--extended-outline-heading-row-spacing",
+  "--extended-outline-level-marker-font-size",
+  "--extended-outline-level-marker-font-style",
+  "--extended-outline-level-marker-font-variant",
+  "--extended-outline-level-marker-font-weight",
+  "--extended-outline-level-marker-gap",
+  "--extended-outline-level-marker-letter-spacing",
+  "--extended-outline-level-marker-width",
+  "--extended-outline-guide-connector-length",
+  "--extended-outline-guide-connector-offset",
+  "--extended-outline-guide-first-branch-rise",
+  "--extended-outline-guide-marker-gap",
+  "--extended-outline-thread-connector-length",
+  "--extended-outline-thread-corner-radius",
+  "--extended-outline-thread-marker-gap",
+  "--extended-outline-thread-vertical-offset",
+  "display",
+  "font-family",
+  "font-size",
+  "font-style",
+  "font-variant",
+  "font-weight",
+  "letter-spacing",
+  "line-height",
+  "white-space",
+] as const;
+
 export interface InlineSvgFragments {
   label: string;
   svgMarkup: string[];
@@ -128,9 +162,12 @@ interface MeasuredOutlineRow extends DecoratedOutlineRow {
   y: number;
 }
 
+type OutlineMeasurementRow = readonly [number, DecoratedOutlineRow];
+
 interface OutlineAttachment {
   animationFrame: number;
   container: HTMLElement;
+  filePath: string | null;
   guideLayer: SVGGElement | null;
   hoveredSpecIndex: number | null;
   lastMeasuredRows: MeasuredOutlineRow[];
@@ -138,6 +175,8 @@ interface OutlineAttachment {
   markdownCacheSignature: string;
   markdownComponent: Component | null;
   markdownTemplates: Map<string, HTMLElement>;
+  measurementRows: OutlineMeasurementRow[];
+  measurementRowsDirty: boolean;
   model: OutlineTreeModelItem[];
   observer: MutationObserver;
   overlay: SVGSVGElement | null;
@@ -151,6 +190,9 @@ interface OutlineAttachment {
   threadLayer: SVGGElement | null;
   visualAnimationFrame: number;
   visualGeometryDirty: boolean;
+  visualHeight: number;
+  visualStyleSignature: string;
+  visualWidth: number;
 }
 
 function inlineSvgPattern(): RegExp {
@@ -480,6 +522,44 @@ export function outlineVerticalBoundsIntersect(
   );
 }
 
+export function findVisibleOutlineRowRange(
+  rowCount: number,
+  boundsAt: (index: number) => OutlineVerticalBounds,
+  viewport: OutlineVerticalBounds,
+  overscan = 1,
+): readonly [number, number] {
+  if (rowCount <= 0) return [0, 0];
+  const viewportTop = Math.min(viewport.top, viewport.bottom);
+  const viewportBottom = Math.max(viewport.top, viewport.bottom);
+
+  let low = 0;
+  let high = rowCount;
+  while (low < high) {
+    const middle = Math.floor((low + high) / 2);
+    const bounds = boundsAt(middle);
+    const bottom = Math.max(bounds.top, bounds.bottom);
+    if (bottom <= viewportTop) low = middle + 1;
+    else high = middle;
+  }
+  const first = low;
+
+  low = first;
+  high = rowCount;
+  while (low < high) {
+    const middle = Math.floor((low + high) / 2);
+    const bounds = boundsAt(middle);
+    const top = Math.min(bounds.top, bounds.bottom);
+    if (top < viewportBottom) low = middle + 1;
+    else high = middle;
+  }
+
+  const safeOverscan = Math.max(0, Math.floor(overscan));
+  return [
+    Math.max(0, first - safeOverscan),
+    Math.min(rowCount, low + safeOverscan),
+  ];
+}
+
 export function visibleOutlineRowMeasurement(
   row: OutlineVerticalBounds,
   clippingBounds: readonly OutlineVerticalBounds[],
@@ -658,6 +738,7 @@ export function buildOutlineRootThreadPath(
 
 export class CoreOutlineRenderer {
   private readonly attachments = new Map<WorkspaceLeaf, OutlineAttachment>();
+  private layoutReady = false;
   private started = false;
 
   constructor(private readonly plugin: ExtendedHeadingsPlugin) {}
@@ -667,30 +748,30 @@ export class CoreOutlineRenderer {
     this.started = true;
 
     this.plugin.registerEvent(
-      this.plugin.app.workspace.on("layout-change", () => this.refreshAll()),
+      this.plugin.app.workspace.on("layout-change", () => this.refreshLayout()),
     );
     this.plugin.registerEvent(
-      this.plugin.app.workspace.on("editor-change", () => this.refreshAll()),
-    );
-    this.plugin.registerEvent(
-      this.plugin.app.metadataCache.on("changed", () => {
-        this.invalidateMarkdownCaches();
-        this.refreshAll();
+      this.plugin.app.metadataCache.on("changed", (file) => {
+        this.refreshFile(file);
       }),
     );
     this.plugin.registerEvent(
       this.plugin.app.workspace.on("css-change", () => {
         for (const attachment of this.attachments.values()) {
+          attachment.measurementRowsDirty = true;
           this.scheduleVisualPass(attachment, true);
         }
       }),
     );
-    this.plugin.app.workspace.onLayoutReady(() => this.refreshAll());
-    this.refreshAll();
+    this.plugin.app.workspace.onLayoutReady(() => {
+      if (!this.started) return;
+      this.layoutReady = true;
+      this.refreshAll();
+    });
   }
 
   refreshAll(): void {
-    if (!this.started) return;
+    if (!this.started || !this.layoutReady) return;
     if (!this.hasEnabledFeature()) {
       this.detachAll();
       return;
@@ -700,7 +781,7 @@ export class CoreOutlineRenderer {
   }
 
   refreshVisuals(): void {
-    if (!this.started) return;
+    if (!this.started || !this.layoutReady) return;
     if (!this.hasEnabledFeature()) {
       this.detachAll();
       return;
@@ -715,8 +796,34 @@ export class CoreOutlineRenderer {
     }
   }
 
+  private refreshLayout(): void {
+    if (!this.started || !this.layoutReady) return;
+    if (!this.hasEnabledFeature()) {
+      this.detachAll();
+      return;
+    }
+    const attached = new Set(this.attachAll());
+    for (const attachment of this.attachments.values()) {
+      const filePath = this.getOutlineFile(attachment.leaf)?.path ?? null;
+      if (attached.has(attachment) || filePath !== attachment.filePath) {
+        this.schedulePass(attachment);
+      }
+    }
+  }
+
+  private refreshFile(file: TFile): void {
+    if (!this.started || !this.layoutReady || !this.hasEnabledFeature()) return;
+    for (const attachment of this.attachAll()) this.schedulePass(attachment);
+    for (const attachment of this.attachments.values()) {
+      if (this.getOutlineFile(attachment.leaf)?.path !== file.path) continue;
+      this.clearMarkdownCache(attachment);
+      this.schedulePass(attachment);
+    }
+  }
+
   destroy(): void {
     this.started = false;
+    this.layoutReady = false;
     this.detachAll();
   }
 
@@ -731,7 +838,8 @@ export class CoreOutlineRenderer {
     );
   }
 
-  private attachAll(): void {
+  private attachAll(): OutlineAttachment[] {
+    const attached: OutlineAttachment[] = [];
     for (const [leaf, attachment] of this.attachments) {
       if (!attachment.container.isConnected) this.detach(leaf, attachment);
     }
@@ -747,17 +855,30 @@ export class CoreOutlineRenderer {
               mutation.attributeName !== "aria-current" &&
               mutation.attributeName !== "aria-selected",
           );
+          if (geometryChanged) attachment.measurementRowsDirty = true;
           this.scheduleVisualPass(attachment, geometryChanged);
         } else {
           this.schedulePass(attachment);
         }
       });
       const styleObserver = new MutationObserver(() => {
+        const signature = this.readVisualStyleSignature(attachment);
+        if (signature === attachment.visualStyleSignature) return;
+        attachment.visualStyleSignature = signature;
+        attachment.measurementRowsDirty = true;
         this.scheduleVisualPass(attachment, true);
       });
       const ResizeObserverConstructor =
         container.ownerDocument.defaultView?.ResizeObserver ?? ResizeObserver;
       const resizeObserver = new ResizeObserverConstructor(() => {
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+        if (
+          width === attachment.visualWidth &&
+          height === attachment.visualHeight
+        ) return;
+        attachment.visualWidth = width;
+        attachment.visualHeight = height;
         this.scheduleVisualPass(attachment, true);
       });
       const pointerMove = (event: PointerEvent): void => {
@@ -777,6 +898,7 @@ export class CoreOutlineRenderer {
       attachment = {
         animationFrame: 0,
         container,
+        filePath: null,
         guideLayer: null,
         hoveredSpecIndex: null,
         lastMeasuredRows: [],
@@ -784,6 +906,8 @@ export class CoreOutlineRenderer {
         markdownCacheSignature: "",
         markdownComponent: null,
         markdownTemplates: new Map(),
+        measurementRows: [],
+        measurementRowsDirty: true,
         model: [],
         observer,
         overlay: null,
@@ -797,6 +921,9 @@ export class CoreOutlineRenderer {
         threadLayer: null,
         visualAnimationFrame: 0,
         visualGeometryDirty: false,
+        visualHeight: -1,
+        visualStyleSignature: "",
+        visualWidth: -1,
       };
       this.observeMutations(attachment);
       resizeObserver.observe(container);
@@ -808,7 +935,9 @@ export class CoreOutlineRenderer {
       container.addEventListener("pointerleave", pointerLeave);
       container.addEventListener("scroll", scroll, true);
       this.attachments.set(leaf, attachment);
+      attached.push(attachment);
     }
+    return attached;
   }
 
   private detachAll(): void {
@@ -870,19 +999,20 @@ export class CoreOutlineRenderer {
     const revision = ++attachment.revision;
     const file = this.getOutlineFile(attachment.leaf);
     if (!file) {
+      attachment.filePath = null;
       this.mutateWithoutObserving(attachment, () => {
         this.clearDecorations(attachment);
         this.clearMarkdownCache(attachment);
       });
       return;
     }
-
     let text: string;
     try {
       text = await this.getSourceText(file);
     } catch {
       return;
     }
+    attachment.filePath = file.path;
     if (
       revision !== attachment.revision ||
       !this.started ||
@@ -1215,6 +1345,19 @@ export class CoreOutlineRenderer {
   }
 
   private renderVisuals(attachment: OutlineAttachment): void {
+    const width = attachment.container.clientWidth;
+    const height = attachment.container.clientHeight;
+    attachment.visualWidth = width;
+    attachment.visualHeight = height;
+    const computedStyle =
+      attachment.container.ownerDocument.defaultView?.getComputedStyle(
+        attachment.container,
+      ) ?? null;
+    attachment.visualStyleSignature = this.readVisualStyleSignature(
+      attachment,
+      computedStyle,
+    );
+
     const overlayEnabled =
       attachment.rowsBySpecIndex.size > 0 &&
       (this.plugin.settings.enableOutlinePaneHeadingStaticTreeIndentationGuides ||
@@ -1234,8 +1377,6 @@ export class CoreOutlineRenderer {
     guideLayer.replaceChildren();
     threadLayer.replaceChildren();
 
-    const width = attachment.container.clientWidth;
-    const height = attachment.container.clientHeight;
     if (width <= 0 || height <= 0) return;
     overlay.setAttribute("viewBox", `0 0 ${width} ${height}`);
     overlay.setAttribute("width", String(width));
@@ -1245,10 +1386,6 @@ export class CoreOutlineRenderer {
     attachment.lastMeasuredRows = Array.from(measured.values()).sort(
       (left, right) => left.top - right.top,
     );
-    const computedStyle =
-      attachment.container.ownerDocument.defaultView?.getComputedStyle(
-        attachment.container,
-      ) ?? null;
     if (this.plugin.settings.enableOutlinePaneHeadingStaticTreeIndentationGuides) {
       this.renderStaticGuides(
         attachment,
@@ -1336,8 +1473,28 @@ export class CoreOutlineRenderer {
       return bounds;
     };
 
-    for (const [specIndex, decorated] of attachment.rowsBySpecIndex) {
-      const rowRect = decorated.row.getBoundingClientRect();
+    const measurementRows = this.getMeasurementRows(attachment);
+    const rowRects = new Map<number, DOMRect>();
+    const boundsAt = (position: number): DOMRect => {
+      const cached = rowRects.get(position);
+      if (cached) return cached;
+      const rect = measurementRows[position]?.[1].row.getBoundingClientRect();
+      if (!rect) return hostRect;
+      rowRects.set(position, rect);
+      return rect;
+    };
+    const [start, end] = findVisibleOutlineRowRange(
+      measurementRows.length,
+      boundsAt,
+      hostRect,
+      1,
+    );
+
+    for (let position = start; position < end; position += 1) {
+      const entry = measurementRows[position];
+      if (!entry) continue;
+      const [specIndex, decorated] = entry;
+      const rowRect = boundsAt(position);
       if (
         rowRect.height <= 0 ||
         !outlineVerticalBoundsIntersect(rowRect, hostRect)
@@ -1361,6 +1518,31 @@ export class CoreOutlineRenderer {
       });
     }
     return measured;
+  }
+
+  private getMeasurementRows(
+    attachment: OutlineAttachment,
+  ): OutlineMeasurementRow[] {
+    if (!attachment.measurementRowsDirty) return attachment.measurementRows;
+
+    const measurementRows: OutlineMeasurementRow[] = [];
+    for (const row of Array.from(
+      attachment.container.querySelectorAll<HTMLElement>(`.${OUTLINE_ROW_CLASS}`),
+    )) {
+      if (row.getClientRects().length === 0) continue;
+      const specIndex = Number.parseInt(
+        row.dataset.extendedHeadingSpecIndex ?? "",
+        10,
+      );
+      if (!Number.isInteger(specIndex)) continue;
+      const decorated = attachment.rowsBySpecIndex.get(specIndex);
+      if (decorated?.row !== row) continue;
+      measurementRows.push([specIndex, decorated]);
+    }
+
+    attachment.measurementRows = measurementRows;
+    attachment.measurementRowsDirty = false;
+    return measurementRows;
   }
 
   private renderStaticGuides(
@@ -1741,6 +1923,20 @@ export class CoreOutlineRenderer {
     return Number.isFinite(parsed) ? parsed : fallback;
   }
 
+  private readVisualStyleSignature(
+    attachment: OutlineAttachment,
+    containerStyle?: CSSStyleDeclaration | null,
+  ): string {
+    const view = attachment.container.ownerDocument.defaultView;
+    const style =
+      containerStyle ?? view?.getComputedStyle(attachment.container) ?? null;
+    return JSON.stringify(
+      OUTLINE_GEOMETRY_STYLE_PROPERTIES.map((property) =>
+        style?.getPropertyValue(property).trim() ?? ""
+      ),
+    );
+  }
+
   private handlePointerMove(attachment: OutlineAttachment, event: PointerEvent): void {
     if (this.plugin.settings.activeSelectedOutlinePaneHeadingThreading) return;
     const rowIndex = findOutlineRowAtClientY(
@@ -1810,7 +2006,12 @@ export class CoreOutlineRenderer {
     attachment.threadLayer = null;
     attachment.hoveredSpecIndex = null;
     attachment.lastMeasuredRows = [];
+    attachment.measurementRows = [];
+    attachment.measurementRowsDirty = true;
     attachment.visualGeometryDirty = false;
+    attachment.visualHeight = -1;
+    attachment.visualStyleSignature = "";
+    attachment.visualWidth = -1;
     attachment.rowsBySpecIndex.clear();
     attachment.model = [];
   }
@@ -1820,12 +2021,6 @@ export class CoreOutlineRenderer {
     attachment.markdownCacheSignature = "";
     attachment.markdownComponent = null;
     attachment.markdownTemplates.clear();
-  }
-
-  private invalidateMarkdownCaches(): void {
-    for (const attachment of this.attachments.values()) {
-      this.clearMarkdownCache(attachment);
-    }
   }
 
   private observeMutations(attachment: OutlineAttachment): void {

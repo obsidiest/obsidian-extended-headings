@@ -69,8 +69,11 @@ export class CoreIntegration {
       // editor already owns the current text, so this path normally injects
       // and notifies the core Outline synchronously, without waiting for a
       // cachedRead or for the background reconciliation pass.
-      void this.reindexActiveFile(true);
-      void this.runStartupReindex();
+      if (this.metadataResolved) {
+        void this.runStartupReindex();
+      } else {
+        void this.reindexActiveFile(true);
+      }
     });
   }
 
@@ -79,7 +82,10 @@ export class CoreIntegration {
     this.generation += 1;
   }
 
-  async reindexAll(forceNotify = false): Promise<void> {
+  async reindexAll(
+    forceNotify = false,
+    cooperative = false,
+  ): Promise<void> {
     const generation = ++this.generation;
     if (!this.plugin.settings.coreIntegration) {
       await this.removeAll();
@@ -93,9 +99,10 @@ export class CoreIntegration {
       ? files.findIndex((file) => file.path === activeFile.path)
       : -1;
     if (activeIndex > 0) [files[0], files[activeIndex]] = [files[activeIndex], files[0]];
-    const concurrency = 6;
+    const concurrency = cooperative ? 2 : 6;
     let next = 0;
     const worker = async () => {
+      let filesSinceYield = 0;
       while (next < files.length && generation === this.generation) {
         const file = files[next++];
         const cache = this.plugin.app.metadataCache.getFileCache(file);
@@ -103,6 +110,11 @@ export class CoreIntegration {
         const data = await this.plugin.app.vault.cachedRead(file);
         if (generation !== this.generation) return;
         this.inject(file, data, cache, true, forceNotify);
+        filesSinceYield += 1;
+        if (cooperative && filesSinceYield >= 8) {
+          filesSinceYield = 0;
+          await new Promise<void>((resolve) => window.setTimeout(resolve, 0));
+        }
       }
     };
     await Promise.all(Array.from({ length: Math.min(concurrency, files.length) }, worker));
@@ -222,7 +234,7 @@ export class CoreIntegration {
       do {
         this.startupReindexQueued = false;
         await this.reindexActiveFile(true);
-        await this.reindexAll(true);
+        await this.reindexAll(false, true);
       } while (this.startupReindexQueued && !this.stopped);
 
       // If the initial `resolved` signal arrives while the layout pass is in

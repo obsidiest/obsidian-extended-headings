@@ -2,10 +2,13 @@
 
 ## 1.0.1
 
-- Reduced default Outline static-guide activation and scrolling work by rejecting offscreen rows before label and clipping measurements, and by memoizing the clipping bounds shared by visible rows.
+- Reduced default Outline static-guide activation and scrolling work by caching the prepared DOM-order row list, binary-searching its visible range, and measuring only that range plus a one-row overscan instead of reading every heading rectangle on every scroll frame.
 - Reused the existing measured geometry and static guide layer for hover- and selection-only threading updates instead of rebuilding unchanged guide paths.
 - Made static-guide and threading setting changes refresh the prepared Outline visualization directly, avoiding an unnecessary note-source and Markdown remapping pass.
 - Read all guide and thread geometry variables from one computed-style snapshot per visual pass.
+- Removed the full Outline rebuild previously scheduled on every editor change, limited metadata refreshes to Outline panes showing the changed note, and limited layout refreshes to newly attached panes or panes whose displayed file changed.
+- Suppressed focus-only body-style and duplicate resize callbacks unless computed Outline geometry or container dimensions actually changed.
+- Kept the active note's startup bridge immediate while reducing the background vault reindex to two cooperative workers with periodic event-loop yields and without force-refreshing unchanged bridges.
 - Retained Obsidian 1.13.7 as the latest audited compatibility target.
 
 ## 1.0.0

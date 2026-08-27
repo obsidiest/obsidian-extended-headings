@@ -548,7 +548,35 @@ test("measures visible row portions and excludes rows outside the Outline viewpo
   assert.match(source, /overflowY/);
 });
 
-test("culls offscreen Outline rows before expensive guide measurements", () => {
+test("finds the visible Outline row range with logarithmic bounds reads", () => {
+  assert.equal(typeof outlineSvg.findVisibleOutlineRowRange, "function");
+  let boundsReads = 0;
+  const range = outlineSvg.findVisibleOutlineRowRange(
+    1000,
+    (index) => {
+      boundsReads += 1;
+      return { bottom: index * 24 + 20, top: index * 24 };
+    },
+    { bottom: 960, top: 480 },
+    1,
+  );
+  assert.deepEqual(Array.from(range), [19, 41]);
+  assert.ok(boundsReads < 30, `expected logarithmic reads, received ${boundsReads}`);
+  assert.deepEqual(
+    Array.from(
+      outlineSvg.findVisibleOutlineRowRange(
+        0,
+        () => {
+          throw new Error("empty ranges must not read bounds");
+        },
+        { bottom: 480, top: 0 },
+      ),
+    ),
+    [0, 0],
+  );
+});
+
+test("binary-searches cached visible Outline rows before guide measurements", () => {
   assert.equal(typeof outlineSvg.outlineVerticalBoundsIntersect, "function");
   assert.equal(
     outlineSvg.outlineVerticalBoundsIntersect(
@@ -567,6 +595,7 @@ test("culls offscreen Outline rows before expensive guide measurements", () => {
 
   let itemRectReads = 0;
   let rowRectReads = 0;
+  let rowVisibilityReads = 0;
   let sharedAncestorStyleReads = 0;
   const ownerDocument = {
     defaultView: {
@@ -580,14 +609,29 @@ test("culls offscreen Outline rows before expensive guide measurements", () => {
   const container = {
     getBoundingClientRect: () => hostRect,
     ownerDocument,
+    querySelectorAll: () => orderedRows,
   };
   const sharedAncestor = {
     classList: { contains: () => false },
     parentElement: container,
   };
   const rowsBySpecIndex = new Map();
+  const orderedRows = [];
   for (let index = 0; index < 1000; index += 1) {
     const top = index * 24;
+    const row = {
+      dataset: { extendedHeadingSpecIndex: String(index) },
+      getBoundingClientRect() {
+        rowRectReads += 1;
+        return { bottom: top + 20, height: 20, top };
+      },
+      getClientRects() {
+        rowVisibilityReads += 1;
+        return [{}];
+      },
+      parentElement: sharedAncestor,
+    };
+    orderedRows.push(row);
     rowsBySpecIndex.set(index, {
       item: {
         getBoundingClientRect() {
@@ -602,27 +646,48 @@ test("culls offscreen Outline rows before expensive guide measurements", () => {
         parentIndex: null,
         rootIndex: index,
       },
-      row: {
-        getBoundingClientRect() {
-          rowRectReads += 1;
-          return { bottom: top + 20, height: 20, top };
-        },
-        parentElement: sharedAncestor,
-      },
+      row,
       specIndex: index,
     });
   }
 
   const renderer = new outlineSvg.CoreOutlineRenderer({});
+  const attachment = {
+    container,
+    measurementRows: [],
+    measurementRowsDirty: true,
+    rowsBySpecIndex,
+  };
   const measured = renderer.measureRows(
-    { container, rowsBySpecIndex },
+    attachment,
     600,
     480,
   );
   assert.equal(measured.size, 20);
-  assert.equal(rowRectReads, 1000);
+  assert.equal(rowVisibilityReads, 1000);
+  assert.ok(rowRectReads < 60, `expected visible-slice reads, received ${rowRectReads}`);
   assert.equal(itemRectReads, 20);
   assert.equal(sharedAncestorStyleReads, 1);
+
+  itemRectReads = 0;
+  rowRectReads = 0;
+  rowVisibilityReads = 0;
+  sharedAncestorStyleReads = 0;
+  const measuredAgain = renderer.measureRows(attachment, 600, 480);
+  assert.equal(measuredAgain.size, 20);
+  assert.equal(rowVisibilityReads, 0);
+  assert.ok(rowRectReads < 60, `expected cached visible-slice reads, received ${rowRectReads}`);
+  assert.equal(itemRectReads, 20);
+  assert.equal(sharedAncestorStyleReads, 1);
+});
+
+test("targets Outline refreshes and ignores focus-only geometry callbacks", () => {
+  assert.doesNotMatch(source, /workspace\.on\("editor-change"/);
+  assert.match(source, /workspace\.on\("layout-change", \(\) => this\.refreshLayout\(\)\)/);
+  assert.match(source, /metadataCache\.on\("changed", \(file\)[\s\S]{0,100}refreshFile\(file\)/);
+  assert.match(source, /signature === attachment\.visualStyleSignature/);
+  assert.match(source, /width === attachment\.visualWidth/);
+  assert.match(source, /height === attachment\.visualHeight/);
 });
 
 test("reuses static guide geometry for pointer-only thread updates", () => {
