@@ -18,9 +18,9 @@ import {
   editorInfoField,
   editorLivePreviewField,
 } from "obsidian";
-import { scanHeadings } from "./headings";
+import { hasHeadingContent, scanHeadings } from "./headings";
 import type { ExtendedHeadingsSettings } from "./settings";
-import { scanHeadingSubpathLinks } from "./wiki-links";
+import { scanHeadingLivePreviewLinks } from "./wiki-links";
 
 const renderedLinkComponents = new WeakMap<HTMLElement, Component>();
 
@@ -114,6 +114,8 @@ function buildDecorations(view: EditorView, getSettings: () => ExtendedHeadingsS
 
   for (const heading of headings) {
     const line = view.state.doc.line(heading.line + 1);
+    const concealMarkers =
+      settings.hideMarkersInLivePreview && hasHeadingContent(heading);
     builder.add(
       line.from,
       line.from,
@@ -130,14 +132,14 @@ function buildDecorations(view: EditorView, getSettings: () => ExtendedHeadingsS
         heading.markerFrom,
         heading.bodyFrom,
         Decoration.mark({
-          class: settings.hideMarkersInLivePreview
+          class: concealMarkers
             ? "extended-heading-marker extended-heading-marker-hideable"
             : "extended-heading-marker",
         }),
       );
     }
     if (livePreview && editorInfo) {
-      for (const link of scanHeadingSubpathLinks(heading.rawBody, heading.bodyFrom)) {
+      for (const link of scanHeadingLivePreviewLinks(heading.rawBody, heading.bodyFrom)) {
         if (selectionTouches(view.state, link.from, link.to)) continue;
         builder.add(
           link.from,
@@ -152,7 +154,11 @@ function buildDecorations(view: EditorView, getSettings: () => ExtendedHeadingsS
       builder.add(
         heading.bodyTo,
         heading.to,
-        Decoration.mark({ class: "extended-heading-marker extended-heading-closing-marker" }),
+        Decoration.mark({
+          class: concealMarkers
+            ? "extended-heading-marker extended-heading-closing-marker extended-heading-marker-hideable"
+            : "extended-heading-marker extended-heading-closing-marker",
+        }),
       );
     }
   }

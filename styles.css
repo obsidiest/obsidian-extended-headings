@@ -1595,11 +1595,7 @@ body.extended-outline-thread-override-colors-enabled {
 body.extended-headings-hide-markers
   .markdown-source-view.mod-cm6.is-live-preview
   .cm-line:not(.cm-active)
-  .extended-heading-marker-hideable,
-body.extended-headings-hide-markers
-  .markdown-source-view.mod-cm6.is-live-preview
-  .cm-line:not(.cm-active)
-  .extended-heading-closing-marker {
+  .extended-heading-marker-hideable {
   display: none;
 }
 

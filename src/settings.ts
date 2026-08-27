@@ -123,9 +123,13 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
         },
       },
       {
-        name: "Hide hashes on inactive Live Preview lines",
-        desc: "Conceal H7+ hash markers when the heading line is not active. Hashes are hidden by default.",
-        aliases: ["hash markers", "Live Preview"],
+        name: "Hide hashes on inactive Live Preview heading lines",
+        desc: "Conceal H7+ hash markers on inactive, content-bearing heading lines. Blank headings keep their hashes visible. Hashes are hidden by default.",
+        aliases: [
+          "hash markers",
+          "Live Preview",
+          "Hide hashes on inactive Live Preview lines",
+        ],
         control: {
           type: "toggle",
           key: "hideMarkersInLivePreview",

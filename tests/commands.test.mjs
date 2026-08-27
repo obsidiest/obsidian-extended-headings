@@ -99,8 +99,19 @@ test("preserves punctuation in default Outline display labels", () => {
 });
 
 test("renders heading-subpath links in H7+ Live Preview through an independent fallback", () => {
-  assert.match(extension, /scanHeadingSubpathLinks\(heading\.rawBody, heading\.bodyFrom\)/);
+  assert.match(extension, /scanHeadingLivePreviewLinks\(heading\.rawBody, heading\.bodyFrom\)/);
   assert.match(extension, /MarkdownRenderer\.render/);
   assert.match(extension, /Decoration\.replace/);
   assert.doesNotMatch(extension, /Decoration\.mark\(\{ class: "extended-heading-text" \}\)/);
+});
+
+test("keeps hashes visible on inactive blank H7-H12 headings", () => {
+  assert.match(
+    extension,
+    /settings\.hideMarkersInLivePreview && hasHeadingContent\(heading\)/,
+  );
+  assert.match(
+    extension,
+    /extended-heading-closing-marker extended-heading-marker-hideable/,
+  );
 });

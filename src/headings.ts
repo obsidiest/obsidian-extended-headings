@@ -9,6 +9,12 @@ export interface ParsedHeading {
   rawBody: string;
 }
 
+export function hasHeadingContent(
+  heading: Pick<ParsedHeading, "rawBody">,
+): boolean {
+  return heading.rawBody.trim().length > 0;
+}
+
 interface Fence {
   character: "`" | "~";
   length: number;
@@ -30,8 +36,12 @@ export function parseHeadingLine(
   const markerFromInLine = match[1].length;
   const bodyFromInLine = match[0].length;
   let bodyToInLine = lineText.length;
-  const closing = /[\t ]+#+[\t ]*$/.exec(lineText.slice(bodyFromInLine));
-  if (closing?.index !== undefined) {
+  const bodyAndClosing = lineText.slice(bodyFromInLine);
+  const closingOnly = /^#+[\t ]*$/.test(bodyAndClosing);
+  const closing = /[\t ]+#+[\t ]*$/.exec(bodyAndClosing);
+  if (closingOnly) {
+    bodyToInLine = bodyFromInLine;
+  } else if (closing?.index !== undefined) {
     bodyToInLine = bodyFromInLine + closing.index;
   } else {
     while (bodyToInLine > bodyFromInLine && /[\t ]/.test(lineText[bodyToInLine - 1])) {

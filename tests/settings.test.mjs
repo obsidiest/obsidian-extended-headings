@@ -14,6 +14,15 @@ test("defaults to the full H12 range and native-style inactive-line concealment"
   assert.match(settings, /Hashes are hidden by default\./);
 });
 
+test("names inactive-line concealment precisely and exempts blank headings", () => {
+  assert.match(settings, /name: "Hide hashes on inactive Live Preview heading lines"/);
+  assert.match(settings, /Blank headings keep their hashes visible\./);
+  assert.doesNotMatch(
+    settings,
+    /name: "Hide hashes on inactive Live Preview lines"/,
+  );
+});
+
 test("defaults copied heading references to complete ancestor paths", () => {
   assert.match(settings, /copyFullyNestedHeadingPaths:\s*true/);
   assert.match(settings, /name: "Copy fully nested heading paths"/);
@@ -23,6 +32,10 @@ test("defaults copied heading references to complete ancestor paths", () => {
 test("retains configurable inactive-line hash concealment behavior", () => {
   assert.match(styles, /body\.extended-headings-hide-markers/);
   assert.match(styles, /\.cm-line:not\(\.cm-active\)/);
+  assert.doesNotMatch(
+    styles,
+    /\.cm-line:not\(\.cm-active\)[\s\S]{0,120}\.extended-heading-closing-marker/,
+  );
 });
 
 test("includes Heading Shifter-compatible command settings", () => {
@@ -129,7 +142,7 @@ test("enables Outline static guides and path threading with requested defaults",
 });
 
 test("manifest describes the plugin's overall purpose", () => {
-  assert.equal(manifest.version, "1.0.0");
+  assert.equal(manifest.version, "1.0.1");
   assert.equal(
     manifest.description,
     "Extends ATX heading support through H12 with consistent editing, styling, folding, outlines, links, navigation, and heading-level markers.",

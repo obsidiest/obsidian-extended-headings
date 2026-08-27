@@ -19,12 +19,12 @@ The default maximum is H12. It can be lowered to H7 under **Settings → Communi
 
 The compatibility target records the newest Obsidian base-program version audited and tested when this release was prepared. Version 0.4.9 deliberately raises the minimum from 1.7.2 to 1.13.0 so the plugin can use Obsidian's searchable declarative settings API without retaining a second legacy settings renderer. Earlier releases remain mapped to their historical minimum versions in `versions.json`.
 
-Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 1.0.0 has not been device-tested on Obsidian Mobile.
+Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 1.0.1 has not been device-tested on Obsidian Mobile.
 
 ## Features
 
 - Heading typography in Source mode and Live Preview.
-- Hash markers hidden on inactive Live Preview lines by default, with an option to keep them visible.
+- Hash markers hidden on inactive content-bearing Live Preview heading lines by default, while blank headings retain their hashes.
 - Heading rendering and optional folding in Reading View.
 - Editor folding ranges that respect the complete H1–H12 hierarchy.
 - A supported-API **Extended Outline** side pane.
@@ -77,7 +77,7 @@ Outline Pane Static Heading Tree Indentation Guides Toggle DISABLED - Outline Pa
 | Setting | Default | Effect |
 | --- | --- | --- |
 | Maximum heading level | `12` | Recognizes extended ATX headings from H7 through the selected level. |
-| Hide hashes on inactive Live Preview lines | On | Conceals H7+ hashes when their line is inactive. |
+| Hide hashes on inactive Live Preview heading lines | On | Conceals H7+ hashes on inactive content-bearing headings while keeping blank-heading hashes visible. |
 | Reading View folding | On | Shows a folding control beside extended headings in Reading View. |
 | Core Outline and heading-link bridge | On | Adds H7+ entries to Obsidian's in-memory heading cache for the core Outline, heading links, and navigation. |
 | Outline Pane Markdown Rendering | On | Renders inline Markdown formatting in H1–H12 default-Outline labels while keeping embedded links compact. |

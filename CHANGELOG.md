@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1
+
+- Kept opening and optional closing ATX hashes visible on inactive blank H7–H12 Live Preview heading lines while continuing to conceal hashes on inactive content-bearing headings.
+- Renamed **Hide hashes on inactive Live Preview lines** to **Hide hashes on inactive Live Preview heading lines** without changing its persisted setting key or default.
+- Fixed ordinary internal links at the beginning of H7–H12 headings rendering as literal `[[link]]` source by extending the isolated Live Preview fallback used for heading-subpath links.
+- Retained Obsidian 1.13.7 as the latest audited compatibility target.
+
 ## 1.0.0
 
 - Renamed the editor setting to **Show Editor Gutter heading level markers**, preserved existing preferences through migration, and added the default-on **Show Outline pane heading level markers** toggle for H1–H12 labels.
