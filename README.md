@@ -59,7 +59,7 @@ Extended Headings declares mobile compatibility because its runtime uses Obsidia
 
 ## Feature preview
 
-This representative Live Preview shows every extended level. H8 is active, so its eight ATX hashes are visible; the inactive H7, H9, and H10–H12 lines demonstrate the default hash-concealment behavior:
+This representative Live Preview shows every extended level. H8 is active, so its eight ATX hashes are visible; the inactive H7, H9, and H10–H12 lines demonstrate the default hash-concealment behavior. Plugin-added outline-pane decorations are disabled:
 
 ![Extended headings H7 through H12 in Live Preview, with H8 active and the remaining levels inactive](docs/images/extended-heading-levels-live-preview.png)
 
