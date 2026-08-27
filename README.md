@@ -52,6 +52,10 @@ Extended Headings declares mobile compatibility because its runtime uses Obsidia
 - H7–H12 ATX hash markers that track the size, weight, style, and variant selected for their heading level.
 - Searchable plugin settings through Obsidian 1.13's declarative settings API.
 
+## Miscellaneous Feature-Specific Performance Warnings
+
+- Enabling the `Outline Pane Heading Static Tree Indentation Guides` toggle may cause some lag to render those guides in the pane upon activation of a given note or while scrolling through a given outline pane.
+
 ## Feature preview
 
 This representative Live Preview shows every extended level. H8 is active, so its eight ATX hashes are visible; the inactive H7, H9, and H10–H12 lines demonstrate the default hash-concealment behavior:
