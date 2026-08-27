@@ -1,6 +1,6 @@
 # Extended Headings
 
-Extended Headings extends Obsidian's ATX heading workflow from H1–H6 through H12. It adds editing, styling, folding, outlines, heading navigation, heading-level markers, heading shifting, and block-or-heading reference commands while leaving note text in a readable Markdown-like form.
+Extended Headings extends Obsidian's ATX heading workflow from H1–H6 through H12. It adds editing, styling, folding, outlines, heading navigation, heading-level markers (in the editor gutter and outline pane, respectively), heading shifting, block-or-heading reference commands, Outline pane heading tree indentation guide lines (both static guides and dynamic threading), Outline pane Markdown Rendering, and Outline pane SVG rendering.
 
 ```markdown
 ###### Native H6
