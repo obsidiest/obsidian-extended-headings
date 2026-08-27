@@ -345,10 +345,12 @@ test("restores an arbitrary persisted weight from the generated CSS variable", (
   assert.ok(select.options.some((option) => option.value === "437.5"));
 });
 
-test("covers all fourteen sliders plus both inherited global weight controls", () => {
-  assert.equal((styles.match(/type: variable-number-slider/g) ?? []).length, 14);
+test("covers all thirty-eight sliders plus every inherited numerical weight control", () => {
+  assert.equal((styles.match(/type: variable-number-slider/g) ?? []).length, 38);
   assert.match(source, /"extended-heading-level-marker-weight"/);
   assert.match(source, /"extended-hash-marker-weight"/);
+  assert.match(source, /"extended-outline-heading-font-weight"/);
+  assert.match(source, /"extended-outline-level-marker-font-weight"/);
   assert.match(source, /STYLE_SETTINGS_SECTION_SELECTOR/);
 });
 

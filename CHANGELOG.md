@@ -1,5 +1,29 @@
 # Changelog
 
+## 1.0.0
+
+- Renamed the editor setting to **Show Editor Gutter heading level markers**, preserved existing preferences through migration, and added the default-on **Show Outline pane heading level markers** toggle for H1–H12 labels.
+- Added default-on measured static tree indentation guides to Obsidian's default Outline, with root, nested, and orphan connectors.
+- Added default-on Outline heading threading with independent active-path and all-branches behavior for individual H1 trees, the virtual root-level H1 tree, orphan H2–H12 trees, and a combined root-level ⟺ orphan tree. Active paths default on; all-branches modes default off.
+- Added the default-off **Active Selected Heading Threading** override, which activates every enabled threading submode from Obsidian's selected Outline heading instead of pointer hover.
+- Expanded each Outline heading's threading hover target across the full pane width by adapting the measured vertical-row hit testing proven in List Tree Indentation Guides 1.0.6.
+- Fixed missing Outline heading-level markers and related decorations for headings made entirely from internal links by normalizing rendered link labels and retaining a source-order mapping fallback for complete Outlines.
+- Fixed missing Outline markers, static guides, and threading for headings made entirely from embedded internal links, including Obsidian's compact `Note#Heading` Outline-label form.
+- Fixed inconsistent Outline decoration in Markdown-heavy notes by canonicalizing emphasis, strong, highlight, strikethrough, code, HTML, internal-link, and embed-label forms before matching source headings to transient Outline rows.
+- Added the default-on subordinate **Outline Pane – Expand Long Heading Titles** toggle, which wraps Markdown-rendered long titles while retaining the previous single-line ellipsis behavior when disabled.
+- Fixed missing decorations and threading for repeated short labels such as `n.` in partial or collapsed Outlines by replacing all-or-nothing occurrence matching with source-ordered subsequence matching bounded by surrounding headings.
+- Fixed aliased embedded-link headings whose Outline label changes between the visible alias and compact `Note#Heading` target by matching both canonical forms.
+- Prevented offscreen headings from being clamped into the Outline toolbar, eliminating stray overdrawn static-guide segments at the viewport edge.
+- Fixed static guides and active threads disappearing from visible headings whenever their parent row was scrolled above the Outline viewport; clipped branches now continue from the content boundary.
+- Fixed internal-link and embedded-link headings intermittently falling back to plain Outline text by building a complete note-wide Markdown-template cache, rendering templates sequentially, and retrying incomplete link output before caching it.
+- Fixed Markdown-rendered Outline headings beginning with numbered or other block markers being indented as lists or blockquotes; their leading markers now remain literal while inline code and other inline formatting still render.
+- Added the default-on **Outline Pane Markdown Rendering** setting for reversible inline Markdown rendering across H1–H12 labels. Embedded links render as compact links rather than transcluded note contents.
+- Added an **Editor Gutter** Style Settings section with independently configurable heading-level-marker and hash-marker font variants, both preserving their inherited appearance by default.
+- Added default Outline heading and marker typography/appearance controls plus complete static-guide and thread appearance, geometry, pattern, depth-color, fallback, and override controls to Style Settings. Outline heading-level markers default to **All small caps**.
+- Extended precise numerical input support to all 38 Style Settings sliders and all four inherited numerical weight selectors.
+- Consolidated core Outline SVGs, markers, guides, and threads into one sanitized, reversible, animation-frame-coalesced renderer.
+- Retained Obsidian 1.13.7 as the latest audited compatibility target.
+
 ## 0.4.16
 
 - Restored the exact 0.4.14 shared gutter layout for active and inactive H1–H9 markers, correcting the clipping and indentation regression introduced in 0.4.15.

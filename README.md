@@ -19,7 +19,7 @@ The default maximum is H12. It can be lowered to H7 under **Settings → Communi
 
 The compatibility target records the newest Obsidian base-program version audited and tested when this release was prepared. Version 0.4.9 deliberately raises the minimum from 1.7.2 to 1.13.0 so the plugin can use Obsidian's searchable declarative settings API without retaining a second legacy settings renderer. Earlier releases remain mapped to their historical minimum versions in `versions.json`.
 
-Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 0.4.16 has not been device-tested on Obsidian Mobile.
+Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 1.0.0 has not been device-tested on Obsidian Mobile.
 
 ## Features
 
@@ -30,7 +30,12 @@ Extended Headings declares mobile compatibility because its runtime uses Obsidia
 - A supported-API **Extended Outline** side pane.
 - An experimental bridge for the core Outline, `[[Note#Heading]]` links, link suggestions, and heading navigation.
 - True H7–H12 levels in Obsidian's default Outline, preserving the complete unflattened hierarchy.
+- Default-on reversible inline Markdown rendering for H1–H12 labels in Obsidian's default Outline; embedded links remain compact instead of transcluding note contents, and leading numbered labels remain ordinary heading text rather than Markdown lists.
 - Optional sanitized rendering of inline SVGs from H1–H12 heading source in Obsidian's default Outline, enabled by default.
+- Default-on H1–H12 heading-level markers beside labels in Obsidian's default Outline.
+- Default-on static Outline heading-tree indentation guides with measured spines and branch connectors.
+- Default-on full-row Outline heading threading for active ancestor paths, virtual root-level H1 trees, orphan H2–H12 trees, and combined root-level ⟺ orphan trees, with optional all-branches modes and a default-off selected-heading activation override.
+- Reliable H1–H12 Outline decoration and Markdown link rendering for plain, Markdown-formatted, internal-link-only, and embedded-internal-link-only headings, including rows mounted after scrolling.
 - Immediate active-note injection at workspace readiness, followed by a background vault-wide reindex after metadata resolution.
 - Punctuation-preserving H7–H12 labels in the default Outline, including parentheses and colons.
 - An independent Live Preview rendering fallback for heading-subpath links placed directly on H7–H12 lines.
@@ -42,7 +47,7 @@ Extended Headings declares mobile compatibility because its runtime uses Obsidia
 - H1–H12-aware rename, copy-link, and copy-embed commands.
 - Heading- or block-specific copy actions in the editor context menu.
 - Minimal-style typography controls for every extended level from H7 through H12.
-- Global Style Settings controls for heading level marker size and weight and for hash marker size and weight across all H1–H12 heading levels.
+- An **Editor Gutter** Style Settings section with global heading-level-marker and hash-marker size, weight, and font-variant controls across all H1–H12 heading levels.
 - Synchronized precise number inputs that accept arbitrary in-range values for every numerical Style Settings control.
 - H7–H12 ATX hash markers that track the size, weight, style, and variant selected for their heading level.
 - Searchable plugin settings through Obsidian 1.13's declarative settings API.
@@ -51,7 +56,7 @@ Extended Headings declares mobile compatibility because its runtime uses Obsidia
 
 This representative Live Preview shows every extended level. H8 is active, so its eight ATX hashes are visible; the inactive H7, H9, and H10–H12 lines demonstrate the default hash-concealment behavior:
 
-![Extended headings H7 through H12 in Live Preview, with H9 active and the remaining levels inactive](docs/images/extended-heading-levels-live-preview.png)
+![Extended headings H7 through H12 in Live Preview, with H8 active and the remaining levels inactive](docs/images/extended-heading-levels-live-preview.png)
 
 ## Settings
 
@@ -61,13 +66,30 @@ This representative Live Preview shows every extended level. H8 is active, so it
 | Hide hashes on inactive Live Preview lines | On | Conceals H7+ hashes when their line is inactive. |
 | Reading View folding | On | Shows a folding control beside extended headings in Reading View. |
 | Core Outline and heading-link bridge | On | Adds H7+ entries to Obsidian's in-memory heading cache for the core Outline, heading links, and navigation. |
+| Outline Pane Markdown Rendering | On | Renders inline Markdown formatting in H1–H12 default-Outline labels while keeping embedded links compact. |
+| Outline Pane – Expand Long Heading Titles | On | Wraps Markdown-rendered long heading titles onto additional lines; turn it off to use single-line ellipsis truncation. Available only while Outline Pane Markdown Rendering is enabled. |
 | Render inline SVGs in default Outline | On | Renders sanitized inline SVGs from H1–H12 heading source beside their labels in Obsidian's default Outline. |
 | Copy fully nested heading paths | On | Includes every ancestor heading in copied heading links and embeds; disable it to copy only the shorter target-heading link. |
 | Lower limit of heading | `1` | Sets the shallowest level that **Decrease headings** may reach; `0` permits conversion to a paragraph. |
 | Enable override Tab behavior | Off | Makes Tab and Shift+Tab shift headings when the active selection contains a heading. |
-| Show heading level markers | On | Shows H1–H12 heading markers in the editor gutter. |
+| Show Editor Gutter heading level markers | On | Shows H1–H12 heading markers in the editor gutter. Existing `showHeadingMarkers` preferences migrate automatically. |
+| Show Outline pane heading level markers | On | Shows an H1–H12 marker to the left of every matched heading in Obsidian's default Outline. |
 | Show before line numbers | On | Places heading markers before the line-number gutter. |
 | Show in source mode | On | Shows heading markers in Source mode as well as Live Preview. |
+| Enable Outline Pane Heading Static Tree Indentation Guides | On | Shows persistent measured spines and connectors for root-level, nested, and orphan heading branches. |
+| Enable Outline Pane Heading Threading | On | Enables active heading-tree paths in the default Outline. |
+| Active Selected Heading Threading | Off | Uses the selected Outline heading, instead of pointer hover, to activate every enabled regular, root-level, orphan, and combined threading mode. |
+| Active Heading Threading | On | Highlights the ancestor path inside the active heading's individual H1-rooted tree. |
+| All Branches of an Active Heading Tree Threading | Off | Highlights every descendant branch in the active heading's individual H1-rooted tree. |
+| Active Root-Level Heading Tree Threading | On | Allows the note's sibling H1 headings and all their descendants to act as one virtual root-level tree. |
+| Active Root-Level Heading Threading | On | Highlights the H1-root sequence and nested ancestor path leading to the active heading. |
+| All Branches of an Active Root-Level Tree Threading | Off | Highlights every H1 root and descendant branch in the virtual root-level tree. |
+| Active Orphan Heading Tree Threading | On | Allows threading for top-level H2–H12 branches without an H1 ancestor. |
+| Active Orphan Heading Threading | On | Highlights the virtual orphan-root sequence and nested ancestor path leading to the active heading. |
+| All Branches of an Active Orphan Heading Tree Threading | Off | Highlights all roots and descendant branches in the active orphan tree. |
+| Active Root-Level ⟺ Orphan Heading Tree Threading | On | Allows orphan H2–H12 roots, sibling H1 roots, and their descendants to act as one combined bidirectional tree. |
+| Active Root-Level ⟺ Orphan Heading Threading | On | Highlights the combined top-level root/orphan spine and the nested ancestor path to the active heading. |
+| All Branches of an Active Root-Level ⟺ Orphan Heading Tree Threading | Off | Highlights every root, orphan root, and descendant branch in the combined tree. |
 | Unordered list | On | Removes a leading unordered-list marker when a non-heading line becomes a heading. |
 | Ordered list | On | Removes a leading ordered-list marker when a non-heading line becomes a heading. |
 | User-defined beginning patterns | Empty | Removes matching regular expressions from the start of converted lines. |
@@ -77,7 +99,11 @@ This representative Live Preview shows every extended level. H8 is active, so it
 | Children behavior | `Outdent to 0` | Controls how a contiguous child list is re-indented when its preceding line becomes a heading. |
 | Tab size | `4` | Sets the spaces per indentation level for child-list operations. |
 
-With the **Style Settings** community plugin enabled, open **Settings → Style Settings → Extended Headings**. Global controls set the heading level marker size and weight and the hash marker size and weight across all H1–H12 heading levels. Both marker-size controls default to `1em`, relative to their existing context, and both marker-weight controls default to `inherit`, so enabling the controls does not change the current appearance. Every adjustable numerical value has a synchronized precise number input beside its slider or weight selector. These boxes accept arbitrary in-range values, including decimals between the slider's predefined ticks. A blank global-weight input means **Inherit**. Complete in-range values update immediately; incomplete values such as `1.` and out-of-range values remain editable but revert to the last accepted value when editing ends. The editor preserves decimal typing and its caret position instead of rewriting the box during entry. H7 through H12 each also have a collapsible section with font size, weight, individual light/dark color, variant, style, and divider controls. The default size and weight for every extended level are `0.9em` and `500`; H7 also defaults to the `normal` font variant and style. A shared H7+ color remains the fallback until an individual level color is set. Unless overridden by the global controls, ATX hashes inherit the selected font size, weight, style, and variant for their corresponding heading level.
+With the **Style Settings** community plugin enabled, open **Settings → Style Settings → Extended Headings**. The **Editor Gutter** section groups the global editor-gutter heading-level-marker and hash-marker controls. Both marker types expose size, weight, and font variant across all H1–H12 heading levels. Both marker-size controls default to `1em`, while weight and font variant default to `inherit`, preserving their current appearance. Every adjustable numerical value has a synchronized precise number input beside its slider or weight selector. These boxes accept arbitrary in-range values, including decimals between the slider's predefined ticks. A blank numerical weight input means **Inherit**. Complete in-range values update immediately; incomplete values such as `1.` and out-of-range values remain editable but revert to the last accepted value when editing ends. The editor preserves decimal typing and its caret position instead of rewriting the box during entry.
+
+The **Default Outline Pane** Style Settings section supplies heading typography and appearance controls for font family, size, weight, color, style, variant, letter spacing, opacity, and row spacing. Its heading-level-marker subsection independently controls marker size, weight, color, style, variant, spacing, opacity, reserved width, and label gap. Marker size defaults to `1em`, marker weight inherits the Outline heading, and marker font variant defaults to **All small caps**. Static-guide controls cover color, opacity, thickness, solid/dashed/dotted patterns, dash and dot spacing, connector length, marker gap, first-branch rise, and connector offset. Thread controls cover opacity, thickness, corner radius, line cap, connector geometry, eight independently toggleable depth colors, deeper-level fallback, and light/dark fallback and override colors. Those thread controls apply uniformly to individual H1 trees, the virtual root-level H1 tree, orphan H2–H12 trees, and the combined root-level ⟺ orphan tree. When a branch's parent is above the scroll viewport, its visible guide and active thread continue from the Outline content boundary instead of disappearing or drawing through the toolbar.
+
+H7 through H12 each also have a collapsible section with font size, weight, individual light/dark color, variant, style, and divider controls. The default size and weight for every extended level are `0.9em` and `500`; H7 also defaults to the `normal` font variant and style. A shared H7+ color remains the fallback until an individual level color is set. Unless overridden by the global controls, ATX hashes inherit the selected font size, weight, style, and variant for their corresponding heading level.
 
 ## Commands and hotkeys
 
@@ -128,7 +154,7 @@ Markdown and HTML officially stop at H6. Other Markdown applications therefore t
 
 The editor, Reading View, folding service, Live Preview link fallback, and Extended Outline use supported Obsidian and CodeMirror APIs. The optional **Core Outline and heading-link bridge** adds H7+ objects with their true levels to Obsidian's in-memory metadata cache so the default Outline remains unflattened through H12. Obsidian's public type documentation describes cached heading levels as 1–6, so this bridge is intentionally outside that documented range and is the plugin's most fragile compatibility surface.
 
-The default-on **Render inline SVGs in default Outline** integration reads raw inline SVG fragments from H1–H12 headings, sanitizes each fragment through Obsidian's `sanitizeHTMLToDom`, and adds only the resulting SVG elements to the matching Outline label. SVGs enclosed inside trailing parentheses retain that placement in the Outline. The integration never assigns raw source to `innerHTML`. Because Obsidian does not expose a public API for decorating core Outline rows, this feature observes the core Outline's non-public DOM structure. H7–H12 Outline rows also require the **Core Outline and heading-link bridge**. If an Obsidian update changes that structure, disable SVG rendering until the plugin is updated; the headings and their text remain unchanged.
+The unified default-Outline renderer canonicalizes plain text, inline Markdown, ordinary internal links, and embedded internal links before matching H1–H12 source headings to their transient Outline rows. This accounts for Obsidian's rendered emphasis text and both its `Note > Heading` and compact `Note#Heading` link-label forms, then adds the enabled heading-level markers, measured static guides, active threads, Markdown output, and sanitized SVG elements. **Outline Pane Markdown Rendering** uses Obsidian's renderer inside a reversible wrapper; embedded links are converted to ordinary links for the Outline so they cannot transclude an entire note. Pointer activation uses each measured row's vertical bounds, so its active area spans the Outline pane width rather than only the label or connector beneath the pointer. Enabling **Active Selected Heading Threading** instead derives that same active heading from Obsidian's selected Outline row and suppresses hover activation for every threading submode. Raw inline SVG fragments pass through Obsidian's `sanitizeHTMLToDom`, and only the resulting SVG elements are attached; SVGs enclosed inside trailing parentheses retain that placement. The renderer never assigns raw source to `innerHTML`, coalesces source and geometry refreshes to animation frames, unloads Markdown-rendering components, and restores the original Outline DOM when disabled or unloaded. Because Obsidian does not expose a public API for decorating core Outline rows, these features observe the core Outline's non-public DOM structure. H7–H12 Outline rows also require the **Core Outline and heading-link bridge**. If an Obsidian update changes that structure, disable the affected default-Outline toggles until the plugin is updated; headings and note text remain unchanged.
 
 The separate Live Preview link fallback does not alter cache levels or the default Outline hierarchy. If an Obsidian update disrupts the bridge, disable it and use Extended Outline until the plugin is updated; note content is not migrated by enabling or disabling the bridge.
 
@@ -175,7 +201,7 @@ If you received the combined distribution ZIP, the contents of `_source` are the
 - Startup and manual reindexing enumerate Markdown file paths inside the active vault and read those notes through Obsidian's Vault API to index H7–H12 headings. No files outside the vault are examined.
 - Copy-link and copy-embed commands write the generated reference to the system clipboard only when explicitly invoked. The plugin does not read clipboard contents.
 - The experimental core bridge changes only Obsidian's in-memory metadata cache and does not rewrite note content.
-- Default Outline SVG rendering reads inline SVG source from headings, sanitizes it with Obsidian's HTML sanitizer, and changes only the Outline pane's transient DOM; it does not rewrite note content or inject unsanitized HTML.
+- Default Outline markers, guides, threads, and SVG rendering change only the Outline pane's transient DOM. SVG source is sanitized with Obsidian's HTML sanitizer; none of these features rewrite note content or inject unsanitized HTML.
 - Heading-shift, set-heading, and contextual-insert commands modify only the active editor selection or cursor line when explicitly invoked.
 - Copying a reference to an ordinary block may append a block ID to that block when none exists.
 - Renaming an H7–H12 heading may update matching heading links and embeds in Markdown files throughout the vault after explicit confirmation through the command.
@@ -216,12 +242,14 @@ I had hoped someone capable and sufficiently ambitious might create a plugin lik
 - Version 0.4.14 H1–H12 marker controls, precise Style Settings inputs, heading-marker and parenthesized-Outline-SVG fixes, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 - Version 0.4.15 intrinsic H10–H12 gutter sizing, arbitrary-value and caret-stable Style Settings inputs, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 - Version 0.4.16 targeted H10–H12 Minimal-padding correction, restoration of the 0.4.14 H1–H9 marker layout, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
+- Version 1.0.0 default-Outline Markdown rendering, robust formatted/link/embed heading matching, markers, static guides, full-row individual/root-level/orphan/combined threading, Outline and Editor Gutter Style Settings, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 
 Incorporates features inspired by the following Obsidian community plugins:
 
 - [Heading Shifter](https://github.com/k4a-l/obsidian-heading-shifter)
 - [Lapel](https://github.com/liamcain/obsidian-lapel)
 - [Copy Block Link](https://github.com/mgmeyers/obsidian-copy-block-link)
+- [List Tree Indentation Guides](https://github.com/obsidiest/obsidian-list-tree-indentation-guides) v1.0.6 (static-guide and threading interaction/appearance reference; MIT licensed)
 
 Primary implementation references:
 
