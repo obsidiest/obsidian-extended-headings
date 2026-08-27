@@ -55,6 +55,7 @@ Extended Headings declares mobile compatibility because its runtime uses Obsidia
 ## Miscellaneous Feature-Specific Performance Warnings
 
 - Enabling the `Outline Pane Heading Static Tree Indentation Guides` toggle may cause some lag to render those guides in the pane upon activation of a given note or while scrolling through a given outline pane.
+  - The lag seems to be proportional to the heading count and hierarchy complexity of a given note.
 
 ## Feature preview
 
