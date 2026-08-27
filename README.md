@@ -63,6 +63,15 @@ This representative Live Preview shows every extended level. H8 is active, so it
 
 ![Extended headings H7 through H12 in Live Preview, with H8 active and the remaining levels inactive](docs/images/extended-heading-levels-live-preview.png)
 
+Active Heading Threading Toggle ENABLED - Default Colors
+<img width="2558" height="1438" alt="Active Heading Threading Toggle ENABLED - Default Colors" src="https://github.com/user-attachments/assets/1a63ea36-af50-41fb-b04e-568467e9f3f9" />
+
+Active Heading Threading  Toggle ENABLED - Global Override Heading Thread Colors Toggle ENABLED - Default Color
+<img width="2558" height="1438" alt="Active Heading Threading  Toggle ENABLED - Global Override Heading Thread Colors Toggle ENABLED - Default Color" src="https://github.com/user-attachments/assets/c85fadf0-6364-45bb-9c6e-c5c1b9e25fae" />
+
+Outline Pane Static Heading Tree Indentation Guides Toggle DISABLED - Outline Pane Heading Threading Global Toggle DISABLED
+<img width="2558" height="1438" alt="Outline Pane Static Heading Tree Indentation Guides Toggle DISABLED - Outline Pane Heading Threading Global Toggle DISABLED " src="https://github.com/user-attachments/assets/3b23fa6e-9979-46d6-8c35-22592da5aa85" />
+
 ## Settings
 
 | Setting | Default | Effect |
