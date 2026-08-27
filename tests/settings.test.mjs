@@ -129,7 +129,7 @@ test("enables Outline static guides and path threading with requested defaults",
 });
 
 test("manifest describes the plugin's overall purpose", () => {
-  assert.equal(manifest.version, "1.0.0");
+  assert.equal(manifest.version, "1.0.1");
   assert.equal(
     manifest.description,
     "Extends ATX heading support through H12 with consistent editing, styling, folding, outlines, links, navigation, and heading-level markers.",

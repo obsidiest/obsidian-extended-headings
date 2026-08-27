@@ -91,6 +91,23 @@ export type PersistedExtendedHeadingsSettings = Partial<ExtendedHeadingsSettings
 
 type SettingsKey = keyof ExtendedHeadingsSettings;
 
+const OUTLINE_VISUAL_ONLY_SETTINGS = new Set<SettingsKey>([
+  "enableOutlinePaneHeadingStaticTreeIndentationGuides",
+  "enableOutlinePaneHeadingThreading",
+  "activeSelectedOutlinePaneHeadingThreading",
+  "activeOutlinePaneHeadingThreading",
+  "allBranchesOfActiveOutlinePaneHeadingTreeThreading",
+  "activeRootLevelOutlinePaneHeadingTreeThreading",
+  "activeRootLevelOutlinePaneHeadingThreading",
+  "allBranchesOfActiveRootLevelOutlinePaneHeadingTreeThreading",
+  "activeOrphanOutlinePaneHeadingTreeThreading",
+  "activeOrphanOutlinePaneHeadingThreading",
+  "allBranchesOfActiveOrphanOutlinePaneHeadingTreeThreading",
+  "activeRootLevelOrphanOutlinePaneHeadingTreeThreading",
+  "activeRootLevelOrphanOutlinePaneHeadingThreading",
+  "allBranchesOfActiveRootLevelOrphanOutlinePaneHeadingTreeThreading",
+]);
+
 const SETTINGS_KEYS = new Set<string>(Object.keys(DEFAULT_SETTINGS));
 
 function clampInteger(value: number, minimum: number, maximum: number): number {
@@ -665,7 +682,10 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
         return;
     }
 
-    await this.plugin.settingsChanged(reindex);
+    await this.plugin.settingsChanged(
+      reindex,
+      OUTLINE_VISUAL_ONLY_SETTINGS.has(key as SettingsKey),
+    );
 
     if (key === "maximumLevel") this.update();
     if (key === "coreIntegration") {

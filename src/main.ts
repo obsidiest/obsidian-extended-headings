@@ -272,12 +272,16 @@ export default class ExtendedHeadingsPlugin extends Plugin {
     ]) document.body.removeClass(className);
   }
 
-  async settingsChanged(reindex: boolean): Promise<void> {
+  async settingsChanged(
+    reindex: boolean,
+    outlineVisualOnly = false,
+  ): Promise<void> {
     await this.saveData(this.settings);
     this.app.workspace.updateOptions();
     this.syncBodyClasses();
     if (reindex) await this.coreIntegration?.reindexAll();
-    this.coreOutlineRenderer?.refreshAll();
+    if (outlineVisualOnly) this.coreOutlineRenderer?.refreshVisuals();
+    else this.coreOutlineRenderer?.refreshAll();
     for (const leaf of this.app.workspace.getLeavesOfType(EXTENDED_OUTLINE_VIEW)) {
       if (leaf.view instanceof ExtendedOutlineView) leaf.view.requestUpdate();
     }

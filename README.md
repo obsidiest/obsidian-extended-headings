@@ -19,7 +19,7 @@ The default maximum is H12. It can be lowered to H7 under **Settings → Communi
 
 The compatibility target records the newest Obsidian base-program version audited and tested when this release was prepared. Version 0.4.9 deliberately raises the minimum from 1.7.2 to 1.13.0 so the plugin can use Obsidian's searchable declarative settings API without retaining a second legacy settings renderer. Earlier releases remain mapped to their historical minimum versions in `versions.json`.
 
-Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 1.0.0 has not been device-tested on Obsidian Mobile.
+Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 1.0.1 has not been device-tested on Obsidian Mobile.
 
 ## Features
 
@@ -54,8 +54,8 @@ Extended Headings declares mobile compatibility because its runtime uses Obsidia
 
 ## Miscellaneous Feature-Specific Performance Warnings
 
-- Enabling the `Outline Pane Heading Static Tree Indentation Guides` toggle may cause some lag to render those guides in the pane upon activation of a given note or while scrolling through a given outline pane.
-  - The lag seems to be proportional to the heading count and hierarchy complexity of a given note.
+- Version 1.0.1 reduces static-guide activation and scrolling work by measuring secondary label and clipping geometry only for visible Outline rows, reusing shared clipping calculations, and preserving unchanged guide paths during thread-only updates.
+  - Extremely large or deeply nested notes may still require a brief initial layout pass because these decorations depend on measuring Obsidian's private core Outline DOM.
 
 ## Feature preview
 
@@ -248,6 +248,7 @@ I had hoped someone capable and sufficiently ambitious might create a plugin lik
 - Version 0.4.15 intrinsic H10–H12 gutter sizing, arbitrary-value and caret-stable Style Settings inputs, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 - Version 0.4.16 targeted H10–H12 Minimal-padding correction, restoration of the 0.4.14 H1–H9 marker layout, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 - Version 1.0.0 default-Outline Markdown rendering, robust formatted/link/embed heading matching, markers, static guides, full-row individual/root-level/orphan/combined threading, Outline and Editor Gutter Style Settings, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
+- Version 1.0.1 viewport-culling, clipping-cache, thread-only redraw, visual-settings refresh, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 
 Incorporates features inspired by the following Obsidian community plugins:
 

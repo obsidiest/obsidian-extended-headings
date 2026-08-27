@@ -548,6 +548,91 @@ test("measures visible row portions and excludes rows outside the Outline viewpo
   assert.match(source, /overflowY/);
 });
 
+test("culls offscreen Outline rows before expensive guide measurements", () => {
+  assert.equal(typeof outlineSvg.outlineVerticalBoundsIntersect, "function");
+  assert.equal(
+    outlineSvg.outlineVerticalBoundsIntersect(
+      { bottom: 24, top: 0 },
+      { bottom: 480, top: 0 },
+    ),
+    true,
+  );
+  assert.equal(
+    outlineSvg.outlineVerticalBoundsIntersect(
+      { bottom: 504, top: 480 },
+      { bottom: 480, top: 0 },
+    ),
+    false,
+  );
+
+  let itemRectReads = 0;
+  let rowRectReads = 0;
+  let sharedAncestorStyleReads = 0;
+  const ownerDocument = {
+    defaultView: {
+      getComputedStyle() {
+        sharedAncestorStyleReads += 1;
+        return { overflowY: "visible" };
+      },
+    },
+  };
+  const hostRect = { bottom: 480, left: 0, top: 0 };
+  const container = {
+    getBoundingClientRect: () => hostRect,
+    ownerDocument,
+  };
+  const sharedAncestor = {
+    classList: { contains: () => false },
+    parentElement: container,
+  };
+  const rowsBySpecIndex = new Map();
+  for (let index = 0; index < 1000; index += 1) {
+    const top = index * 24;
+    rowsBySpecIndex.set(index, {
+      item: {
+        getBoundingClientRect() {
+          itemRectReads += 1;
+          return { left: 100, width: 300 };
+        },
+      },
+      model: {
+        depth: 0,
+        level: 1,
+        orphan: false,
+        parentIndex: null,
+        rootIndex: index,
+      },
+      row: {
+        getBoundingClientRect() {
+          rowRectReads += 1;
+          return { bottom: top + 20, height: 20, top };
+        },
+        parentElement: sharedAncestor,
+      },
+      specIndex: index,
+    });
+  }
+
+  const renderer = new outlineSvg.CoreOutlineRenderer({});
+  const measured = renderer.measureRows(
+    { container, rowsBySpecIndex },
+    600,
+    480,
+  );
+  assert.equal(measured.size, 20);
+  assert.equal(rowRectReads, 1000);
+  assert.equal(itemRectReads, 20);
+  assert.equal(sharedAncestorStyleReads, 1);
+});
+
+test("reuses static guide geometry for pointer-only thread updates", () => {
+  assert.match(source, /visualGeometryDirty/);
+  assert.match(source, /renderThreadVisuals\(attachment\)/);
+  assert.match(source, /scheduleVisualPass\(attachment, false\)/);
+  assert.match(settings, /OUTLINE_VISUAL_ONLY_SETTINGS/);
+  assert.match(main, /outlineVisualOnly[\s\S]{0,200}refreshVisuals\(\)/);
+});
+
 test("continues visible guides and threads when their parent row is clipped above", () => {
   assert.match(
     source,

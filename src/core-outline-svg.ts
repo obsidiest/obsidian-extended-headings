@@ -150,6 +150,7 @@ interface OutlineAttachment {
   styleObserver: MutationObserver;
   threadLayer: SVGGElement | null;
   visualAnimationFrame: number;
+  visualGeometryDirty: boolean;
 }
 
 function inlineSvgPattern(): RegExp {
@@ -463,6 +464,22 @@ export function visibleOutlineRowCenter(
   return visibleOutlineRowMeasurement(row, clippingBounds)?.center ?? null;
 }
 
+export function outlineVerticalBoundsIntersect(
+  first: OutlineVerticalBounds,
+  second: OutlineVerticalBounds,
+): boolean {
+  const firstTop = Math.min(first.top, first.bottom);
+  const firstBottom = Math.max(first.top, first.bottom);
+  const secondTop = Math.min(second.top, second.bottom);
+  const secondBottom = Math.max(second.top, second.bottom);
+  return (
+    firstBottom > firstTop &&
+    secondBottom > secondTop &&
+    firstBottom > secondTop &&
+    firstTop < secondBottom
+  );
+}
+
 export function visibleOutlineRowMeasurement(
   row: OutlineVerticalBounds,
   clippingBounds: readonly OutlineVerticalBounds[],
@@ -664,7 +681,7 @@ export class CoreOutlineRenderer {
     this.plugin.registerEvent(
       this.plugin.app.workspace.on("css-change", () => {
         for (const attachment of this.attachments.values()) {
-          this.scheduleVisualPass(attachment);
+          this.scheduleVisualPass(attachment, true);
         }
       }),
     );
@@ -680,6 +697,22 @@ export class CoreOutlineRenderer {
     }
     this.attachAll();
     for (const attachment of this.attachments.values()) this.schedulePass(attachment);
+  }
+
+  refreshVisuals(): void {
+    if (!this.started) return;
+    if (!this.hasEnabledFeature()) {
+      this.detachAll();
+      return;
+    }
+    this.attachAll();
+    for (const attachment of this.attachments.values()) {
+      if (attachment.rowsBySpecIndex.size === 0) {
+        this.schedulePass(attachment);
+      } else {
+        this.scheduleVisualPass(attachment, true);
+      }
+    }
   }
 
   destroy(): void {
@@ -709,18 +742,23 @@ export class CoreOutlineRenderer {
       let attachment!: OutlineAttachment;
       const observer = new MutationObserver((mutations) => {
         if (mutations.every((mutation) => mutation.type === "attributes")) {
-          this.scheduleVisualPass(attachment);
+          const geometryChanged = mutations.some(
+            (mutation) =>
+              mutation.attributeName !== "aria-current" &&
+              mutation.attributeName !== "aria-selected",
+          );
+          this.scheduleVisualPass(attachment, geometryChanged);
         } else {
           this.schedulePass(attachment);
         }
       });
       const styleObserver = new MutationObserver(() => {
-        this.scheduleVisualPass(attachment);
+        this.scheduleVisualPass(attachment, true);
       });
       const ResizeObserverConstructor =
         container.ownerDocument.defaultView?.ResizeObserver ?? ResizeObserver;
       const resizeObserver = new ResizeObserverConstructor(() => {
-        this.scheduleVisualPass(attachment);
+        this.scheduleVisualPass(attachment, true);
       });
       const pointerMove = (event: PointerEvent): void => {
         this.handlePointerMove(attachment, event);
@@ -729,11 +767,11 @@ export class CoreOutlineRenderer {
         if (this.plugin.settings.activeSelectedOutlinePaneHeadingThreading) return;
         if (attachment.hoveredSpecIndex === null) return;
         attachment.hoveredSpecIndex = null;
-        this.scheduleVisualPass(attachment);
+        this.scheduleVisualPass(attachment, false);
       };
       const scroll = (): void => {
         attachment.lastMeasuredRows = [];
-        this.scheduleVisualPass(attachment);
+        this.scheduleVisualPass(attachment, true);
       };
 
       attachment = {
@@ -758,6 +796,7 @@ export class CoreOutlineRenderer {
         styleObserver,
         threadLayer: null,
         visualAnimationFrame: 0,
+        visualGeometryDirty: false,
       };
       this.observeMutations(attachment);
       resizeObserver.observe(container);
@@ -805,7 +844,11 @@ export class CoreOutlineRenderer {
     });
   }
 
-  private scheduleVisualPass(attachment: OutlineAttachment): void {
+  private scheduleVisualPass(
+    attachment: OutlineAttachment,
+    geometryChanged: boolean,
+  ): void {
+    if (geometryChanged) attachment.visualGeometryDirty = true;
     if (
       attachment.visualAnimationFrame !== 0 ||
       !attachment.container.isConnected
@@ -813,7 +856,13 @@ export class CoreOutlineRenderer {
     const win = attachment.container.ownerDocument.defaultView ?? window;
     attachment.visualAnimationFrame = win.requestAnimationFrame(() => {
       attachment.visualAnimationFrame = 0;
-      this.mutateWithoutObserving(attachment, () => this.renderVisuals(attachment));
+      const measureGeometry =
+        attachment.visualGeometryDirty || attachment.lastMeasuredRows.length === 0;
+      attachment.visualGeometryDirty = false;
+      this.mutateWithoutObserving(attachment, () => {
+        if (measureGeometry) this.renderVisuals(attachment);
+        else this.renderThreadVisuals(attachment);
+      });
     });
   }
 
@@ -964,13 +1013,6 @@ export class CoreOutlineRenderer {
         }
       }
 
-      if (
-        attachment.rowsBySpecIndex.size > 0 &&
-        (this.plugin.settings.enableOutlinePaneHeadingStaticTreeIndentationGuides ||
-          this.plugin.settings.enableOutlinePaneHeadingThreading)
-      ) {
-        this.ensureOverlay(attachment);
-      }
       if (attachment.rowsBySpecIndex.size > 0) {
         attachment.container.classList.add(OUTLINE_HOST_CLASS);
       }
@@ -1173,6 +1215,20 @@ export class CoreOutlineRenderer {
   }
 
   private renderVisuals(attachment: OutlineAttachment): void {
+    const overlayEnabled =
+      attachment.rowsBySpecIndex.size > 0 &&
+      (this.plugin.settings.enableOutlinePaneHeadingStaticTreeIndentationGuides ||
+        this.plugin.settings.enableOutlinePaneHeadingThreading);
+    if (!overlayEnabled) {
+      attachment.overlay?.remove();
+      attachment.overlay = null;
+      attachment.guideLayer = null;
+      attachment.threadLayer = null;
+      attachment.lastMeasuredRows = [];
+      return;
+    }
+
+    this.ensureOverlay(attachment);
     const { overlay, guideLayer, threadLayer } = attachment;
     if (!overlay || !guideLayer || !threadLayer) return;
     guideLayer.replaceChildren();
@@ -1189,12 +1245,56 @@ export class CoreOutlineRenderer {
     attachment.lastMeasuredRows = Array.from(measured.values()).sort(
       (left, right) => left.top - right.top,
     );
+    const computedStyle =
+      attachment.container.ownerDocument.defaultView?.getComputedStyle(
+        attachment.container,
+      ) ?? null;
     if (this.plugin.settings.enableOutlinePaneHeadingStaticTreeIndentationGuides) {
-      this.renderStaticGuides(attachment, measured, guideLayer, width, height);
+      this.renderStaticGuides(
+        attachment,
+        measured,
+        guideLayer,
+        width,
+        height,
+        computedStyle,
+      );
     }
     if (this.plugin.settings.enableOutlinePaneHeadingThreading) {
-      this.renderThreads(attachment, measured, threadLayer, width, height);
+      this.renderThreads(
+        attachment,
+        measured,
+        threadLayer,
+        width,
+        height,
+        computedStyle,
+      );
     }
+  }
+
+  private renderThreadVisuals(attachment: OutlineAttachment): void {
+    const { overlay, threadLayer } = attachment;
+    if (!overlay || !threadLayer) return;
+    threadLayer.replaceChildren();
+    if (!this.plugin.settings.enableOutlinePaneHeadingThreading) return;
+
+    const width = attachment.container.clientWidth;
+    const height = attachment.container.clientHeight;
+    if (width <= 0 || height <= 0) return;
+    const measured = new Map(
+      attachment.lastMeasuredRows.map((row) => [row.specIndex, row]),
+    );
+    const computedStyle =
+      attachment.container.ownerDocument.defaultView?.getComputedStyle(
+        attachment.container,
+      ) ?? null;
+    this.renderThreads(
+      attachment,
+      measured,
+      threadLayer,
+      width,
+      height,
+      computedStyle,
+    );
   }
 
   private measureRows(
@@ -1204,33 +1304,51 @@ export class CoreOutlineRenderer {
   ): Map<number, MeasuredOutlineRow> {
     const measured = new Map<number, MeasuredOutlineRow>();
     const hostRect = attachment.container.getBoundingClientRect();
-    for (const [specIndex, decorated] of attachment.rowsBySpecIndex) {
-      const rowRect = decorated.row.getBoundingClientRect();
-      const itemRect = decorated.item.getBoundingClientRect();
-      if (rowRect.height <= 0 || itemRect.width <= 0) continue;
-      const clippingBounds: OutlineVerticalBounds[] = [hostRect];
-      const view = decorated.row.ownerDocument.defaultView;
-      for (
-        let ancestor = decorated.row.parentElement;
-        ancestor && ancestor !== attachment.container;
-        ancestor = ancestor.parentElement
-      ) {
+    const hostClippingBounds: readonly OutlineVerticalBounds[] = [hostRect];
+    const clippingBoundsByAncestor = new Map<
+      HTMLElement,
+      readonly OutlineVerticalBounds[]
+    >();
+    const view = attachment.container.ownerDocument.defaultView;
+    const clippingBoundsFor = (
+      ancestor: HTMLElement | null,
+    ): readonly OutlineVerticalBounds[] => {
+      if (!ancestor || ancestor === attachment.container) {
+        return hostClippingBounds;
+      }
+      const cached = clippingBoundsByAncestor.get(ancestor);
+      if (cached) return cached;
+
+      const inherited = clippingBoundsFor(ancestor.parentElement);
+      let clipsVertically = ancestor.classList.contains("view-content");
+      if (!clipsVertically) {
         const overflowY = view?.getComputedStyle(ancestor).overflowY ?? "visible";
-        if (
-          ancestor.classList.contains("view-content") ||
+        clipsVertically =
           overflowY === "auto" ||
           overflowY === "scroll" ||
           overflowY === "hidden" ||
-          overflowY === "clip"
-        ) {
-          clippingBounds.push(ancestor.getBoundingClientRect());
-        }
+          overflowY === "clip";
       }
+      const bounds = clipsVertically
+        ? [...inherited, ancestor.getBoundingClientRect()]
+        : inherited;
+      clippingBoundsByAncestor.set(ancestor, bounds);
+      return bounds;
+    };
+
+    for (const [specIndex, decorated] of attachment.rowsBySpecIndex) {
+      const rowRect = decorated.row.getBoundingClientRect();
+      if (
+        rowRect.height <= 0 ||
+        !outlineVerticalBoundsIntersect(rowRect, hostRect)
+      ) continue;
       const visibleMeasurement = visibleOutlineRowMeasurement(
         rowRect,
-        clippingBounds,
+        clippingBoundsFor(decorated.row.parentElement),
       );
       if (visibleMeasurement === null) continue;
+      const itemRect = decorated.item.getBoundingClientRect();
+      if (itemRect.width <= 0) continue;
       const y = visibleMeasurement.center - hostRect.top;
       const endX = clamp(itemRect.left - hostRect.left, 0, width);
       measured.set(specIndex, {
@@ -1251,24 +1369,25 @@ export class CoreOutlineRenderer {
     layer: SVGGElement,
     width: number,
     height: number,
+    computedStyle: CSSStyleDeclaration | null,
   ): void {
     const connectorLength = this.readStyleNumber(
-      attachment.container,
+      computedStyle,
       "--extended-outline-guide-connector-length",
       18,
     );
     const firstBranchRise = this.readStyleNumber(
-      attachment.container,
+      computedStyle,
       "--extended-outline-guide-first-branch-rise",
       10,
     );
     const connectorOffset = this.readStyleNumber(
-      attachment.container,
+      computedStyle,
       "--extended-outline-guide-connector-offset",
       0,
     );
     const markerGap = this.readStyleNumber(
-      attachment.container,
+      computedStyle,
       "--extended-outline-guide-marker-gap",
       4,
     );
@@ -1375,6 +1494,7 @@ export class CoreOutlineRenderer {
     layer: SVGGElement,
     width: number,
     height: number,
+    computedStyle: CSSStyleDeclaration | null,
   ): void {
     const activeIndex = this.plugin.settings.activeSelectedOutlinePaneHeadingThreading
       ? this.findSelectedSpecIndex(attachment)
@@ -1384,22 +1504,22 @@ export class CoreOutlineRenderer {
     if (!active) return;
 
     const connectorLength = this.readStyleNumber(
-      attachment.container,
+      computedStyle,
       "--extended-outline-thread-connector-length",
       28,
     );
     const markerGap = this.readStyleNumber(
-      attachment.container,
+      computedStyle,
       "--extended-outline-thread-marker-gap",
       4,
     );
     const verticalOffset = this.readStyleNumber(
-      attachment.container,
+      computedStyle,
       "--extended-outline-thread-vertical-offset",
       0,
     );
     const radius = this.readStyleNumber(
-      attachment.container,
+      computedStyle,
       "--extended-outline-thread-corner-radius",
       8,
     );
@@ -1611,9 +1731,12 @@ export class CoreOutlineRenderer {
     layer.append(path);
   }
 
-  private readStyleNumber(element: HTMLElement, property: string, fallback: number): number {
-    const view = element.ownerDocument.defaultView;
-    const value = view?.getComputedStyle(element).getPropertyValue(property) ?? "";
+  private readStyleNumber(
+    computedStyle: CSSStyleDeclaration | null,
+    property: string,
+    fallback: number,
+  ): number {
+    const value = computedStyle?.getPropertyValue(property) ?? "";
     const parsed = Number.parseFloat(value);
     return Number.isFinite(parsed) ? parsed : fallback;
   }
@@ -1629,7 +1752,7 @@ export class CoreOutlineRenderer {
       : (attachment.lastMeasuredRows[rowIndex]?.specIndex ?? null);
     if (specIndex === attachment.hoveredSpecIndex) return;
     attachment.hoveredSpecIndex = specIndex;
-    this.scheduleVisualPass(attachment);
+    this.scheduleVisualPass(attachment, false);
   }
 
   private findSelectedSpecIndex(attachment: OutlineAttachment): number | null {
@@ -1687,6 +1810,7 @@ export class CoreOutlineRenderer {
     attachment.threadLayer = null;
     attachment.hoveredSpecIndex = null;
     attachment.lastMeasuredRows = [];
+    attachment.visualGeometryDirty = false;
     attachment.rowsBySpecIndex.clear();
     attachment.model = [];
   }

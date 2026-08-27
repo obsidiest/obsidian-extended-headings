@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.1
+
+- Reduced default Outline static-guide activation and scrolling work by rejecting offscreen rows before label and clipping measurements, and by memoizing the clipping bounds shared by visible rows.
+- Reused the existing measured geometry and static guide layer for hover- and selection-only threading updates instead of rebuilding unchanged guide paths.
+- Made static-guide and threading setting changes refresh the prepared Outline visualization directly, avoiding an unnecessary note-source and Markdown remapping pass.
+- Read all guide and thread geometry variables from one computed-style snapshot per visual pass.
+- Retained Obsidian 1.13.7 as the latest audited compatibility target.
+
 ## 1.0.0
 
 - Renamed the editor setting to **Show Editor Gutter heading level markers**, preserved existing preferences through migration, and added the default-on **Show Outline pane heading level markers** toggle for H1–H12 labels.
