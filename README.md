@@ -72,6 +72,10 @@ Active Heading Threading  Toggle ENABLED - Global Override Heading Thread Colors
 Outline Pane Static Heading Tree Indentation Guides Toggle DISABLED - Outline Pane Heading Threading Global Toggle DISABLED
 <img width="2558" height="1438" alt="Outline Pane Static Heading Tree Indentation Guides Toggle DISABLED - Outline Pane Heading Threading Global Toggle DISABLED " src="https://github.com/user-attachments/assets/3b23fa6e-9979-46d6-8c35-22592da5aa85" />
 
+Outline Pane Markdown and SVG Rendering Toggles Enabled
+<img width="2558" height="1438" alt="Outline Pane Markdown and SVG Rendering Enabled" src="https://github.com/user-attachments/assets/2bc4b36c-f0ae-4609-95e0-089eed86f780" />
+
+
 ## Settings
 
 | Setting | Default | Effect |
