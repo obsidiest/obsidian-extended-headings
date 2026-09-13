@@ -48,6 +48,8 @@ for (const scope of ["breadcrumb", "editorBreadcrumb", "outlineBreadcrumb"] as c
     defaults[`${scope}Thread${option}`] = BREADCRUMB_THREAD_OPTIONS[option][0];
   }
 }
+// Opt in globally; the existing per-pane defaults still apply once enabled.
+defaults.breadcrumbThreadMixedActive = false;
 export const DEFAULT_BREADCRUMB_TIMEOUT = 0.01;
 export const MAX_BREADCRUMB_TIMEOUT = 2_147_483.647;
 for (const mode of ["global", "livePreview", "source", "reading"] as const) {
@@ -140,7 +142,7 @@ export function breadcrumbSettingDefinitions(getSettings: () => BreadcrumbSettin
       }
     }
   }
-  items.push(subheading("Hover Breadcrumb Popover Timeout"));
+  items.push(subheading("Heading Hover Breadcrumb Popover Timeout"));
   for (const [mode, label] of [["global", "Global"], ["livePreview", "Live Preview Mode"], ["source", "Source Mode"], ["reading", "Reading Mode"]] as const) {
     const key: BreadcrumbNumberKey = `${mode}BreadcrumbTimeoutSeconds`;
     items.push(toggle(`${mode}BreadcrumbTimeoutEnabled`, mode === "global"

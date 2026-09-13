@@ -9,10 +9,12 @@ const { scanHeadings } = load("headings");
 
 test("breadcrumb defaults, activation precedence, and every setting dependency", () => {
   const settings = { ...defaults };
+  assert.equal(settings.breadcrumbThreadMixedActive, false);
   for (const pane of ["editor", "outline"]) {
     for (const mode of ["livePreview", "source", "reading"]) assert.equal(breadcrumbEnabled(settings, pane, mode), true);
     assert.equal(breadcrumbActivation(settings, pane), "marker");
     assert.equal(settings[`${pane}BreadcrumbThreading`], false);
+    assert.equal(settings[`${pane}BreadcrumbThreadMixedActive`], true);
   }
   settings.breadcrumbFieldActivation = true;
   assert.equal(breadcrumbActivation(settings, "editor"), "marker");
@@ -33,6 +35,19 @@ test("breadcrumb defaults, activation precedence, and every setting dependency",
   assert.equal(item("editorBreadcrumbThreadRootAll").disabled(), false);
   settings.breadcrumbThreadRoot = false;
   assert.equal(item("editorBreadcrumbThreadRootAll").disabled(), true);
+});
+
+test("breadcrumb is the last main-settings section and its timeout values reach runtime", async () => {
+  const loader = sourceLoader({ obsidian: { PluginSettingTab: class {} } });
+  const { ExtendedHeadingsSettingTab, DEFAULT_SETTINGS } = loader("settings");
+  const plugin = { settings: { ...DEFAULT_SETTINGS }, breadcrumbSettingsChanged: async () => {} };
+  const tab = new ExtendedHeadingsSettingTab({}, plugin);
+  const groups = tab.getSettingDefinitions().filter((item) => item.type === "group");
+  assert.equal(groups.at(-1).heading, "Heading Hover Breadcrumb");
+  assert.ok(groups.at(-1).items.some((item) => item.name === "Heading Hover Breadcrumb Popover Timeout"));
+  await tab.setControlValue("globalBreadcrumbTimeoutSeconds", 1.275);
+  assert.equal(tab.getControlValue("globalBreadcrumbTimeoutSeconds"), 1.275);
+  assert.equal(breadcrumbTimeout(plugin.settings, "livePreview"), 1275);
 });
 
 test("timeouts accept fractional seconds, honor per-mode overrides, and reject invalid persistence", () => {

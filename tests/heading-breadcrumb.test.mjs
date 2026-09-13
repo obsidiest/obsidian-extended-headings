@@ -37,7 +37,7 @@ function fixture(mode = "source", text = "# Root\n## Child\n############ Deep") 
     marker.textContent = `H${/^#+/.exec(line.textContent)?.[0].length ?? 1}`;
     gutter.append(marker); root.querySelector(".cm-extended-heading-gutter").append(gutter);
   }
-  const cm = { state, dom: root, documentTop: 100,
+  const cm = { state, dom: root, scrollDOM: root.querySelector(".cm-scroller"), documentTop: 100,
     lineBlockAtHeight: (height) => {
       const i = Math.max(0, Math.min(state.doc.lines - 1, Math.floor(height / 30)));
       return { from: state.doc.line(i + 1).from, top: i * 30, bottom: (i + 1) * 30 };
@@ -58,6 +58,9 @@ function fixture(mode = "source", text = "# Root\n## Child\n############ Deep") 
   };
   win.HTMLElement.prototype.getBoundingClientRect = function () {
     if (this === root) return new win.DOMRect(0, 0, 800, 600);
+    if (this.classList.contains("cm-scroller")) return new win.DOMRect(0, 90, 800, 500);
+    if (this.classList.contains("cm-gutterElement")) return new win.DOMRect(20, 100 + Number(this.dataset.line) * 30, 25, 30);
+    if (this.classList.contains("cm-heading-marker")) return new win.DOMRect(25, 100 + Number(this.parentElement.dataset.line) * 30, 30, 30);
     const popup = this.closest(".extended-breadcrumb-popover");
     if (this.classList.contains("extended-breadcrumb-popover")) return new win.DOMRect(20, 250, 420, 220);
     if (popup) {
@@ -80,7 +83,7 @@ for (const mode of ["livePreview", "source"]) {
   test(`${mode}: full gutter cell activates, hashes do not, and preview preserves the caret`, () => {
     const f = fixture(mode);
     try {
-      f.move(f.lines[1]);
+      f.move(f.lines[1], 1, 70);
       assert.equal(f.document.querySelector(".extended-breadcrumb-popover"), null);
       // The full cell is wider than the H2 glyphs: the old narrow-hit-area bug.
       const gutter = f.document.querySelectorAll(".cm-gutterElement")[1];
@@ -120,6 +123,88 @@ test("full-field activation reaches the scroller margin and independent feature 
     assert.equal(popup.querySelectorAll(".extended-breadcrumb-row").length, 3);
     f.settings.editorHeadingHoverBreadcrumb = false; f.manager.refresh();
     f.move(f.document.querySelector(".cm-scroller"), 2, 700);
+    assert.equal(f.document.querySelector(".extended-breadcrumb-popover"), null);
+  } finally { f.close(); }
+});
+
+for (const mode of ["livePreview", "source"]) {
+  test(`${mode}: marker activation covers the left margin and overhanging glyphs behind editor content`, () => {
+    const f = fixture(mode);
+    try {
+      // A theme/editor layer receives these events. The marker paints from
+      // x=25 to 55, overhanging its gutter cell, which ends at x=45.
+      for (const x of [2, 24, 35, 54]) {
+        f.move(f.lines[1], 1, x);
+        assert.ok(f.document.querySelector(".extended-breadcrumb-popover"), `x=${x}`);
+        f.manager.refresh();
+      }
+      f.move(f.lines[1], 1, 60);
+      assert.equal(f.document.querySelector(".extended-breadcrumb-popover"), null, "hashes/text remain excluded");
+      f.settings.editorBreadcrumbMarkerActivation = false;
+      f.move(f.lines[1], 1, 35);
+      assert.equal(f.document.querySelector(".extended-breadcrumb-popover"), null);
+    } finally { f.close(); }
+  });
+}
+
+function clock(win) {
+  let time = 0, id = 0;
+  const tasks = new Map();
+  win.setTimeout = (callback, delay) => { tasks.set(++id, { callback, at: time + delay }); return id; };
+  win.clearTimeout = (key) => tasks.delete(key);
+  return (milliseconds) => {
+    time += milliseconds;
+    for (const [key, task] of tasks) if (task.at <= time) { tasks.delete(key); task.callback(); }
+  };
+}
+
+test("configured dismissal delay applies to scrolling and changes with the numeric setting", () => {
+  const f = fixture();
+  try {
+    const advance = clock(f.win);
+    for (const seconds of [1, 2.75]) {
+      f.settings.globalBreadcrumbTimeoutSeconds = seconds;
+      f.move(f.lines[1], 1, 35);
+      f.document.querySelector(".cm-scroller").dispatchEvent(new f.win.Event("scroll"));
+      advance(seconds * 1000 - 1);
+      assert.ok(f.document.querySelector(".extended-breadcrumb-popover"));
+      advance(1);
+      assert.equal(f.document.querySelector(".extended-breadcrumb-popover"), null);
+    }
+  } finally { f.close(); }
+});
+
+test("entering the gap or popup cancels dismissal, including scrollbar and preview layout changes", () => {
+  const f = fixture();
+  try {
+    const advance = clock(f.win);
+    f.move(f.lines[1], 1, 35);
+    const popup = f.document.querySelector(".extended-breadcrumb-popover");
+    f.move(f.lines[1], 1, 750); // Start the default 10ms timer.
+    f.move(f.lines[2], 2, 35); // Another heading lies in the gap to this popup.
+    advance(100);
+    assert.equal(f.document.querySelector(".extended-breadcrumb-popover"), popup);
+    assert.equal(popup.querySelectorAll(".extended-breadcrumb-row").length, 2);
+    // Simulate a scrollbar event whose target is outside the popup DOM.
+    f.move(f.document.body, 5, 435);
+    f.document.querySelector(".cm-scroller").dispatchEvent(new f.win.Event("scroll"));
+    // Ancestor preview can recycle the original CodeMirror line/gutter.
+    f.lines[1].remove(); f.handlers.get("layout-change")(); f.handlers.get("file-open")();
+    advance(10000);
+    assert.equal(f.document.querySelector(".extended-breadcrumb-popover"), popup);
+    f.move(f.document.body, 0, 750);
+    advance(9); assert.ok(popup.isConnected);
+    advance(1); assert.equal(popup.isConnected, false);
+  } finally { f.close(); }
+});
+
+test("changing the owner note closes the breadcrumb even while it is hovered", () => {
+  const f = fixture();
+  try {
+    f.move(f.lines[1], 1, 35);
+    f.move(f.document.body, 5, 100);
+    f.view.file = { path: "Another.md" };
+    f.handlers.get("file-open")();
     assert.equal(f.document.querySelector(".extended-breadcrumb-popover"), null);
   } finally { f.close(); }
 });

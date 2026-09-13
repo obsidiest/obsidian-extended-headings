@@ -1261,7 +1261,7 @@ settings:
     id: extended-breadcrumb-max-height
     title: Maximum height
     type: variable-number-slider
-    default: 360
+    default: 400
     min: 100
     max: 800
     step: 1
@@ -3970,7 +3970,7 @@ body {
   --extended-breadcrumb-hover-color: #343b4a;
   --extended-breadcrumb-min-width: 320px;
   --extended-breadcrumb-max-width: 560px;
-  --extended-breadcrumb-max-height: 360px;
+  --extended-breadcrumb-max-height: 400px;
   --extended-breadcrumb-padding: 10px;
   --extended-breadcrumb-row-gap: 2px;
   --extended-breadcrumb-indent: 18px;
@@ -4091,6 +4091,8 @@ body.theme-light {
 
 .extended-breadcrumb-popover {
   position: fixed;
+  display: flex;
+  flex-direction: column;
   z-index: var(--layer-popover, 1000);
   box-sizing: border-box;
   width: max-content;
@@ -4106,6 +4108,7 @@ body.theme-light {
   box-shadow: 0 var(--extended-breadcrumb-shadow-y) var(--extended-breadcrumb-shadow-blur) rgba(0, 0, 0, var(--extended-breadcrumb-shadow-opacity));
 }
 .extended-breadcrumb-title {
+  flex: 0 0 auto;
   margin-bottom: var(--extended-breadcrumb-title-gap);
   color: var(--extended-breadcrumb-title-color);
   font-size: var(--extended-breadcrumb-title-size);
@@ -4115,10 +4118,11 @@ body.theme-light {
 }
 .extended-breadcrumb-title-normal .extended-breadcrumb-title { text-transform: none; }
 .extended-breadcrumb-tree {
+  flex: 1 1 auto;
   overflow: auto;
   scrollbar-gutter: stable;
+  min-height: 0;
   min-width: 0;
-  max-height: min(calc(var(--extended-breadcrumb-max-height) - 2 * var(--extended-breadcrumb-padding) - var(--extended-breadcrumb-title-size) - var(--extended-breadcrumb-title-gap) - 8px), calc(100vh - 2 * var(--extended-breadcrumb-viewport-gap) - 2 * var(--extended-breadcrumb-padding) - 40px));
 }
 .extended-breadcrumb-content {
   position: relative;

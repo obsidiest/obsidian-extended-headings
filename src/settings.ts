@@ -111,7 +111,6 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
     }
 
     return [
-      ...breadcrumbSettingDefinitions(() => this.plugin.settings),
       {
         name: "Maximum heading level",
         desc: "Recognize additional ATX headings from H7 through this level.",
@@ -581,6 +580,7 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
           },
         ],
       },
+      ...breadcrumbSettingDefinitions(() => this.plugin.settings),
     ];
   }
 

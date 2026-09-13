@@ -24,6 +24,7 @@ interface HoverTarget extends HeadingLocation {
   mode: BreadcrumbMode;
   element: HTMLElement;
   view: MarkdownView;
+  activationRect: DOMRect;
 }
 interface Popup {
   target: HoverTarget;
@@ -47,6 +48,7 @@ interface DocumentState {
   timer: number | null;
   highlightView: MarkdownView | null;
   highlighted: Set<HTMLElement>;
+  pointer: { x: number; y: number } | null;
 }
 class ReadingHeadingRegistration extends MarkdownRenderChild {
   constructor(element: HTMLElement, private readonly cleanup: () => void) { super(element); }
@@ -87,9 +89,7 @@ export class HeadingBreadcrumb {
     this.plugin.registerEvent(this.plugin.app.workspace.on("layout-change", () => this.refreshViews()));
     this.plugin.registerEvent(this.plugin.app.workspace.on("window-open", (_leaf, win) => this.observeDocument(win.document)));
     this.plugin.registerEvent(this.plugin.app.workspace.on("window-close", (_leaf, win) => this.removeDocument(win.document)));
-    this.plugin.registerEvent(this.plugin.app.workspace.on("file-open", () => {
-      for (const state of this.documents.values()) this.dismiss(state);
-    }));
+    this.plugin.registerEvent(this.plugin.app.workspace.on("file-open", () => this.refreshViews()));
     this.plugin.registerEvent(this.plugin.app.workspace.on("editor-change", (_editor, view) => {
       if (!(view instanceof MarkdownView)) return;
       for (const state of this.documents.values()) {
@@ -197,17 +197,20 @@ export class HeadingBreadcrumb {
     for (const leaf of this.plugin.app.workspace.getLeavesOfType("outline")) this.observeDocument(leaf.view.containerEl.ownerDocument);
     for (const state of this.documents.values()) {
       if (state.document.defaultView?.closed) this.removeDocument(state.document);
-      else if (state.popup && (!state.popup.target.element.isConnected || modeOf(state.popup.target.view) !== state.popup.target.mode)) this.dismiss(state);
+      else if (state.popup && (!state.popup.target.view.containerEl.isConnected
+        || state.popup.target.view.containerEl.getBoundingClientRect().width === 0
+        || state.popup.target.view.file?.path !== state.popup.target.file
+        || modeOf(state.popup.target.view) !== state.popup.target.mode)) this.dismiss(state);
     }
   }
 
   private observeDocument(document: Document): void {
     if (this.stopped || this.documents.has(document) || !document.defaultView) return;
     const abort = new document.defaultView.AbortController();
-    const state: DocumentState = { document, abort, popup: null, timer: null, highlightView: null, highlighted: new Set() };
+    const state: DocumentState = { document, abort, popup: null, timer: null, highlightView: null, highlighted: new Set(), pointer: null };
     this.documents.set(document, state);
-    document.addEventListener("pointermove", (event) => this.pointerMove(state, event), { passive: true, signal: abort.signal });
-    document.addEventListener("pointerleave", () => this.scheduleDismiss(state), { signal: abort.signal });
+    document.addEventListener("pointermove", (event) => this.pointerMove(state, event), { capture: true, passive: true, signal: abort.signal });
+    document.addEventListener("pointerleave", () => { state.pointer = null; this.scheduleDismiss(state); }, { signal: abort.signal });
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape" || !state.popup) return;
       const popup = state.popup;
@@ -220,7 +223,7 @@ export class HeadingBreadcrumb {
       if (!popup || popup.element.contains(event.target as Node)) return;
       // Previewing an ancestor can scroll the main pane while the pointer is
       // inside the popup. Keep it open at its original viewport anchor.
-      if (!popup.element.matches(":hover") && !popup.element.contains(document.activeElement)) this.dismiss(state);
+      this.scheduleDismiss(state);
     }, { capture: true, passive: true, signal: abort.signal });
     document.defaultView.addEventListener("blur", () => this.dismiss(state), { signal: abort.signal });
     document.defaultView.addEventListener("resize", () => this.scheduleDraw(state), { signal: abort.signal });
@@ -272,9 +275,11 @@ export class HeadingBreadcrumb {
       const scope = breadcrumbActivation(settings, "outline");
       if (!breadcrumbEnabled(settings, "outline", mode) || !scope) return null;
       if (scope === "marker" && !element.closest(".extended-heading-outline-level-marker")) return null;
-      return { file, line: Number(row.dataset.extendedBreadcrumbLine), pane: "outline", mode, view, element: row };
+      const anchor = scope === "marker" ? row.querySelector(".extended-heading-outline-level-marker") ?? row : row;
+      return { file, line: Number(row.dataset.extendedBreadcrumbLine), pane: "outline", mode, view, element: row,
+        activationRect: anchor.getBoundingClientRect() };
     }
-    if (!element.closest(".cm-scroller, .markdown-preview-view")) return null;
+    if (!element.closest(".markdown-source-view, .markdown-preview-view")) return null;
     const view = this.viewFor(element);
     if (!view?.file) return null;
     const mode = modeOf(view);
@@ -284,12 +289,14 @@ export class HeadingBreadcrumb {
       const heading = element.closest<HTMLElement>(HEADING_SELECTOR);
       if (!heading || scope === "marker" && !element.closest(".extended-breadcrumb-reading-marker")) return null;
       const location = this.readingLocations.get(heading);
-      return location && location.file === view.file.path ? { ...location, pane: "editor", mode, view, element: heading } : null;
+      const anchor = scope === "marker" ? heading.querySelector(".extended-breadcrumb-reading-marker") ?? heading : heading;
+      return location && location.file === view.file.path ? { ...location, pane: "editor", mode, view, element: heading,
+        activationRect: anchor.getBoundingClientRect() } : null;
     }
-    const gutter = element.closest<HTMLElement>(".cm-extended-heading-gutter .cm-gutterElement");
-    if (scope === "marker" && !gutter?.querySelector(".cm-heading-marker:not(.cm-heading-marker-spacer)")) return null;
     const cm = editorView(view);
     if (!cm) return null;
+    const viewport = cm.scrollDOM.getBoundingClientRect();
+    if (!within(event.clientX, event.clientY, viewport)) return null;
     const block = cm.lineBlockAtHeight(event.clientY - cm.documentTop);
     if (event.clientY < cm.documentTop + block.top || event.clientY > cm.documentTop + block.bottom) return null;
     const sourceLine = cm.state.doc.lineAt(block.from);
@@ -297,9 +304,27 @@ export class HeadingBreadcrumb {
     if (!parseHeadingLine(sourceLine.text, line, 0, 1, settings.maximumLevel)) return null;
     const dom = cm.domAtPos(block.from).node;
     const lineElement = (dom.nodeType === 1 ? dom as HTMLElement : dom.parentElement)?.closest<HTMLElement>(".cm-line");
-    const anchor = element.closest<HTMLElement>(".cm-line, .cm-gutterElement") ?? lineElement;
+    let activationRect: DOMRect | null = null;
+    if (scope === "marker") {
+      // Themes place the gutter behind the editor and can paint marker glyphs
+      // outside its cell. Hit-test visible geometry, not event.target ancestry.
+      for (const marker of Array.from(cm.dom.querySelectorAll<HTMLElement>(".cm-extended-heading-gutter .cm-heading-marker:not(.cm-heading-marker-spacer)"))) {
+        const cell = marker.closest<HTMLElement>(".cm-gutterElement");
+        if (!cell) continue;
+        const cellRect = cell.getBoundingClientRect(), markerRect = marker.getBoundingClientRect();
+        if (!markerRect.width || !markerRect.height) continue;
+        const top = Math.max(viewport.top, Math.min(cellRect.top, markerRect.top));
+        const bottom = Math.min(viewport.bottom, Math.max(cellRect.bottom, markerRect.bottom));
+        const right = Math.min(viewport.right, Math.max(cellRect.right, markerRect.right));
+        const rect = new element.ownerDocument.defaultView!.DOMRect(viewport.left, top, right - viewport.left, bottom - top);
+        if (within(event.clientX, event.clientY, rect)) { activationRect = rect; break; }
+      }
+      if (!activationRect) return null;
+    }
+    const anchor = lineElement ?? element.closest<HTMLElement>(".cm-gutterElement");
     if (!anchor) return null;
-    return { file: view.file.path, line, pane: "editor", mode, view, element: anchor };
+    return { file: view.file.path, line, pane: "editor", mode, view, element: anchor,
+      activationRect: activationRect ?? anchor.getBoundingClientRect() };
   }
 
   private headingsFor(view: MarkdownView): BreadcrumbHeading[] {
@@ -314,10 +339,14 @@ export class HeadingBreadcrumb {
   }
 
   private pointerMove(state: DocumentState, event: PointerEvent): void {
+    state.pointer = { x: event.clientX, y: event.clientY };
     const element = elementAt(event);
     if (!element) return;
     const popup = state.popup;
     if (popup?.element.contains(element)) { this.cancelDismiss(state); return; }
+    // The gap may cover another heading. Preserve the open hierarchy while
+    // travelling into the popup instead of replacing it with that heading.
+    if (popup && this.pointerInPopup(state)) { this.cancelDismiss(state); return; }
     if (popup && (element === popup.target.element || popup.target.element.contains(element))) {
       // Recheck scope, so moving from the marker onto text dismisses a
       // marker-only breadcrumb, while full-field scope stays active.
@@ -331,17 +360,20 @@ export class HeadingBreadcrumb {
       this.show(state, target);
       return;
     }
-    if (popup) {
-      const rect = popup.element.getBoundingClientRect();
-      const anchor = popup.anchorRect;
-      const left = Math.min(rect.left, anchor.left);
-      const right = Math.max(rect.right, anchor.right);
-      const gapTop = Math.min(rect.bottom, anchor.bottom);
-      const gapBottom = Math.max(rect.top, anchor.top);
-      if (within(event.clientX, event.clientY, rect) || event.clientX >= left && event.clientX <= right
-        && event.clientY >= gapTop && event.clientY <= gapBottom) { this.cancelDismiss(state); return; }
-    }
     this.scheduleDismiss(state);
+  }
+
+  private pointerInPopup(state: DocumentState): boolean {
+    if (!state.popup || !state.pointer) return false;
+    const { x, y } = state.pointer;
+    const rect = state.popup.element.getBoundingClientRect(), anchor = state.popup.anchorRect;
+    if (within(x, y, rect)) return true;
+    const below = rect.top >= anchor.bottom;
+    const from = below ? anchor : rect, to = below ? rect : anchor;
+    if (to.top <= from.bottom || y < from.bottom || y > to.top) return false;
+    const fraction = (y - from.bottom) / (to.top - from.bottom);
+    return x >= from.left + (to.left - from.left) * fraction
+      && x <= from.right + (to.right - from.right) * fraction;
   }
 
   private show(state: DocumentState, target: HoverTarget): void {
@@ -365,6 +397,8 @@ export class HeadingBreadcrumb {
     const content = create("div", "extended-breadcrumb-content");
     const svg = state.document.createElementNS(SVG_NS, "svg");
     svg.classList.add("extended-breadcrumb-guides"); svg.setAttribute("aria-hidden", "true");
+    // Do not let SVG's default 300×150 viewport become scrollable content.
+    svg.setAttribute("width", "0"); svg.setAttribute("height", "0");
     content.append(svg); tree.append(content); element.append(title, tree);
     const rows = new Map<number, HTMLButtonElement>();
     const settings = this.plugin.settings;
@@ -400,7 +434,7 @@ export class HeadingBreadcrumb {
     }
     const resize = new win.ResizeObserver(() => this.scheduleDraw(state));
     const popup: Popup = { target, headings, current, active: current, selected: current,
-      element, tree, content, svg, rows, anchorRect: target.element.getBoundingClientRect(), resize, frame: null };
+      element, tree, content, svg, rows, anchorRect: target.activationRect, resize, frame: null };
     state.popup = popup;
     element.addEventListener("pointerenter", () => this.cancelDismiss(state));
     element.addEventListener("pointerleave", () => this.scheduleDismiss(state));
@@ -415,7 +449,12 @@ export class HeadingBreadcrumb {
     resize.observe(content);
     this.draw(state);
     const currentRow = rows.get(current);
-    if (currentRow) tree.scrollTop = Math.max(0, currentRow.offsetTop - tree.clientHeight / 2);
+    if (currentRow) {
+      const rowRect = currentRow.getBoundingClientRect(), treeRect = tree.getBoundingClientRect();
+      // Scroll only if the current row is out of view. Centering a row in a
+      // short list used to cut off otherwise visible ancestors.
+      if (rowRect.bottom > treeRect.bottom) tree.scrollTop += rowRect.bottom - treeRect.bottom;
+    }
   }
 
   private activate(state: DocumentState, index: number): void {
@@ -548,7 +587,8 @@ export class HeadingBreadcrumb {
         }), `extended-breadcrumb-thread-path extended-breadcrumb-thread-depth-${Math.max(1, Math.min(8, headings[index].depth + (roots.length ? 1 : 0)))}`);
       }
     }
-    svg.setAttribute("width", String(content.scrollWidth)); svg.setAttribute("height", String(content.scrollHeight));
+    // Size from layout, never scrollWidth/Height (which include the old SVG).
+    svg.setAttribute("width", String(rect.width)); svg.setAttribute("height", String(rect.height));
     svg.replaceChildren(fragment);
     this.position(popup, number("anchor-gap", 8), number("viewport-gap", 8));
   }
@@ -581,11 +621,16 @@ export class HeadingBreadcrumb {
   }
 
   private scheduleDismiss(state: DocumentState): void {
-    if (!state.popup || state.timer !== null || state.popup.element.matches(":hover")
+    if (!state.popup || state.timer !== null || this.pointerInPopup(state) || state.popup.element.matches(":hover")
       || state.popup.element.contains(state.document.activeElement)) return;
     const timeout = breadcrumbTimeout(this.plugin.settings, state.popup.target.mode);
     if (timeout === 0) { this.dismiss(state); return; }
-    state.timer = state.document.defaultView?.setTimeout(() => this.dismiss(state), timeout) ?? null;
+    const popup = state.popup;
+    state.timer = state.document.defaultView?.setTimeout(() => {
+      state.timer = null;
+      if (state.popup === popup && !this.pointerInPopup(state) && !popup.element.matches(":hover")
+        && !popup.element.contains(state.document.activeElement)) this.dismiss(state);
+    }, timeout) ?? null;
   }
 
   private dismiss(state: DocumentState): void {
