@@ -17,9 +17,9 @@ The default maximum is H12. It can be lowered to H7 under **Settings → Communi
 - **Latest compatibility target:** Obsidian 1.13.7 (Desktop, public release).
 - **Minimum supported Obsidian version:** 1.13.0.
 
-The compatibility target records the Obsidian version used for the compatibility audit. For 2.0.0, automated tests and Chromium/CodeMirror checks are separate from device testing inside Obsidian; see [2.0.0 validation](docs/testing-2.0.0.md). Version 0.4.9 deliberately raises the minimum from 1.7.2 to 1.13.0 so the plugin can use Obsidian's searchable declarative settings API without retaining a second legacy settings renderer. Earlier releases remain mapped to their historical minimum versions in `versions.json`.
+The compatibility target records the Obsidian version used for the compatibility audit. For 2.1.0, automated tests and Chromium/CodeMirror checks are separate from device testing inside Obsidian; see [2.1.0 validation](docs/testing-2.1.0.md). Version 0.4.9 deliberately raises the minimum from 1.7.2 to 1.13.0 so the plugin can use Obsidian's searchable declarative settings API without retaining a second legacy settings renderer. Earlier releases remain mapped to their historical minimum versions in `versions.json`.
 
-Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 2.0.0 has not been device-tested on Obsidian Mobile.
+Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 2.1.0 has not been device-tested on Obsidian Mobile.
 
 ## Features
 
@@ -91,7 +91,7 @@ Outline Pane Markdown and SVG Rendering Toggles ENABLED
 | Copy fully nested heading paths | On | Includes every ancestor heading in copied heading links and embeds; disable it to copy only the shorter target-heading link. |
 | Lower limit of heading | `1` | Sets the shallowest level that **Decrease headings** may reach; `0` permits conversion to a paragraph. |
 | Enable override Tab behavior | Off | Makes Tab and Shift+Tab shift headings when the active selection contains a heading. |
-| Show Editor Gutter heading level markers | On | Shows H1–H12 heading markers in the editor gutter. Existing `showHeadingMarkers` preferences migrate automatically. |
+| Show Editor Gutter heading level markers | On | Shows H1–H12 heading markers in the editor gutter and H7–H12 markers inside linked embeds. Existing `showHeadingMarkers` preferences migrate automatically. |
 | Show Outline pane heading level markers | On | Shows an H1–H12 marker to the left of every matched heading in Obsidian's default Outline. |
 | Show before line numbers | On | Places heading markers before the line-number gutter. |
 | Show in source mode | On | Shows heading markers in Source mode as well as Live Preview. |
@@ -126,7 +126,7 @@ H7 through H12 each also have a collapsible section with font size, weight, indi
 
 ## Heading Hover Breadcrumb
 
-Hover an H1–H12 level marker to open the heading's ancestor hierarchy. The originating heading stays highlighted in the popover. Hovering another entry previews and highlights that heading in the editor and default Outline without moving the editor caret. Click an entry to navigate; in Source and Live Preview the caret moves to the heading line. The popover scrolls independently, and its focused entries support **Up**, **Down**, **Home**, **End**, **Enter**, and **Space**. **Esc** closes it.
+Hover an H1–H12 level marker to open the heading's ancestor hierarchy. The originating heading stays highlighted in the popover. By default, hovering another entry temporarily previews and highlights that heading in the editor and default Outline without moving the editor caret, then restores the prior view when the popover closes. Click an entry to navigate permanently; in Source and Live Preview the caret moves to the heading line. The popover scrolls independently, and its focused entries support **Up**, **Down**, **Home**, **End**, **Enter**, and **Space**. **Esc** closes it.
 
 The **Heading Hover Breadcrumb** section appears last in the main settings. Subordinate controls become inaccessible whenever a required parent is off; stored values are retained.
 
@@ -149,6 +149,22 @@ Breadcrumb threading has separate global, Editor, and Outline controls for all o
 In Source and Live Preview, marker activation covers the left editor margin through the complete visible Hn marker, including glyphs that extend outside their gutter cell. It requires the existing marker visibility settings and excludes heading hashes. Reading mode supplies Hn hover markers beside headings while marker activation is enabled. Outline marker activation requires **Show Outline pane heading level markers**. With marker and field activation both off for a pane, it has no hover trigger.
 
 The **Heading Hover Breadcrumb Popover Timeout** controls adapt Nested Properties Advanced's dismissal behavior. The global timeout defaults to **0.01 seconds**, with its control enabled. Each viewing mode has an optional independent override, disabled by default and also initialized to **0.01 seconds**. Decimal values are supported. The timeout is a dismissal delay, not a lifetime while interacting: entering the popover or its connecting gap cancels it, and scrolling or previewing ancestors keeps the popover open. Ordinary main-pane scrolling outside the popover uses the same delay. Changing notes/modes, editing the document, leaving the window, or pressing Esc still dismisses it. Hover previews and dismissal preserve the editor caret.
+
+**Heading Hover Breadcrumb Navigation** adds two independent controls in 2.1.0, available while the master Heading Hover Breadcrumb toggle is enabled:
+
+- **Hover Over a Given Breadcrumb Heading to Change the Screen Focus to the Corresponding Heading in the Main UI Before the Breadcrumb Popover Timeout** — **On** by default. Preview hovered or keyboard-focused entries while the popover is open.
+- **Hover Over a Given Breadcrumb Heading to Change the Screen Focus to the Corresponding Heading in the Main UI After the Breadcrumb Popover Timeout** — **Off** by default. Keep or apply the last hovered or keyboard-focused entry when the dismissal timer expires.
+
+| Before timeout | After timeout | Navigation behavior |
+| --- | --- | --- |
+| On | Off | Preview while open; restore the prior view on dismissal. |
+| On | On | Preview while open; keep the last preview when the timer expires. |
+| Off | On | Keep the view still while open; navigate to the last hovered entry when the timer expires. |
+| Off | Off | Hover highlights entries without scrolling the main UI. Click to navigate. |
+
+These controls apply to both Editor and Outline breadcrumbs in all three viewing modes. They use the existing global/per-mode dismissal delay; there is no extra hover timer. Click navigation always takes priority and is never undone by dismissal. Escape, window blur, settings changes, or replacing the popover cancel deferred navigation. Clicking outside the popover also cancels it and leaves the main UI under your control. A changed note, mode, or document is never scrolled back to an old preview position.
+
+Internal linked embeds now show H7–H12 level markers using **Show Editor Gutter heading level markers** and its existing typography controls. The full label, fold button, and heading text occupy separate spaces within the embed, including H10–H12. These are display markers; an embedded heading does not activate a breadcrumb for the containing note.
 
 In **Style Settings → Extended Headings → Heading Hover Breadcrumb**, customize popover typography, dimensions, spacing, scrolling area, colors, current/hover appearance, borders, corners, shadow, and main-heading highlights. Marker typography includes size, weight, color, style, variant, letter spacing, opacity, reserved width, and gap; **All small caps** is the default variant. Static guides and threading expose all of the Outline's corresponding pattern, geometry, opacity, thickness, palette, fallback, and override controls. **Editor Pane Breadcrumb Decorations** and **Outline Pane Breadcrumb Decorations** can override the shared marker/guide/thread appearance independently, using the same defaults and precise numerical inputs.
 

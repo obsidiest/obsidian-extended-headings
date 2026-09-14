@@ -3641,6 +3641,47 @@ body:not(.extended-headings-markers-before) .cm-extended-heading-gutter { order:
   position: relative;
 }
 
+.extended-heading-reading-content { display: contents; }
+.extended-heading-embed-marker { display: none; }
+
+/* Embeds have no editor gutter. Keep the complete H7-H12 marker, folding
+   control, and inline title in separate columns within the embed boundary. */
+.internal-embed .extended-heading-reading {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: 0.25em;
+}
+
+body.extended-headings-show-level-markers .internal-embed .extended-heading-embed-marker {
+  display: block;
+  grid-column: 1;
+  grid-row: 1;
+  color: var(--text-faint);
+  font-size: var(--font-smallest);
+  font-weight: var(--extended-heading-level-marker-weight);
+  font-variant: var(--extended-heading-level-marker-font-variant);
+  white-space: nowrap;
+  user-select: none;
+}
+.extended-heading-embed-marker > span { font-size: var(--extended-heading-level-marker-size); }
+.internal-embed .extended-heading-reading > .extended-heading-fold {
+  grid-column: 2;
+  grid-row: 1;
+  margin-inline: 0;
+  min-width: 1em;
+}
+.internal-embed .extended-heading-reading > .extended-heading-reading-content {
+  display: block;
+  grid-column: 3;
+  grid-row: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+/* A detached Reading fragment can acquire a breadcrumb marker before it is
+   mounted inside an embed. It must not overlap the embed's level marker. */
+.internal-embed .extended-breadcrumb-reading-marker { display: none; }
+
 .extended-heading-fold {
   align-items: center;
   background: transparent;

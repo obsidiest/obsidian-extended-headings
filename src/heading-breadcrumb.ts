@@ -26,12 +26,20 @@ interface HoverTarget extends HeadingLocation {
   view: MarkdownView;
   activationRect: DOMRect;
 }
+interface NavigationPreview {
+  restore: () => void;
+  outlineScroll: Map<HTMLElement, { left: number; top: number; owner: HTMLElement }>;
+}
 interface Popup {
   target: HoverTarget;
   headings: BreadcrumbHeading[];
   current: number;
   selected: number;
   active: number;
+  hovered: number | null;
+  committedLine: number | null;
+  preview: NavigationPreview | null;
+  sourceDocument: EditorView["state"]["doc"] | undefined;
   element: HTMLElement;
   tree: HTMLElement;
   content: HTMLElement;
@@ -174,7 +182,8 @@ export class HeadingBreadcrumb {
 
   private updateReadingMarker(element: HTMLElement): void {
     const settings = this.plugin.settings;
-    const visible = breadcrumbEnabled(settings, "editor", "reading") && breadcrumbActivation(settings, "editor") === "marker";
+    const visible = !element.closest(".internal-embed") && breadcrumbEnabled(settings, "editor", "reading")
+      && breadcrumbActivation(settings, "editor") === "marker";
     let marker = element.querySelector<HTMLElement>(":scope > .extended-breadcrumb-reading-marker");
     element.classList.toggle("extended-breadcrumb-reading-host", visible);
     if (!visible) { marker?.remove(); return; }
@@ -211,6 +220,14 @@ export class HeadingBreadcrumb {
     this.documents.set(document, state);
     document.addEventListener("pointermove", (event) => this.pointerMove(state, event), { capture: true, passive: true, signal: abort.signal });
     document.addEventListener("pointerleave", () => { state.pointer = null; this.scheduleDismiss(state); }, { signal: abort.signal });
+    document.addEventListener("pointerdown", (event) => {
+      const popup = state.popup;
+      if (!popup || popup.element.contains(event.target as Node)) return;
+      // A deliberate interaction in the main UI supersedes hover navigation.
+      // Do not later undo it or apply a queued hover after the timer expires.
+      popup.preview = null; popup.hovered = null;
+      this.dismiss(state);
+    }, { capture: true, signal: abort.signal });
     document.addEventListener("keydown", (event) => {
       if (event.key !== "Escape" || !state.popup) return;
       const popup = state.popup;
@@ -279,7 +296,7 @@ export class HeadingBreadcrumb {
       return { file, line: Number(row.dataset.extendedBreadcrumbLine), pane: "outline", mode, view, element: row,
         activationRect: anchor.getBoundingClientRect() };
     }
-    if (!element.closest(".markdown-source-view, .markdown-preview-view")) return null;
+    if (element.closest(".internal-embed") || !element.closest(".markdown-source-view, .markdown-preview-view")) return null;
     const view = this.viewFor(element);
     if (!view?.file) return null;
     const mode = modeOf(view);
@@ -428,12 +445,12 @@ export class HeadingBreadcrumb {
         event.preventDefault(); event.stopPropagation();
         if (!state.popup) return;
         state.popup.selected = index;
-        this.activate(state, index);
-        this.navigate(target, heading.line, true);
+        this.activate(state, index, true);
       });
     }
     const resize = new win.ResizeObserver(() => this.scheduleDraw(state));
     const popup: Popup = { target, headings, current, active: current, selected: current,
+      hovered: null, committedLine: null, preview: null, sourceDocument: editorView(target.view)?.state.doc,
       element, tree, content, svg, rows, anchorRect: target.activationRect, resize, frame: null };
     state.popup = popup;
     element.addEventListener("pointerenter", () => this.cancelDismiss(state));
@@ -457,16 +474,24 @@ export class HeadingBreadcrumb {
     }
   }
 
-  private activate(state: DocumentState, index: number): void {
+  private activate(state: DocumentState, index: number, select = false): void {
     const popup = state.popup;
     if (!popup) return;
     popup.active = index;
+    popup.hovered = select ? null : index;
+    // A click commits navigation even when both hover controls are off. A
+    // subsequent hover starts a new preview from the clicked position.
+    if (select) { popup.preview = null; popup.committedLine = popup.headings[index].line; }
     for (const [rowIndex, row] of popup.rows) {
       row.classList.toggle("is-active", rowIndex === index);
       row.setAttribute("aria-selected", String(rowIndex === popup.selected));
       row.tabIndex = rowIndex === index ? 0 : -1;
     }
     this.highlight(state, popup.target, popup.headings[index].line);
+    if (select || this.plugin.settings.breadcrumbNavigateBeforeTimeout) {
+      if (!select) popup.preview ??= this.captureNavigation(popup.target, popup.committedLine);
+      this.navigateMainUI(state, popup, popup.headings[index].line, select);
+    }
     this.scheduleDraw(state);
   }
 
@@ -476,9 +501,7 @@ export class HeadingBreadcrumb {
     if (modeOf(target.view) !== "reading" && cm) {
       cm.dispatch({ effects: breadcrumbHighlight.of(line) });
       state.highlightView = target.view;
-      this.navigate(target, line, false);
     } else {
-      this.navigate(target, line, false);
       for (const element of this.readingElements) {
         const location = this.readingLocations.get(element);
         if (location?.file === target.file && location.line === line && target.view.containerEl.contains(element)) {
@@ -489,8 +512,54 @@ export class HeadingBreadcrumb {
     for (const row of Array.from(state.document.querySelectorAll<HTMLElement>(".tree-item-self[data-extended-breadcrumb-line]"))) {
       if (row.dataset.extendedBreadcrumbFile === target.file && Number(row.dataset.extendedBreadcrumbLine) === line) {
         row.dataset.extendedBreadcrumbHighlight = "true"; state.highlighted.add(row);
-        if (target.pane === "outline") row.scrollIntoView({ block: "nearest" });
       }
+    }
+  }
+
+  private captureNavigation(target: HoverTarget, committedLine: number | null): NavigationPreview {
+    const cm = target.mode !== "reading" ? editorView(target.view) : null;
+    const snapshot = cm?.scrollSnapshot();
+    const reading = target.mode === "reading" ? target.view.previewMode : null;
+    const readingScroll = reading?.getScroll();
+    const readingLeft = reading?.containerEl.scrollLeft ?? 0;
+    const outlineScroll: NavigationPreview["outlineScroll"] = new Map();
+    return { outlineScroll, restore: () => {
+      // CodeMirror applies scroll effects during its next measure. If a click
+      // and another hover occur in one frame, the snapshot still predates the
+      // click. Return to the committed heading in that case (and in Reading).
+      if (committedLine !== null) this.navigate(target, committedLine, false);
+      else if (cm && snapshot && cm.dom.isConnected) cm.dispatch({ effects: snapshot });
+      else if (reading && typeof readingScroll === "number" && Number.isFinite(readingScroll)) {
+        reading.applyScroll(readingScroll);
+        reading.containerEl.scrollLeft = readingLeft;
+      }
+      const owners = new Set(Array.from(outlineScroll.values(), (position) => position.owner));
+      for (const owner of owners) {
+        // An Outline may have changed notes independently of the editor.
+        if (!owner.isConnected || owner.querySelector<HTMLElement>("[data-extended-breadcrumb-file]")?.dataset.extendedBreadcrumbFile !== target.file) continue;
+        for (const [element, position] of outlineScroll) {
+          if (position.owner !== owner || !element.isConnected) continue;
+          element.scrollLeft = position.left; element.scrollTop = position.top;
+        }
+      }
+    } };
+  }
+
+  private navigateMainUI(state: DocumentState, popup: Popup, line: number, select: boolean): void {
+    this.navigate(popup.target, line, select);
+    if (popup.target.pane !== "outline") return;
+    for (const row of Array.from(state.document.querySelectorAll<HTMLElement>(".tree-item-self[data-extended-breadcrumb-line]"))) {
+      if (row.dataset.extendedBreadcrumbFile !== popup.target.file || Number(row.dataset.extendedBreadcrumbLine) !== line) continue;
+      const owner = row.closest<HTMLElement>('[data-type="outline"]');
+      if (!select && popup.preview && owner) {
+        // Record only ancestors that scrollIntoView can move, and only once
+        // per preview. Popover scrolling itself is never restored.
+        for (let element = row.parentElement; element && owner.contains(element); element = element.parentElement) {
+          if (!popup.preview.outlineScroll.has(element)) popup.preview.outlineScroll.set(element,
+            { left: element.scrollLeft, top: element.scrollTop, owner });
+        }
+      }
+      row.scrollIntoView({ block: "nearest" });
     }
   }
 
@@ -624,16 +693,16 @@ export class HeadingBreadcrumb {
     if (!state.popup || state.timer !== null || this.pointerInPopup(state) || state.popup.element.matches(":hover")
       || state.popup.element.contains(state.document.activeElement)) return;
     const timeout = breadcrumbTimeout(this.plugin.settings, state.popup.target.mode);
-    if (timeout === 0) { this.dismiss(state); return; }
+    if (timeout === 0) { this.dismiss(state, true); return; }
     const popup = state.popup;
     state.timer = state.document.defaultView?.setTimeout(() => {
       state.timer = null;
       if (state.popup === popup && !this.pointerInPopup(state) && !popup.element.matches(":hover")
-        && !popup.element.contains(state.document.activeElement)) this.dismiss(state);
+        && !popup.element.contains(state.document.activeElement)) this.dismiss(state, true);
     }, timeout) ?? null;
   }
 
-  private dismiss(state: DocumentState): void {
+  private dismiss(state: DocumentState, timedOut = false): void {
     this.cancelDismiss(state);
     const popup = state.popup;
     state.popup = null;
@@ -641,5 +710,13 @@ export class HeadingBreadcrumb {
     if (popup?.frame !== null && popup?.frame !== undefined) state.document.defaultView?.cancelAnimationFrame(popup.frame);
     popup?.element.remove();
     this.clearHighlight(state);
+    if (!popup || !popup.target.view.containerEl.isConnected
+      || popup.target.view.containerEl.getBoundingClientRect().width === 0
+      || popup.target.view.file?.path !== popup.target.file
+      || modeOf(popup.target.view) !== popup.target.mode
+      || editorView(popup.target.view)?.state.doc !== popup.sourceDocument) return;
+    if (timedOut && this.plugin.settings.breadcrumbNavigateAfterTimeout && popup.hovered !== null) {
+      this.navigateMainUI(state, popup, popup.headings[popup.hovered].line, false);
+    } else popup.preview?.restore();
   }
 }

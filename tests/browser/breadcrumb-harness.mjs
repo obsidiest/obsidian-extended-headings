@@ -4,8 +4,11 @@ import { MarkdownView } from "obsidian";
 import { HeadingBreadcrumb } from "../../src/heading-breadcrumb";
 import { DEFAULT_BREADCRUMB_SETTINGS } from "../../src/breadcrumb-settings";
 import { breadcrumbHighlightField } from "../../src/breadcrumb-editor";
+import { renderExtendedHeadings } from "../../src/reading";
 Object.assign(window, {
+    renderExtendedHeadings,
     createEl: (tag) => document.createElement(tag),
+    createDiv: () => document.createElement("div"),
     createSpan: () => document.createElement("span"),
     createFragment: () => document.createDocumentFragment(),
 });

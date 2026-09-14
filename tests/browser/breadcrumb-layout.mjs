@@ -34,7 +34,8 @@ try {
       .breadcrumb-test-editor .markdown-source-view { height: 100%; }
       .breadcrumb-test-has-outline { right: 420px; }
       .breadcrumb-test-outline { position: fixed; right: 16px; top: 40px; width: 370px; height: 690px; overflow: auto; }
-      .breadcrumb-test-outline .tree-item-self { min-height: 36px; padding: 4px; display: flex; }` });
+      .breadcrumb-test-outline .tree-item-self { min-height: 36px; padding: 4px; display: flex; }
+      .breadcrumb-test-embed { margin: 30px; max-width: 600px; padding: 10px; }` });
     await page.addScriptTag({ content: bundle.outputFiles[0].text });
     await page.evaluate(() => window.setupBreadcrumb());
     await page.locator('.cm-heading-marker[data-level="12"]').hover();
@@ -158,6 +159,82 @@ try {
         assert.equal(await popup.count(), 1); checks++;
         await popup.waitFor({ state: "detached", timeout: 2000 }); checks++;
       }
+      // Verify actual CodeMirror scrolling, including restoration of a viewport
+      // whose originating heading has been virtualized out during preview.
+      const navigationText = ["# Root", ...Array(80).fill("Body text"), "## Child", ...Array(80).fill("Body text"), "############ Deep", ...Array(40).fill("Body text")].join("\n");
+      const settle = () => page.evaluate(() => new Promise((resolve) => window.requestAnimationFrame(() => window.requestAnimationFrame(resolve))));
+      for (const before of [true, false]) for (const after of [false, true]) {
+        await page.evaluate(({ text, before, after }) => {
+          window.setupBreadcrumb({ breadcrumbNavigateBeforeTimeout: before, breadcrumbNavigateAfterTimeout: after,
+            globalBreadcrumbTimeoutSeconds: 0.05 }, { text });
+          const { cm } = window.breadcrumbTest;
+          cm.dispatch({ effects: cm.constructor.scrollIntoView(cm.state.doc.line(163).from, { y: "center" }) });
+        }, { text: navigationText, before, after });
+        await page.locator('.cm-heading-marker[data-level="12"]').hover();
+        const originalScroll = await page.evaluate(() => window.breadcrumbTest.cm.scrollDOM.scrollTop);
+        assert.ok(originalScroll > 1000); checks++;
+        await popup.locator(".extended-breadcrumb-row").first().hover(); await settle();
+        let scroll = await page.evaluate(() => window.breadcrumbTest.cm.scrollDOM.scrollTop);
+        assert.ok(before ? scroll < 10 : Math.abs(scroll - originalScroll) < 2, JSON.stringify({ before, after, scroll, originalScroll })); checks++;
+        await page.mouse.move(1195, 845); await popup.waitFor({ state: "detached" }); await settle();
+        scroll = await page.evaluate(() => window.breadcrumbTest.cm.scrollDOM.scrollTop);
+        assert.ok(after ? scroll < 10 : Math.abs(scroll - originalScroll) < 2, JSON.stringify({ before, after, scroll, originalScroll })); checks++;
+        assert.equal(await page.evaluate(() => window.breadcrumbTest.cm.state.selection.main.head), 0); checks++;
+      }
+      await page.evaluate((text) => {
+        window.setupBreadcrumb({ globalBreadcrumbTimeoutSeconds: 0.05 }, { text });
+        const { cm } = window.breadcrumbTest;
+        cm.dispatch({ effects: cm.constructor.scrollIntoView(cm.state.doc.line(163).from, { y: "center" }) });
+      }, navigationText);
+      await page.locator('.cm-heading-marker[data-level="12"]').hover();
+      await popup.locator(".extended-breadcrumb-row").first().hover(); await settle();
+      // A click may queue a scroll which has not yet been measured when the
+      // pointer enters another row. Timeout must still return to the click.
+      await popup.evaluate((element) => {
+        const rows = element.querySelectorAll(".extended-breadcrumb-row");
+        rows[1].click(); rows[0].dispatchEvent(new PointerEvent("pointerenter"));
+      });
+      await settle(); await page.mouse.move(1195, 845);
+      await popup.waitFor({ state: "detached" }); await settle();
+      const committed = await page.evaluate(() => {
+        const { cm } = window.breadcrumbTest, line = cm.state.doc.line(82);
+        return { caret: cm.state.selection.main.head, line: line.from, scroll: cm.scrollDOM.scrollTop };
+      });
+      assert.equal(committed.caret, committed.line); checks++;
+      assert.ok(committed.scroll > 1000, JSON.stringify(committed)); checks++;
+    }
+    // The embedded reading renderer has no CodeMirror gutter. Check all six
+    // extended marker labels and their separation from folds and wrapped text.
+    for (const folding of [true, false]) {
+      await page.evaluate((folding) => {
+        window.setupBreadcrumb(); window.breadcrumbTest.manager.destroy();
+        window.breadcrumbTest.cm.destroy(); document.body.replaceChildren();
+        document.body.classList.add("extended-headings-show-level-markers");
+        const section = document.createElement("div"); section.className = "markdown-preview-section";
+        for (let level = 7; level <= 12; level++) {
+          const paragraph = document.createElement("p");
+          paragraph.textContent = `${"#".repeat(level)} Extended heading level ${level} with a long title that should wrap within the embed`;
+          section.append(paragraph);
+        }
+        window.renderExtendedHeadings(section, () => ({ maximumLevel: 12, readingModeFolding: folding }));
+        const embed = document.createElement("div"); embed.className = "internal-embed markdown-embed breadcrumb-test-embed";
+        embed.append(section); document.body.append(embed);
+      }, folding);
+      const boxes = await page.locator(".extended-heading-reading").evaluateAll((headings) => headings.map((heading) => {
+        const marker = heading.querySelector(".extended-heading-embed-marker"), content = heading.querySelector(".extended-heading-reading-content"), fold = heading.querySelector(".extended-heading-fold");
+        const rect = (el) => { const r = el.getBoundingClientRect(); return { left: r.left, right: r.right, width: r.width }; };
+        return { level: heading.getAttribute("aria-level"), label: marker.textContent, heading: rect(heading), marker: rect(marker), content: rect(content), fold: fold && rect(fold) };
+      }));
+      for (const box of boxes) {
+        assert.equal(box.label, `H${box.level}`);
+        assert.ok(box.marker.width > 0 && box.marker.left >= box.heading.left - 1);
+        assert.ok(box.marker.right <= (box.fold ?? box.content).left);
+        assert.ok(!box.fold || box.fold.right <= box.content.left);
+        assert.ok(box.content.right <= box.heading.right + 1);
+        checks += 5;
+      }
+      await page.evaluate(() => document.body.classList.remove("extended-headings-show-level-markers"));
+      assert.equal(await page.locator(".extended-heading-embed-marker:visible").count(), 0); checks++;
     }
     assert.deepEqual(errors, []);
     await page.close();

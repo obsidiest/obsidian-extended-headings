@@ -10,7 +10,7 @@ interface DomPoint {
 let foldId = 0;
 
 function locateTextOffset(root: HTMLElement, target: number): DomPoint {
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const walker = root.ownerDocument.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   let consumed = 0;
   let last: Text | null = null;
   while (walker.nextNode()) {
@@ -24,7 +24,7 @@ function locateTextOffset(root: HTMLElement, target: number): DomPoint {
 }
 
 function cloneTextRange(root: HTMLElement, from: number, to: number): DocumentFragment {
-  const range = document.createRange();
+  const range = root.ownerDocument.createRange();
   const start = locateTextOffset(root, from);
   const end = locateTextOffset(root, to);
   range.setStart(start.node, start.offset);
@@ -63,27 +63,36 @@ function appendHeading(
   fragment: DocumentFragment,
   settings: ExtendedHeadingsSettings,
 ): void {
-  const element = createDiv({
-    cls: `extended-heading-reading extended-heading-${heading.level}`,
-  });
+  const document = source.ownerDocument;
+  const win = document.win as Window & { createDiv: typeof createDiv; createSpan: typeof createSpan; createEl: typeof createEl };
+  const element = win.createDiv();
+  element.className = `extended-heading-reading extended-heading-${heading.level}`;
   element.setAttribute("role", "heading");
   element.setAttribute("aria-level", String(heading.level));
   element.dataset.heading = fragment.textContent?.trim() ?? heading.rawBody;
   element.tabIndex = -1;
 
+  // A transclusion has no CodeMirror gutter. Create its marker even when the
+  // postprocessor runs before the fragment is attached to an embed; CSS limits
+  // its visibility to embeds and follows the existing marker toggle.
+  const marker = win.createSpan();
+  marker.className = "extended-heading-embed-marker";
+  marker.setAttribute("aria-hidden", "true");
+  const markerLabel = win.createSpan();
+  markerLabel.textContent = `H${heading.level}`;
+  marker.append(markerLabel); element.append(marker);
+
   if (settings.readingModeFolding) {
-    const fold = createEl("button", {
-      cls: "extended-heading-fold",
-      text: "⌄",
-      attr: {
-        type: "button",
-        "aria-label": "Fold heading",
-        "aria-expanded": "true",
-      },
-    });
+    const fold = win.createEl("button");
+    fold.className = "extended-heading-fold"; fold.textContent = "⌄";
+    fold.type = "button";
+    fold.setAttribute("aria-label", "Fold heading");
+    fold.setAttribute("aria-expanded", "true");
     element.append(fold);
   }
-  element.append(fragment);
+  const content = win.createSpan();
+  content.className = "extended-heading-reading-content";
+  content.append(fragment); element.append(content);
   source.before(element);
 }
 

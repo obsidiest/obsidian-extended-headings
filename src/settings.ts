@@ -232,7 +232,7 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
         items: [
           {
             name: "Show Editor Gutter heading level markers",
-            desc: "Show H1–H12 heading level markers in the editor gutter.",
+            desc: "Show H1–H12 heading level markers in the editor gutter and H7–H12 markers inside linked embeds.",
             aliases: ["Lapel", "gutter"],
             control: {
               type: "toggle",
