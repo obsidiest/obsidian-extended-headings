@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { setImmediate as nextTurn } from "node:timers/promises";
 import { JSDOM } from "jsdom";
 import { sourceLoader } from "./helpers/load-source.mjs";
 
@@ -158,7 +159,7 @@ test("Enter submits once, prevents a newline, and permits retry after rejection"
   input.dispatchEvent(enter());
   assert.equal(event.defaultPrevented, true);
   assert.deepEqual(h.submissions, ["Renamed [[Heading]]"], "in-flight submissions are not duplicated");
-  await Promise.resolve(); await Promise.resolve();
+  await nextTurn();
   input.dispatchEvent(enter());
   assert.equal(h.submissions.length, 2);
   assert.equal(input.value, "Renamed [[Heading]]");
@@ -184,7 +185,7 @@ test("accepted submission closes the dialog and releases its layout observer", a
   h.service.renameExtendedHeading = async () => true;
   const input = h.open();
   input.dispatchEvent(new h.win.KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true }));
-  await Promise.resolve(); await Promise.resolve();
+  await nextTurn();
   assert.equal(h.modal.closed, true);
   assert.equal(h.frames.size, 0);
   assert.equal(h.observers[0].disconnected, true);
