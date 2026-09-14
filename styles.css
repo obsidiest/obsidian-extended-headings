@@ -1174,6 +1174,1819 @@ settings:
     description: Adds a border below the heading
     type: class-toggle
     default: false
+  -
+    id: extended-breadcrumb
+    title: Heading Hover Breadcrumb
+    type: heading
+    level: 1
+    collapsed: true
+  -
+    id: extended-breadcrumb-appearance
+    title: Popover Appearance
+    type: heading
+    level: 2
+  -
+    id: extended-breadcrumb-background
+    title: Breadcrumb background
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#ffffff'
+    default-dark: '#202225'
+  -
+    id: extended-breadcrumb-border-color
+    title: Breadcrumb border color
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#d7d7d7'
+    default-dark: '#46484d'
+  -
+    id: extended-breadcrumb-text-color
+    title: Breadcrumb text color
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#252525'
+    default-dark: '#dcddde'
+  -
+    id: extended-breadcrumb-title-color
+    title: Breadcrumb title color
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#666666'
+    default-dark: '#a7a9ad'
+  -
+    id: extended-breadcrumb-current-color
+    title: Current heading color
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#4c78cc'
+    default-dark: '#7aa2f7'
+  -
+    id: extended-breadcrumb-hover-color
+    title: Hovered heading color
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#e7edf8'
+    default-dark: '#343b4a'
+  -
+    id: extended-breadcrumb-geometry
+    title: Breadcrumb Geometry and Typography
+    type: heading
+    level: 3
+    collapsed: true
+  -
+    id: extended-breadcrumb-min-width
+    title: Minimum width
+    type: variable-number-slider
+    default: 320
+    min: 120
+    max: 640
+    step: 1
+    format: px
+  -
+    id: extended-breadcrumb-max-width
+    title: Maximum width
+    type: variable-number-slider
+    default: 560
+    min: 180
+    max: 960
+    step: 1
+    format: px
+  -
+    id: extended-breadcrumb-max-height
+    title: Maximum height
+    type: variable-number-slider
+    default: 400
+    min: 100
+    max: 800
+    step: 1
+    format: px
+  -
+    id: extended-breadcrumb-padding
+    title: Panel padding
+    type: variable-number-slider
+    default: 10
+    min: 0
+    max: 40
+    step: 0.5
+    format: px
+  -
+    id: extended-breadcrumb-row-gap
+    title: Row gap
+    type: variable-number-slider
+    default: 2
+    min: 0
+    max: 16
+    step: 0.5
+    format: px
+  -
+    id: extended-breadcrumb-indent
+    title: Tree indentation
+    type: variable-number-slider
+    default: 18
+    min: 8
+    max: 48
+    step: 1
+    format: px
+  -
+    id: extended-breadcrumb-row-padding-x
+    title: Row horizontal padding
+    type: variable-number-slider
+    default: 6
+    min: 0
+    max: 24
+    step: 0.5
+    format: px
+  -
+    id: extended-breadcrumb-row-padding-y
+    title: Row vertical padding
+    type: variable-number-slider
+    default: 4
+    min: 0
+    max: 20
+    step: 0.5
+    format: px
+  -
+    id: extended-breadcrumb-font-size
+    title: Heading font size
+    type: variable-number-slider
+    default: 13
+    min: 8
+    max: 28
+    step: 0.25
+    format: px
+  -
+    id: extended-breadcrumb-font-weight
+    title: Heading font weight
+    type: variable-number-slider
+    default: 400
+    min: 100
+    max: 900
+    step: 1
+  -
+    id: extended-breadcrumb-line-height
+    title: Heading line height
+    type: variable-number-slider
+    default: 1.35
+    min: 0.8
+    max: 3
+    step: 0.05
+  -
+    id: extended-breadcrumb-title-size
+    title: Title font size
+    type: variable-number-slider
+    default: 11
+    min: 8
+    max: 24
+    step: 0.25
+    format: px
+  -
+    id: extended-breadcrumb-title-weight
+    title: Title font weight
+    type: variable-number-slider
+    default: 600
+    min: 100
+    max: 900
+    step: 1
+  -
+    id: extended-breadcrumb-title-letter-spacing
+    title: Title letter spacing
+    type: variable-number-slider
+    default: 0.03
+    min: -0.1
+    max: 0.5
+    step: 0.01
+    format: em
+  -
+    id: extended-breadcrumb-title-case
+    title: Title letter case
+    type: class-select
+    allowEmpty: false
+    default: extended-breadcrumb-title-uppercase
+    options:
+      -
+        label: Normal
+        value: extended-breadcrumb-title-normal
+      -
+        label: Uppercase
+        value: extended-breadcrumb-title-uppercase
+  -
+    id: extended-breadcrumb-title-gap
+    title: Gap below title
+    type: variable-number-slider
+    default: 6
+    min: 0
+    max: 24
+    step: 0.5
+    format: px
+  -
+    id: extended-breadcrumb-current-background-opacity
+    title: Current heading background opacity
+    type: variable-number-slider
+    default: 14
+    min: 0
+    max: 100
+    step: 1
+  -
+    id: extended-breadcrumb-border-thickness
+    title: Border thickness
+    type: variable-number-slider
+    default: 1
+    min: 0
+    max: 8
+    step: 0.25
+    format: px
+  -
+    id: extended-breadcrumb-radius
+    title: Panel corner radius
+    type: variable-number-slider
+    default: 8
+    min: 0
+    max: 32
+    step: 0.5
+    format: px
+  -
+    id: extended-breadcrumb-shadow-y
+    title: Shadow vertical offset
+    type: variable-number-slider
+    default: 4
+    min: -12
+    max: 24
+    step: 0.5
+    format: px
+  -
+    id: extended-breadcrumb-shadow-blur
+    title: Shadow blur
+    type: variable-number-slider
+    default: 18
+    min: 0
+    max: 64
+    step: 0.5
+    format: px
+  -
+    id: extended-breadcrumb-shadow-opacity
+    title: Shadow opacity
+    type: variable-number-slider
+    default: 0.25
+    min: 0
+    max: 1
+    step: 0.01
+  -
+    id: extended-breadcrumb-anchor-gap
+    title: Gap from hovered heading
+    type: variable-number-slider
+    default: 8
+    min: 0
+    max: 48
+    step: 0.5
+    format: px
+  -
+    id: extended-breadcrumb-viewport-gap
+    title: Minimum gap from viewport edges
+    type: variable-number-slider
+    default: 8
+    min: 0
+    max: 48
+    step: 0.5
+    format: px
+  -
+    id: extended-breadcrumb-main-highlight
+    title: Active Heading Highlight
+    type: heading
+    level: 3
+    collapsed: true
+  -
+    id: extended-breadcrumb-main-color
+    title: Active heading color
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#4c78cc'
+    default-dark: '#7aa2f7'
+  -
+    id: extended-breadcrumb-main-opacity
+    title: Active heading highlight opacity
+    type: variable-number-slider
+    default: 0.18
+    min: 0
+    max: 1
+    step: 0.01
+  -
+    id: extended-breadcrumb-main-radius
+    title: Active heading highlight radius
+    type: variable-number-slider
+    default: 4
+    min: 0
+    max: 20
+    step: 0.5
+    format: px
+  -
+    id: extended-breadcrumb-main-outline-thickness
+    title: Active heading outline thickness
+    type: variable-number-slider
+    default: 1
+    min: 0
+    max: 8
+    step: 0.25
+    format: px
+  -
+    id: extended-breadcrumb-main-outline-opacity
+    title: Active heading outline opacity
+    type: variable-number-slider
+    default: 0.55
+    min: 0
+    max: 1
+    step: 0.01
+  -
+    id: extended-breadcrumb-main-outline-offset
+    title: Active heading outline offset
+    type: variable-number-slider
+    default: 1
+    min: -4
+    max: 12
+    step: 0.25
+    format: px
+  -
+    id: extended-breadcrumb-level-marker-appearance
+    title: Heading Level Marker Typography and Appearance
+    type: heading
+    level: 3
+    collapsed: true
+  -
+    id: extended-breadcrumb-level-marker-font-size
+    title: Heading level marker font size
+    description: Relative to the breadcrumb heading text; 1 matches its size
+    type: variable-number-slider
+    default: 1
+    min: 0.5
+    max: 2
+    step: 0.05
+    format: em
+  -
+    id: extended-breadcrumb-level-marker-font-weight
+    title: Heading level marker font weight
+    description: Inherit matches the breadcrumb heading text weight
+    type: variable-select
+    allowEmpty: false
+    default: inherit
+    options:
+      -
+        label: Inherit
+        value: inherit
+      -
+        label: 100
+        value: '100'
+      -
+        label: 200
+        value: '200'
+      -
+        label: 300
+        value: '300'
+      -
+        label: 400
+        value: '400'
+      -
+        label: 500
+        value: '500'
+      -
+        label: 600
+        value: '600'
+      -
+        label: 700
+        value: '700'
+      -
+        label: 800
+        value: '800'
+      -
+        label: 900
+        value: '900'
+  -
+    id: extended-breadcrumb-level-marker-color
+    title: Heading level marker color
+    description: Blank inherits the corresponding breadcrumb heading color
+    type: variable-themed-color
+    format: hex
+    default-light: '#'
+    default-dark: '#'
+  -
+    id: extended-breadcrumb-level-marker-font-style
+    title: Heading level marker font style
+    type: variable-select
+    allowEmpty: false
+    default: inherit
+    options:
+      -
+        label: Inherit
+        value: inherit
+      -
+        label: Normal
+        value: normal
+      -
+        label: Italic
+        value: italic
+  -
+    id: extended-breadcrumb-level-marker-font-variant
+    title: Heading level marker font variant
+    type: variable-select
+    allowEmpty: false
+    default: all-small-caps
+    options:
+      -
+        label: Inherit
+        value: inherit
+      -
+        label: Normal
+        value: normal
+      -
+        label: Small caps
+        value: small-caps
+      -
+        label: All small caps
+        value: all-small-caps
+  -
+    id: extended-breadcrumb-level-marker-letter-spacing
+    title: Heading level marker letter spacing
+    type: variable-number-slider
+    default: 0
+    min: -0.1
+    max: 0.3
+    step: 0.01
+    format: em
+  -
+    id: extended-breadcrumb-level-marker-opacity
+    title: Heading level marker opacity
+    type: variable-number-slider
+    default: 1
+    min: 0.05
+    max: 1
+    step: 0.05
+  -
+    id: extended-breadcrumb-level-marker-width
+    title: Heading level marker width
+    description: Reserved width for the complete H1–H12 label
+    type: variable-number-slider
+    default: 3
+    min: 2
+    max: 8
+    step: 0.1
+    format: ch
+  -
+    id: extended-breadcrumb-level-marker-gap
+    title: Gap after heading level marker
+    type: variable-number-slider
+    default: 0.35
+    min: 0
+    max: 2
+    step: 0.05
+    format: em
+  -
+    id: extended-breadcrumb-guide-appearance
+    title: Heading Static Tree Indentation Guide Appearance
+    type: heading
+    level: 3
+    collapsed: true
+  -
+    id: extended-breadcrumb-guide-color
+    title: Guide color
+    description: Color of breadcrumb heading-tree vertical spines and horizontal connectors
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#777777'
+    default-dark: '#888888'
+  -
+    id: extended-breadcrumb-guide-opacity
+    title: Guide opacity
+    type: variable-number-slider
+    default: 0.72
+    min: 0.05
+    max: 1
+    step: 0.05
+  -
+    id: extended-breadcrumb-guide-thickness
+    title: Guide thickness
+    type: variable-number-slider
+    default: 1.5
+    min: 0.5
+    max: 6
+    step: 0.1
+    format: px
+  -
+    id: extended-breadcrumb-guide-pattern
+    title: Guide pattern
+    type: class-select
+    allowEmpty: false
+    default: extended-breadcrumb-guide-line-solid
+    options:
+      -
+        label: Solid
+        value: extended-breadcrumb-guide-line-solid
+      -
+        label: Dashed
+        value: extended-breadcrumb-guide-line-dashed
+      -
+        label: Dotted
+        value: extended-breadcrumb-guide-line-dotted
+  -
+    id: extended-breadcrumb-guide-dash-length
+    title: Dashed-line dash length
+    type: variable-number-slider
+    default: 6
+    min: 0.5
+    max: 24
+    step: 0.5
+    format: px
+  -
+    id: extended-breadcrumb-guide-dash-gap
+    title: Dashed-line gap
+    type: variable-number-slider
+    default: 4
+    min: 0.5
+    max: 24
+    step: 0.5
+    format: px
+  -
+    id: extended-breadcrumb-guide-dot-gap
+    title: Dotted-line gap
+    type: variable-number-slider
+    default: 4
+    min: 0.5
+    max: 24
+    step: 0.5
+    format: px
+  -
+    id: extended-breadcrumb-guide-geometry
+    title: Heading Static Tree Indentation Guide Geometry
+    type: heading
+    level: 4
+    collapsed: true
+  -
+    id: extended-breadcrumb-guide-connector-length
+    title: Horizontal connector length
+    type: variable-number-slider
+    default: 18
+    min: 4
+    max: 48
+    step: 1
+    format: px
+  -
+    id: extended-breadcrumb-guide-marker-gap
+    title: Gap before heading marker or text
+    type: variable-number-slider
+    default: 4
+    min: 0
+    max: 24
+    step: 1
+    format: px
+  -
+    id: extended-breadcrumb-guide-first-branch-rise
+    title: First-branch vertical rise
+    type: variable-number-slider
+    default: 10
+    min: 0
+    max: 40
+    step: 1
+    format: px
+  -
+    id: extended-breadcrumb-guide-connector-offset
+    title: Connector vertical offset
+    type: variable-number-slider
+    default: 0
+    min: -12
+    max: 12
+    step: 0.5
+    format: px
+  -
+    id: extended-breadcrumb-thread-appearance
+    title: Heading Thread Appearance (All Tree Types)
+    description: Applies to individual H1 trees, the virtual root-level H1 tree, orphan H2–H12 trees, and the combined root-level ⟺ orphan tree
+    type: heading
+    level: 3
+    collapsed: true
+  -
+    id: extended-breadcrumb-thread-opacity
+    title: Thread opacity
+    type: variable-number-slider
+    default: 1
+    min: 0.05
+    max: 1
+    step: 0.05
+  -
+    id: extended-breadcrumb-thread-thickness
+    title: Thread thickness
+    type: variable-number-slider
+    default: 4
+    min: 0.5
+    max: 12
+    step: 0.1
+    format: px
+  -
+    id: extended-breadcrumb-thread-corner-radius
+    title: Thread corner radius
+    type: variable-number-slider
+    default: 8
+    min: 0
+    max: 32
+    step: 0.5
+    format: px
+  -
+    id: extended-breadcrumb-thread-line-cap
+    title: Thread line cap
+    type: class-select
+    allowEmpty: false
+    default: extended-breadcrumb-thread-cap-round
+    options:
+      -
+        label: Round
+        value: extended-breadcrumb-thread-cap-round
+      -
+        label: Square
+        value: extended-breadcrumb-thread-cap-square
+      -
+        label: Flat
+        value: extended-breadcrumb-thread-cap-flat
+  -
+    id: extended-breadcrumb-thread-geometry
+    title: Heading Thread Geometry (All Tree Types)
+    description: Applies to individual H1 trees, the virtual root-level H1 tree, orphan H2–H12 trees, and the combined root-level ⟺ orphan tree
+    type: heading
+    level: 4
+    collapsed: true
+  -
+    id: extended-breadcrumb-thread-connector-length
+    title: Thread connector length
+    type: variable-number-slider
+    default: 28
+    min: 4
+    max: 96
+    step: 1
+    format: px
+  -
+    id: extended-breadcrumb-thread-marker-gap
+    title: Thread marker gap
+    type: variable-number-slider
+    default: 4
+    min: 0
+    max: 32
+    step: 0.5
+    format: px
+  -
+    id: extended-breadcrumb-thread-vertical-offset
+    title: Thread vertical offset
+    type: variable-number-slider
+    default: 0
+    min: -16
+    max: 16
+    step: 0.5
+    format: px
+  -
+    id: extended-breadcrumb-thread-colors
+    title: Heading Thread Colors (All Tree Types)
+    description: Applies to individual H1 trees, the virtual root-level H1 tree, orphan H2–H12 trees, and the combined root-level ⟺ orphan tree
+    type: heading
+    level: 4
+    collapsed: true
+  -
+    id: extended-breadcrumb-thread-fallback-colors-enabled
+    title: Global Fallback Heading Thread Colors
+    description: Use the fallback color whenever an individual heading thread color is disabled
+    type: class-toggle
+    default: true
+  -
+    id: extended-breadcrumb-thread-fallback-color-light
+    title: Global fallback heading thread color (light mode)
+    type: variable-text
+    default: '#777777'
+  -
+    id: extended-breadcrumb-thread-fallback-color-dark
+    title: Global fallback heading thread color (dark mode)
+    type: variable-text
+    default: '#888888'
+  -
+    id: extended-breadcrumb-thread-override-colors-enabled
+    title: Global Override Heading Thread Colors
+    description: Override every heading thread color regardless of its individual enablement toggle
+    type: class-toggle
+    default: false
+  -
+    id: extended-breadcrumb-thread-override-color-light
+    title: Global override heading thread color (light mode)
+    type: variable-text
+    default: '#777777'
+  -
+    id: extended-breadcrumb-thread-override-color-dark
+    title: Global override heading thread color (dark mode)
+    type: variable-text
+    default: '#888888'
+  -
+    id: extended-breadcrumb-thread-color-1-enabled
+    title: Enable thread color 1
+    type: class-toggle
+    default: true
+  -
+    id: extended-breadcrumb-thread-color-1
+    title: Thread color 1
+    description: Highlight color for the first nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#d94f00'
+    default-dark: '#ff5a00'
+  -
+    id: extended-breadcrumb-thread-color-2-enabled
+    title: Enable thread color 2
+    type: class-toggle
+    default: true
+  -
+    id: extended-breadcrumb-thread-color-2
+    title: Thread color 2
+    description: Highlight color for the second nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#c99a00'
+    default-dark: '#ffc400'
+  -
+    id: extended-breadcrumb-thread-color-3-enabled
+    title: Enable thread color 3
+    type: class-toggle
+    default: true
+  -
+    id: extended-breadcrumb-thread-color-3
+    title: Thread color 3
+    description: Highlight color for the third nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#79b800'
+    default-dark: '#a8e600'
+  -
+    id: extended-breadcrumb-thread-color-4-enabled
+    title: Enable thread color 4
+    type: class-toggle
+    default: true
+  -
+    id: extended-breadcrumb-thread-color-4
+    title: Thread color 4
+    description: Highlight color for the fourth nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#008ea3'
+    default-dark: '#00c8df'
+  -
+    id: extended-breadcrumb-thread-color-5-enabled
+    title: Enable thread color 5
+    type: class-toggle
+    default: true
+  -
+    id: extended-breadcrumb-thread-color-5
+    title: Thread color 5
+    description: Highlight color for the fifth nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#316fd1'
+    default-dark: '#5794ff'
+  -
+    id: extended-breadcrumb-thread-color-6-enabled
+    title: Enable thread color 6
+    type: class-toggle
+    default: true
+  -
+    id: extended-breadcrumb-thread-color-6
+    title: Thread color 6
+    description: Highlight color for the sixth nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#7547c7'
+    default-dark: '#a66cff'
+  -
+    id: extended-breadcrumb-thread-color-7-enabled
+    title: Enable thread color 7
+    type: class-toggle
+    default: true
+  -
+    id: extended-breadcrumb-thread-color-7
+    title: Thread color 7
+    description: Highlight color for the seventh nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#b83782'
+    default-dark: '#e64fa3'
+  -
+    id: extended-breadcrumb-thread-color-8-enabled
+    title: Enable thread color 8+
+    type: class-toggle
+    default: true
+  -
+    id: extended-breadcrumb-thread-color-8
+    title: Thread color 8+
+    description: Highlight color for the eighth and every deeper nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#b83782'
+    default-dark: '#e64fa3'
+  -
+    id: extended-editor-breadcrumb-appearance
+    title: Editor Pane Breadcrumb Decorations
+    type: heading
+    level: 2
+    collapsed: true
+  -
+    id: extended-editor-breadcrumb-style-overrides
+    title: Customize Editor Pane Breadcrumb Decorations Independently
+    description: When disabled, this pane uses the shared marker, guide, and thread appearance settings above.
+    type: class-toggle
+    default: false
+  -
+    id: extended-editor-breadcrumb-level-marker-appearance
+    title: Heading Level Marker Typography and Appearance
+    type: heading
+    level: 3
+    collapsed: true
+  -
+    id: extended-editor-breadcrumb-level-marker-font-size
+    title: Heading level marker font size
+    description: Relative to the breadcrumb heading text; 1 matches its size
+    type: variable-number-slider
+    default: 1
+    min: 0.5
+    max: 2
+    step: 0.05
+    format: em
+  -
+    id: extended-editor-breadcrumb-level-marker-font-weight
+    title: Heading level marker font weight
+    description: Inherit matches the breadcrumb heading text weight
+    type: variable-select
+    allowEmpty: false
+    default: inherit
+    options:
+      -
+        label: Inherit
+        value: inherit
+      -
+        label: 100
+        value: '100'
+      -
+        label: 200
+        value: '200'
+      -
+        label: 300
+        value: '300'
+      -
+        label: 400
+        value: '400'
+      -
+        label: 500
+        value: '500'
+      -
+        label: 600
+        value: '600'
+      -
+        label: 700
+        value: '700'
+      -
+        label: 800
+        value: '800'
+      -
+        label: 900
+        value: '900'
+  -
+    id: extended-editor-breadcrumb-level-marker-color
+    title: Heading level marker color
+    description: Blank inherits the corresponding breadcrumb heading color
+    type: variable-themed-color
+    format: hex
+    default-light: '#'
+    default-dark: '#'
+  -
+    id: extended-editor-breadcrumb-level-marker-font-style
+    title: Heading level marker font style
+    type: variable-select
+    allowEmpty: false
+    default: inherit
+    options:
+      -
+        label: Inherit
+        value: inherit
+      -
+        label: Normal
+        value: normal
+      -
+        label: Italic
+        value: italic
+  -
+    id: extended-editor-breadcrumb-level-marker-font-variant
+    title: Heading level marker font variant
+    type: variable-select
+    allowEmpty: false
+    default: all-small-caps
+    options:
+      -
+        label: Inherit
+        value: inherit
+      -
+        label: Normal
+        value: normal
+      -
+        label: Small caps
+        value: small-caps
+      -
+        label: All small caps
+        value: all-small-caps
+  -
+    id: extended-editor-breadcrumb-level-marker-letter-spacing
+    title: Heading level marker letter spacing
+    type: variable-number-slider
+    default: 0
+    min: -0.1
+    max: 0.3
+    step: 0.01
+    format: em
+  -
+    id: extended-editor-breadcrumb-level-marker-opacity
+    title: Heading level marker opacity
+    type: variable-number-slider
+    default: 1
+    min: 0.05
+    max: 1
+    step: 0.05
+  -
+    id: extended-editor-breadcrumb-level-marker-width
+    title: Heading level marker width
+    description: Reserved width for the complete H1–H12 label
+    type: variable-number-slider
+    default: 3
+    min: 2
+    max: 8
+    step: 0.1
+    format: ch
+  -
+    id: extended-editor-breadcrumb-level-marker-gap
+    title: Gap after heading level marker
+    type: variable-number-slider
+    default: 0.35
+    min: 0
+    max: 2
+    step: 0.05
+    format: em
+  -
+    id: extended-editor-breadcrumb-guide-appearance
+    title: Heading Static Tree Indentation Guide Appearance
+    type: heading
+    level: 3
+    collapsed: true
+  -
+    id: extended-editor-breadcrumb-guide-color
+    title: Guide color
+    description: Color of breadcrumb heading-tree vertical spines and horizontal connectors
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#777777'
+    default-dark: '#888888'
+  -
+    id: extended-editor-breadcrumb-guide-opacity
+    title: Guide opacity
+    type: variable-number-slider
+    default: 0.72
+    min: 0.05
+    max: 1
+    step: 0.05
+  -
+    id: extended-editor-breadcrumb-guide-thickness
+    title: Guide thickness
+    type: variable-number-slider
+    default: 1.5
+    min: 0.5
+    max: 6
+    step: 0.1
+    format: px
+  -
+    id: extended-editor-breadcrumb-guide-pattern
+    title: Guide pattern
+    type: class-select
+    allowEmpty: false
+    default: extended-editor-breadcrumb-guide-line-solid
+    options:
+      -
+        label: Solid
+        value: extended-editor-breadcrumb-guide-line-solid
+      -
+        label: Dashed
+        value: extended-editor-breadcrumb-guide-line-dashed
+      -
+        label: Dotted
+        value: extended-editor-breadcrumb-guide-line-dotted
+  -
+    id: extended-editor-breadcrumb-guide-dash-length
+    title: Dashed-line dash length
+    type: variable-number-slider
+    default: 6
+    min: 0.5
+    max: 24
+    step: 0.5
+    format: px
+  -
+    id: extended-editor-breadcrumb-guide-dash-gap
+    title: Dashed-line gap
+    type: variable-number-slider
+    default: 4
+    min: 0.5
+    max: 24
+    step: 0.5
+    format: px
+  -
+    id: extended-editor-breadcrumb-guide-dot-gap
+    title: Dotted-line gap
+    type: variable-number-slider
+    default: 4
+    min: 0.5
+    max: 24
+    step: 0.5
+    format: px
+  -
+    id: extended-editor-breadcrumb-guide-geometry
+    title: Heading Static Tree Indentation Guide Geometry
+    type: heading
+    level: 4
+    collapsed: true
+  -
+    id: extended-editor-breadcrumb-guide-connector-length
+    title: Horizontal connector length
+    type: variable-number-slider
+    default: 18
+    min: 4
+    max: 48
+    step: 1
+    format: px
+  -
+    id: extended-editor-breadcrumb-guide-marker-gap
+    title: Gap before heading marker or text
+    type: variable-number-slider
+    default: 4
+    min: 0
+    max: 24
+    step: 1
+    format: px
+  -
+    id: extended-editor-breadcrumb-guide-first-branch-rise
+    title: First-branch vertical rise
+    type: variable-number-slider
+    default: 10
+    min: 0
+    max: 40
+    step: 1
+    format: px
+  -
+    id: extended-editor-breadcrumb-guide-connector-offset
+    title: Connector vertical offset
+    type: variable-number-slider
+    default: 0
+    min: -12
+    max: 12
+    step: 0.5
+    format: px
+  -
+    id: extended-editor-breadcrumb-thread-appearance
+    title: Heading Thread Appearance (All Tree Types)
+    description: Applies to individual H1 trees, the virtual root-level H1 tree, orphan H2–H12 trees, and the combined root-level ⟺ orphan tree
+    type: heading
+    level: 3
+    collapsed: true
+  -
+    id: extended-editor-breadcrumb-thread-opacity
+    title: Thread opacity
+    type: variable-number-slider
+    default: 1
+    min: 0.05
+    max: 1
+    step: 0.05
+  -
+    id: extended-editor-breadcrumb-thread-thickness
+    title: Thread thickness
+    type: variable-number-slider
+    default: 4
+    min: 0.5
+    max: 12
+    step: 0.1
+    format: px
+  -
+    id: extended-editor-breadcrumb-thread-corner-radius
+    title: Thread corner radius
+    type: variable-number-slider
+    default: 8
+    min: 0
+    max: 32
+    step: 0.5
+    format: px
+  -
+    id: extended-editor-breadcrumb-thread-line-cap
+    title: Thread line cap
+    type: class-select
+    allowEmpty: false
+    default: extended-editor-breadcrumb-thread-cap-round
+    options:
+      -
+        label: Round
+        value: extended-editor-breadcrumb-thread-cap-round
+      -
+        label: Square
+        value: extended-editor-breadcrumb-thread-cap-square
+      -
+        label: Flat
+        value: extended-editor-breadcrumb-thread-cap-flat
+  -
+    id: extended-editor-breadcrumb-thread-geometry
+    title: Heading Thread Geometry (All Tree Types)
+    description: Applies to individual H1 trees, the virtual root-level H1 tree, orphan H2–H12 trees, and the combined root-level ⟺ orphan tree
+    type: heading
+    level: 4
+    collapsed: true
+  -
+    id: extended-editor-breadcrumb-thread-connector-length
+    title: Thread connector length
+    type: variable-number-slider
+    default: 28
+    min: 4
+    max: 96
+    step: 1
+    format: px
+  -
+    id: extended-editor-breadcrumb-thread-marker-gap
+    title: Thread marker gap
+    type: variable-number-slider
+    default: 4
+    min: 0
+    max: 32
+    step: 0.5
+    format: px
+  -
+    id: extended-editor-breadcrumb-thread-vertical-offset
+    title: Thread vertical offset
+    type: variable-number-slider
+    default: 0
+    min: -16
+    max: 16
+    step: 0.5
+    format: px
+  -
+    id: extended-editor-breadcrumb-thread-colors
+    title: Heading Thread Colors (All Tree Types)
+    description: Applies to individual H1 trees, the virtual root-level H1 tree, orphan H2–H12 trees, and the combined root-level ⟺ orphan tree
+    type: heading
+    level: 4
+    collapsed: true
+  -
+    id: extended-editor-breadcrumb-thread-fallback-colors-enabled
+    title: Global Fallback Heading Thread Colors
+    description: Use the fallback color whenever an individual heading thread color is disabled
+    type: class-toggle
+    default: true
+  -
+    id: extended-editor-breadcrumb-thread-fallback-color-light
+    title: Global fallback heading thread color (light mode)
+    type: variable-text
+    default: '#777777'
+  -
+    id: extended-editor-breadcrumb-thread-fallback-color-dark
+    title: Global fallback heading thread color (dark mode)
+    type: variable-text
+    default: '#888888'
+  -
+    id: extended-editor-breadcrumb-thread-override-colors-enabled
+    title: Global Override Heading Thread Colors
+    description: Override every heading thread color regardless of its individual enablement toggle
+    type: class-toggle
+    default: false
+  -
+    id: extended-editor-breadcrumb-thread-override-color-light
+    title: Global override heading thread color (light mode)
+    type: variable-text
+    default: '#777777'
+  -
+    id: extended-editor-breadcrumb-thread-override-color-dark
+    title: Global override heading thread color (dark mode)
+    type: variable-text
+    default: '#888888'
+  -
+    id: extended-editor-breadcrumb-thread-color-1-enabled
+    title: Enable thread color 1
+    type: class-toggle
+    default: true
+  -
+    id: extended-editor-breadcrumb-thread-color-1
+    title: Thread color 1
+    description: Highlight color for the first nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#d94f00'
+    default-dark: '#ff5a00'
+  -
+    id: extended-editor-breadcrumb-thread-color-2-enabled
+    title: Enable thread color 2
+    type: class-toggle
+    default: true
+  -
+    id: extended-editor-breadcrumb-thread-color-2
+    title: Thread color 2
+    description: Highlight color for the second nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#c99a00'
+    default-dark: '#ffc400'
+  -
+    id: extended-editor-breadcrumb-thread-color-3-enabled
+    title: Enable thread color 3
+    type: class-toggle
+    default: true
+  -
+    id: extended-editor-breadcrumb-thread-color-3
+    title: Thread color 3
+    description: Highlight color for the third nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#79b800'
+    default-dark: '#a8e600'
+  -
+    id: extended-editor-breadcrumb-thread-color-4-enabled
+    title: Enable thread color 4
+    type: class-toggle
+    default: true
+  -
+    id: extended-editor-breadcrumb-thread-color-4
+    title: Thread color 4
+    description: Highlight color for the fourth nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#008ea3'
+    default-dark: '#00c8df'
+  -
+    id: extended-editor-breadcrumb-thread-color-5-enabled
+    title: Enable thread color 5
+    type: class-toggle
+    default: true
+  -
+    id: extended-editor-breadcrumb-thread-color-5
+    title: Thread color 5
+    description: Highlight color for the fifth nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#316fd1'
+    default-dark: '#5794ff'
+  -
+    id: extended-editor-breadcrumb-thread-color-6-enabled
+    title: Enable thread color 6
+    type: class-toggle
+    default: true
+  -
+    id: extended-editor-breadcrumb-thread-color-6
+    title: Thread color 6
+    description: Highlight color for the sixth nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#7547c7'
+    default-dark: '#a66cff'
+  -
+    id: extended-editor-breadcrumb-thread-color-7-enabled
+    title: Enable thread color 7
+    type: class-toggle
+    default: true
+  -
+    id: extended-editor-breadcrumb-thread-color-7
+    title: Thread color 7
+    description: Highlight color for the seventh nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#b83782'
+    default-dark: '#e64fa3'
+  -
+    id: extended-editor-breadcrumb-thread-color-8-enabled
+    title: Enable thread color 8+
+    type: class-toggle
+    default: true
+  -
+    id: extended-editor-breadcrumb-thread-color-8
+    title: Thread color 8+
+    description: Highlight color for the eighth and every deeper nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#b83782'
+    default-dark: '#e64fa3'
+  -
+    id: extended-outline-breadcrumb-appearance
+    title: Outline Pane Breadcrumb Decorations
+    type: heading
+    level: 2
+    collapsed: true
+  -
+    id: extended-outline-breadcrumb-style-overrides
+    title: Customize Outline Pane Breadcrumb Decorations Independently
+    description: When disabled, this pane uses the shared marker, guide, and thread appearance settings above.
+    type: class-toggle
+    default: false
+  -
+    id: extended-outline-breadcrumb-level-marker-appearance
+    title: Heading Level Marker Typography and Appearance
+    type: heading
+    level: 3
+    collapsed: true
+  -
+    id: extended-outline-breadcrumb-level-marker-font-size
+    title: Heading level marker font size
+    description: Relative to the breadcrumb heading text; 1 matches its size
+    type: variable-number-slider
+    default: 1
+    min: 0.5
+    max: 2
+    step: 0.05
+    format: em
+  -
+    id: extended-outline-breadcrumb-level-marker-font-weight
+    title: Heading level marker font weight
+    description: Inherit matches the breadcrumb heading text weight
+    type: variable-select
+    allowEmpty: false
+    default: inherit
+    options:
+      -
+        label: Inherit
+        value: inherit
+      -
+        label: 100
+        value: '100'
+      -
+        label: 200
+        value: '200'
+      -
+        label: 300
+        value: '300'
+      -
+        label: 400
+        value: '400'
+      -
+        label: 500
+        value: '500'
+      -
+        label: 600
+        value: '600'
+      -
+        label: 700
+        value: '700'
+      -
+        label: 800
+        value: '800'
+      -
+        label: 900
+        value: '900'
+  -
+    id: extended-outline-breadcrumb-level-marker-color
+    title: Heading level marker color
+    description: Blank inherits the corresponding breadcrumb heading color
+    type: variable-themed-color
+    format: hex
+    default-light: '#'
+    default-dark: '#'
+  -
+    id: extended-outline-breadcrumb-level-marker-font-style
+    title: Heading level marker font style
+    type: variable-select
+    allowEmpty: false
+    default: inherit
+    options:
+      -
+        label: Inherit
+        value: inherit
+      -
+        label: Normal
+        value: normal
+      -
+        label: Italic
+        value: italic
+  -
+    id: extended-outline-breadcrumb-level-marker-font-variant
+    title: Heading level marker font variant
+    type: variable-select
+    allowEmpty: false
+    default: all-small-caps
+    options:
+      -
+        label: Inherit
+        value: inherit
+      -
+        label: Normal
+        value: normal
+      -
+        label: Small caps
+        value: small-caps
+      -
+        label: All small caps
+        value: all-small-caps
+  -
+    id: extended-outline-breadcrumb-level-marker-letter-spacing
+    title: Heading level marker letter spacing
+    type: variable-number-slider
+    default: 0
+    min: -0.1
+    max: 0.3
+    step: 0.01
+    format: em
+  -
+    id: extended-outline-breadcrumb-level-marker-opacity
+    title: Heading level marker opacity
+    type: variable-number-slider
+    default: 1
+    min: 0.05
+    max: 1
+    step: 0.05
+  -
+    id: extended-outline-breadcrumb-level-marker-width
+    title: Heading level marker width
+    description: Reserved width for the complete H1–H12 label
+    type: variable-number-slider
+    default: 3
+    min: 2
+    max: 8
+    step: 0.1
+    format: ch
+  -
+    id: extended-outline-breadcrumb-level-marker-gap
+    title: Gap after heading level marker
+    type: variable-number-slider
+    default: 0.35
+    min: 0
+    max: 2
+    step: 0.05
+    format: em
+  -
+    id: extended-outline-breadcrumb-guide-appearance
+    title: Heading Static Tree Indentation Guide Appearance
+    type: heading
+    level: 3
+    collapsed: true
+  -
+    id: extended-outline-breadcrumb-guide-color
+    title: Guide color
+    description: Color of breadcrumb heading-tree vertical spines and horizontal connectors
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#777777'
+    default-dark: '#888888'
+  -
+    id: extended-outline-breadcrumb-guide-opacity
+    title: Guide opacity
+    type: variable-number-slider
+    default: 0.72
+    min: 0.05
+    max: 1
+    step: 0.05
+  -
+    id: extended-outline-breadcrumb-guide-thickness
+    title: Guide thickness
+    type: variable-number-slider
+    default: 1.5
+    min: 0.5
+    max: 6
+    step: 0.1
+    format: px
+  -
+    id: extended-outline-breadcrumb-guide-pattern
+    title: Guide pattern
+    type: class-select
+    allowEmpty: false
+    default: extended-outline-breadcrumb-guide-line-solid
+    options:
+      -
+        label: Solid
+        value: extended-outline-breadcrumb-guide-line-solid
+      -
+        label: Dashed
+        value: extended-outline-breadcrumb-guide-line-dashed
+      -
+        label: Dotted
+        value: extended-outline-breadcrumb-guide-line-dotted
+  -
+    id: extended-outline-breadcrumb-guide-dash-length
+    title: Dashed-line dash length
+    type: variable-number-slider
+    default: 6
+    min: 0.5
+    max: 24
+    step: 0.5
+    format: px
+  -
+    id: extended-outline-breadcrumb-guide-dash-gap
+    title: Dashed-line gap
+    type: variable-number-slider
+    default: 4
+    min: 0.5
+    max: 24
+    step: 0.5
+    format: px
+  -
+    id: extended-outline-breadcrumb-guide-dot-gap
+    title: Dotted-line gap
+    type: variable-number-slider
+    default: 4
+    min: 0.5
+    max: 24
+    step: 0.5
+    format: px
+  -
+    id: extended-outline-breadcrumb-guide-geometry
+    title: Heading Static Tree Indentation Guide Geometry
+    type: heading
+    level: 4
+    collapsed: true
+  -
+    id: extended-outline-breadcrumb-guide-connector-length
+    title: Horizontal connector length
+    type: variable-number-slider
+    default: 18
+    min: 4
+    max: 48
+    step: 1
+    format: px
+  -
+    id: extended-outline-breadcrumb-guide-marker-gap
+    title: Gap before heading marker or text
+    type: variable-number-slider
+    default: 4
+    min: 0
+    max: 24
+    step: 1
+    format: px
+  -
+    id: extended-outline-breadcrumb-guide-first-branch-rise
+    title: First-branch vertical rise
+    type: variable-number-slider
+    default: 10
+    min: 0
+    max: 40
+    step: 1
+    format: px
+  -
+    id: extended-outline-breadcrumb-guide-connector-offset
+    title: Connector vertical offset
+    type: variable-number-slider
+    default: 0
+    min: -12
+    max: 12
+    step: 0.5
+    format: px
+  -
+    id: extended-outline-breadcrumb-thread-appearance
+    title: Heading Thread Appearance (All Tree Types)
+    description: Applies to individual H1 trees, the virtual root-level H1 tree, orphan H2–H12 trees, and the combined root-level ⟺ orphan tree
+    type: heading
+    level: 3
+    collapsed: true
+  -
+    id: extended-outline-breadcrumb-thread-opacity
+    title: Thread opacity
+    type: variable-number-slider
+    default: 1
+    min: 0.05
+    max: 1
+    step: 0.05
+  -
+    id: extended-outline-breadcrumb-thread-thickness
+    title: Thread thickness
+    type: variable-number-slider
+    default: 4
+    min: 0.5
+    max: 12
+    step: 0.1
+    format: px
+  -
+    id: extended-outline-breadcrumb-thread-corner-radius
+    title: Thread corner radius
+    type: variable-number-slider
+    default: 8
+    min: 0
+    max: 32
+    step: 0.5
+    format: px
+  -
+    id: extended-outline-breadcrumb-thread-line-cap
+    title: Thread line cap
+    type: class-select
+    allowEmpty: false
+    default: extended-outline-breadcrumb-thread-cap-round
+    options:
+      -
+        label: Round
+        value: extended-outline-breadcrumb-thread-cap-round
+      -
+        label: Square
+        value: extended-outline-breadcrumb-thread-cap-square
+      -
+        label: Flat
+        value: extended-outline-breadcrumb-thread-cap-flat
+  -
+    id: extended-outline-breadcrumb-thread-geometry
+    title: Heading Thread Geometry (All Tree Types)
+    description: Applies to individual H1 trees, the virtual root-level H1 tree, orphan H2–H12 trees, and the combined root-level ⟺ orphan tree
+    type: heading
+    level: 4
+    collapsed: true
+  -
+    id: extended-outline-breadcrumb-thread-connector-length
+    title: Thread connector length
+    type: variable-number-slider
+    default: 28
+    min: 4
+    max: 96
+    step: 1
+    format: px
+  -
+    id: extended-outline-breadcrumb-thread-marker-gap
+    title: Thread marker gap
+    type: variable-number-slider
+    default: 4
+    min: 0
+    max: 32
+    step: 0.5
+    format: px
+  -
+    id: extended-outline-breadcrumb-thread-vertical-offset
+    title: Thread vertical offset
+    type: variable-number-slider
+    default: 0
+    min: -16
+    max: 16
+    step: 0.5
+    format: px
+  -
+    id: extended-outline-breadcrumb-thread-colors
+    title: Heading Thread Colors (All Tree Types)
+    description: Applies to individual H1 trees, the virtual root-level H1 tree, orphan H2–H12 trees, and the combined root-level ⟺ orphan tree
+    type: heading
+    level: 4
+    collapsed: true
+  -
+    id: extended-outline-breadcrumb-thread-fallback-colors-enabled
+    title: Global Fallback Heading Thread Colors
+    description: Use the fallback color whenever an individual heading thread color is disabled
+    type: class-toggle
+    default: true
+  -
+    id: extended-outline-breadcrumb-thread-fallback-color-light
+    title: Global fallback heading thread color (light mode)
+    type: variable-text
+    default: '#777777'
+  -
+    id: extended-outline-breadcrumb-thread-fallback-color-dark
+    title: Global fallback heading thread color (dark mode)
+    type: variable-text
+    default: '#888888'
+  -
+    id: extended-outline-breadcrumb-thread-override-colors-enabled
+    title: Global Override Heading Thread Colors
+    description: Override every heading thread color regardless of its individual enablement toggle
+    type: class-toggle
+    default: false
+  -
+    id: extended-outline-breadcrumb-thread-override-color-light
+    title: Global override heading thread color (light mode)
+    type: variable-text
+    default: '#777777'
+  -
+    id: extended-outline-breadcrumb-thread-override-color-dark
+    title: Global override heading thread color (dark mode)
+    type: variable-text
+    default: '#888888'
+  -
+    id: extended-outline-breadcrumb-thread-color-1-enabled
+    title: Enable thread color 1
+    type: class-toggle
+    default: true
+  -
+    id: extended-outline-breadcrumb-thread-color-1
+    title: Thread color 1
+    description: Highlight color for the first nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#d94f00'
+    default-dark: '#ff5a00'
+  -
+    id: extended-outline-breadcrumb-thread-color-2-enabled
+    title: Enable thread color 2
+    type: class-toggle
+    default: true
+  -
+    id: extended-outline-breadcrumb-thread-color-2
+    title: Thread color 2
+    description: Highlight color for the second nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#c99a00'
+    default-dark: '#ffc400'
+  -
+    id: extended-outline-breadcrumb-thread-color-3-enabled
+    title: Enable thread color 3
+    type: class-toggle
+    default: true
+  -
+    id: extended-outline-breadcrumb-thread-color-3
+    title: Thread color 3
+    description: Highlight color for the third nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#79b800'
+    default-dark: '#a8e600'
+  -
+    id: extended-outline-breadcrumb-thread-color-4-enabled
+    title: Enable thread color 4
+    type: class-toggle
+    default: true
+  -
+    id: extended-outline-breadcrumb-thread-color-4
+    title: Thread color 4
+    description: Highlight color for the fourth nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#008ea3'
+    default-dark: '#00c8df'
+  -
+    id: extended-outline-breadcrumb-thread-color-5-enabled
+    title: Enable thread color 5
+    type: class-toggle
+    default: true
+  -
+    id: extended-outline-breadcrumb-thread-color-5
+    title: Thread color 5
+    description: Highlight color for the fifth nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#316fd1'
+    default-dark: '#5794ff'
+  -
+    id: extended-outline-breadcrumb-thread-color-6-enabled
+    title: Enable thread color 6
+    type: class-toggle
+    default: true
+  -
+    id: extended-outline-breadcrumb-thread-color-6
+    title: Thread color 6
+    description: Highlight color for the sixth nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#7547c7'
+    default-dark: '#a66cff'
+  -
+    id: extended-outline-breadcrumb-thread-color-7-enabled
+    title: Enable thread color 7
+    type: class-toggle
+    default: true
+  -
+    id: extended-outline-breadcrumb-thread-color-7
+    title: Thread color 7
+    description: Highlight color for the seventh nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#b83782'
+    default-dark: '#e64fa3'
+  -
+    id: extended-outline-breadcrumb-thread-color-8-enabled
+    title: Enable thread color 8+
+    type: class-toggle
+    default: true
+  -
+    id: extended-outline-breadcrumb-thread-color-8
+    title: Thread color 8+
+    description: Highlight color for the eighth and every deeper nested heading edge
+    type: variable-themed-color
+    format: hex
+    opacity: false
+    default-light: '#b83782'
+    default-dark: '#e64fa3'
 */
 
 body {
@@ -1873,3 +3686,1191 @@ body:not(.extended-headings-markers-before) .cm-extended-heading-gutter { order:
 .extended-outline-level-10,
 .extended-outline-level-11,
 .extended-outline-level-12 { color: var(--text-faint); }
+
+/* Heading Hover Breadcrumb. Appearance and dismissal behavior adapted from
+   Nested Properties Advanced 2.0.0; see THIRD-PARTY-NOTICES.md. */
+body {
+  --extended-breadcrumb-level-marker-font-size: 1em;
+  --extended-breadcrumb-level-marker-font-weight: inherit;
+  --extended-breadcrumb-level-marker-color: inherit;
+  --extended-breadcrumb-level-marker-font-style: inherit;
+  --extended-breadcrumb-level-marker-font-variant: all-small-caps;
+  --extended-breadcrumb-level-marker-letter-spacing: 0em;
+  --extended-breadcrumb-level-marker-opacity: 1;
+  --extended-breadcrumb-level-marker-width: 3ch;
+  --extended-breadcrumb-level-marker-gap: 0.35em;
+  --extended-breadcrumb-guide-color: var(--text-muted);
+  --extended-breadcrumb-guide-opacity: 0.72;
+  --extended-breadcrumb-guide-thickness: 1.5px;
+  --extended-breadcrumb-guide-dash-length: 6px;
+  --extended-breadcrumb-guide-dash-gap: 4px;
+  --extended-breadcrumb-guide-dot-gap: 4px;
+  --extended-breadcrumb-guide-connector-length: 18px;
+  --extended-breadcrumb-guide-marker-gap: 4px;
+  --extended-breadcrumb-guide-first-branch-rise: 10px;
+  --extended-breadcrumb-guide-connector-offset: 0px;
+  --extended-breadcrumb-thread-opacity: 1;
+  --extended-breadcrumb-thread-thickness: 4px;
+  --extended-breadcrumb-thread-corner-radius: 8px;
+  --extended-breadcrumb-thread-connector-length: 28px;
+  --extended-breadcrumb-thread-marker-gap: 4px;
+  --extended-breadcrumb-thread-vertical-offset: 0px;
+  --extended-breadcrumb-thread-color-1: #ff5a00;
+  --extended-breadcrumb-thread-color-2: #ffc400;
+  --extended-breadcrumb-thread-color-3: #a8e600;
+  --extended-breadcrumb-thread-color-4: #00c8df;
+  --extended-breadcrumb-thread-color-5: #5794ff;
+  --extended-breadcrumb-thread-color-6: #a66cff;
+  --extended-breadcrumb-thread-color-7: #e64fa3;
+  --extended-breadcrumb-thread-color-8: #e64fa3;
+  --extended-breadcrumb-thread-fallback-color-light: #777777;
+  --extended-breadcrumb-thread-fallback-color-dark: #888888;
+  --extended-breadcrumb-thread-fallback-color: var(
+    --extended-breadcrumb-thread-fallback-color-dark
+  );
+  --extended-breadcrumb-thread-override-color-light: #777777;
+  --extended-breadcrumb-thread-override-color-dark: #888888;
+  --extended-breadcrumb-thread-override-color: var(
+    --extended-breadcrumb-thread-override-color-dark
+  );
+  --extended-breadcrumb-thread-effective-color-1: var(
+    --extended-breadcrumb-thread-color-1
+  );
+  --extended-breadcrumb-thread-effective-color-2: var(
+    --extended-breadcrumb-thread-color-2
+  );
+  --extended-breadcrumb-thread-effective-color-3: var(
+    --extended-breadcrumb-thread-color-3
+  );
+  --extended-breadcrumb-thread-effective-color-4: var(
+    --extended-breadcrumb-thread-color-4
+  );
+  --extended-breadcrumb-thread-effective-color-5: var(
+    --extended-breadcrumb-thread-color-5
+  );
+  --extended-breadcrumb-thread-effective-color-6: var(
+    --extended-breadcrumb-thread-color-6
+  );
+  --extended-breadcrumb-thread-effective-color-7: var(
+    --extended-breadcrumb-thread-color-7
+  );
+  --extended-breadcrumb-thread-effective-color-8: var(
+    --extended-breadcrumb-thread-color-8
+  );
+}
+
+body.theme-light {
+  --extended-breadcrumb-thread-fallback-color: var(
+    --extended-breadcrumb-thread-fallback-color-light
+  );
+  --extended-breadcrumb-thread-override-color: var(
+    --extended-breadcrumb-thread-override-color-light
+  );
+}
+
+body:is(
+    .extended-breadcrumb-thread-cap-round,
+    .extended-breadcrumb-thread-cap-square,
+    .extended-breadcrumb-thread-cap-flat
+  ):not(.extended-breadcrumb-thread-color-1-enabled) {
+  --extended-breadcrumb-thread-effective-color-1: transparent;
+}
+
+body:is(
+    .extended-breadcrumb-thread-cap-round,
+    .extended-breadcrumb-thread-cap-square,
+    .extended-breadcrumb-thread-cap-flat
+  ):not(.extended-breadcrumb-thread-color-2-enabled) {
+  --extended-breadcrumb-thread-effective-color-2: transparent;
+}
+
+body:is(
+    .extended-breadcrumb-thread-cap-round,
+    .extended-breadcrumb-thread-cap-square,
+    .extended-breadcrumb-thread-cap-flat
+  ):not(.extended-breadcrumb-thread-color-3-enabled) {
+  --extended-breadcrumb-thread-effective-color-3: transparent;
+}
+
+body:is(
+    .extended-breadcrumb-thread-cap-round,
+    .extended-breadcrumb-thread-cap-square,
+    .extended-breadcrumb-thread-cap-flat
+  ):not(.extended-breadcrumb-thread-color-4-enabled) {
+  --extended-breadcrumb-thread-effective-color-4: transparent;
+}
+
+body:is(
+    .extended-breadcrumb-thread-cap-round,
+    .extended-breadcrumb-thread-cap-square,
+    .extended-breadcrumb-thread-cap-flat
+  ):not(.extended-breadcrumb-thread-color-5-enabled) {
+  --extended-breadcrumb-thread-effective-color-5: transparent;
+}
+
+body:is(
+    .extended-breadcrumb-thread-cap-round,
+    .extended-breadcrumb-thread-cap-square,
+    .extended-breadcrumb-thread-cap-flat
+  ):not(.extended-breadcrumb-thread-color-6-enabled) {
+  --extended-breadcrumb-thread-effective-color-6: transparent;
+}
+
+body:is(
+    .extended-breadcrumb-thread-cap-round,
+    .extended-breadcrumb-thread-cap-square,
+    .extended-breadcrumb-thread-cap-flat
+  ):not(.extended-breadcrumb-thread-color-7-enabled) {
+  --extended-breadcrumb-thread-effective-color-7: transparent;
+}
+
+body:is(
+    .extended-breadcrumb-thread-cap-round,
+    .extended-breadcrumb-thread-cap-square,
+    .extended-breadcrumb-thread-cap-flat
+  ):not(.extended-breadcrumb-thread-color-8-enabled) {
+  --extended-breadcrumb-thread-effective-color-8: transparent;
+}
+
+body:is(
+    .extended-breadcrumb-thread-cap-round,
+    .extended-breadcrumb-thread-cap-square,
+    .extended-breadcrumb-thread-cap-flat
+  ).extended-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-breadcrumb-thread-color-1-enabled
+  ) {
+  --extended-breadcrumb-thread-effective-color-1: var(
+    --extended-breadcrumb-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-breadcrumb-thread-cap-round,
+    .extended-breadcrumb-thread-cap-square,
+    .extended-breadcrumb-thread-cap-flat
+  ).extended-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-breadcrumb-thread-color-2-enabled
+  ) {
+  --extended-breadcrumb-thread-effective-color-2: var(
+    --extended-breadcrumb-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-breadcrumb-thread-cap-round,
+    .extended-breadcrumb-thread-cap-square,
+    .extended-breadcrumb-thread-cap-flat
+  ).extended-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-breadcrumb-thread-color-3-enabled
+  ) {
+  --extended-breadcrumb-thread-effective-color-3: var(
+    --extended-breadcrumb-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-breadcrumb-thread-cap-round,
+    .extended-breadcrumb-thread-cap-square,
+    .extended-breadcrumb-thread-cap-flat
+  ).extended-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-breadcrumb-thread-color-4-enabled
+  ) {
+  --extended-breadcrumb-thread-effective-color-4: var(
+    --extended-breadcrumb-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-breadcrumb-thread-cap-round,
+    .extended-breadcrumb-thread-cap-square,
+    .extended-breadcrumb-thread-cap-flat
+  ).extended-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-breadcrumb-thread-color-5-enabled
+  ) {
+  --extended-breadcrumb-thread-effective-color-5: var(
+    --extended-breadcrumb-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-breadcrumb-thread-cap-round,
+    .extended-breadcrumb-thread-cap-square,
+    .extended-breadcrumb-thread-cap-flat
+  ).extended-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-breadcrumb-thread-color-6-enabled
+  ) {
+  --extended-breadcrumb-thread-effective-color-6: var(
+    --extended-breadcrumb-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-breadcrumb-thread-cap-round,
+    .extended-breadcrumb-thread-cap-square,
+    .extended-breadcrumb-thread-cap-flat
+  ).extended-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-breadcrumb-thread-color-7-enabled
+  ) {
+  --extended-breadcrumb-thread-effective-color-7: var(
+    --extended-breadcrumb-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-breadcrumb-thread-cap-round,
+    .extended-breadcrumb-thread-cap-square,
+    .extended-breadcrumb-thread-cap-flat
+  ).extended-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-breadcrumb-thread-color-8-enabled
+  ) {
+  --extended-breadcrumb-thread-effective-color-8: var(
+    --extended-breadcrumb-thread-fallback-color
+  );
+}
+
+body.extended-breadcrumb-thread-override-colors-enabled {
+  --extended-breadcrumb-thread-effective-color-1: var(
+    --extended-breadcrumb-thread-override-color
+  );
+  --extended-breadcrumb-thread-effective-color-2: var(
+    --extended-breadcrumb-thread-override-color
+  );
+  --extended-breadcrumb-thread-effective-color-3: var(
+    --extended-breadcrumb-thread-override-color
+  );
+  --extended-breadcrumb-thread-effective-color-4: var(
+    --extended-breadcrumb-thread-override-color
+  );
+  --extended-breadcrumb-thread-effective-color-5: var(
+    --extended-breadcrumb-thread-override-color
+  );
+  --extended-breadcrumb-thread-effective-color-6: var(
+    --extended-breadcrumb-thread-override-color
+  );
+  --extended-breadcrumb-thread-effective-color-7: var(
+    --extended-breadcrumb-thread-override-color
+  );
+  --extended-breadcrumb-thread-effective-color-8: var(
+    --extended-breadcrumb-thread-override-color
+  );
+}
+
+body {
+  --extended-breadcrumb-main-color: #7aa2f7;
+  --extended-breadcrumb-main-opacity: 0.18;
+  --extended-breadcrumb-main-radius: 4px;
+  --extended-breadcrumb-main-outline-thickness: 1px;
+  --extended-breadcrumb-main-outline-opacity: 0.55;
+  --extended-breadcrumb-main-outline-offset: 1px;
+  --extended-breadcrumb-background: #202225;
+  --extended-breadcrumb-border-color: #46484d;
+  --extended-breadcrumb-text-color: #dcddde;
+  --extended-breadcrumb-title-color: #a7a9ad;
+  --extended-breadcrumb-current-color: #7aa2f7;
+  --extended-breadcrumb-hover-color: #343b4a;
+  --extended-breadcrumb-min-width: 320px;
+  --extended-breadcrumb-max-width: 560px;
+  --extended-breadcrumb-max-height: 400px;
+  --extended-breadcrumb-padding: 10px;
+  --extended-breadcrumb-row-gap: 2px;
+  --extended-breadcrumb-indent: 18px;
+  --extended-breadcrumb-row-padding-x: 6px;
+  --extended-breadcrumb-row-padding-y: 4px;
+  --extended-breadcrumb-font-size: 13px;
+  --extended-breadcrumb-font-weight: 400;
+  --extended-breadcrumb-line-height: 1.35;
+  --extended-breadcrumb-title-size: 11px;
+  --extended-breadcrumb-title-weight: 600;
+  --extended-breadcrumb-title-letter-spacing: 0.03em;
+  --extended-breadcrumb-title-gap: 6px;
+  --extended-breadcrumb-current-background-opacity: 14;
+  --extended-breadcrumb-border-thickness: 1px;
+  --extended-breadcrumb-radius: 8px;
+  --extended-breadcrumb-shadow-y: 4px;
+  --extended-breadcrumb-shadow-blur: 18px;
+  --extended-breadcrumb-shadow-opacity: 0.25;
+  --extended-breadcrumb-anchor-gap: 8px;
+  --extended-breadcrumb-viewport-gap: 8px;
+}
+
+body.theme-light {
+  --extended-breadcrumb-main-color: #4c78cc;
+  --extended-breadcrumb-background: #ffffff;
+  --extended-breadcrumb-border-color: #d7d7d7;
+  --extended-breadcrumb-text-color: #252525;
+  --extended-breadcrumb-title-color: #666666;
+  --extended-breadcrumb-current-color: #4c78cc;
+  --extended-breadcrumb-hover-color: #e7edf8;
+}
+.extended-breadcrumb-level-marker {
+  box-sizing: border-box;
+  color: var(--extended-breadcrumb-level-marker-color);
+  flex: 0 0 var(--extended-breadcrumb-level-marker-width);
+  font-family: inherit;
+  font-size: var(--extended-breadcrumb-level-marker-font-size);
+  font-style: var(--extended-breadcrumb-level-marker-font-style);
+  font-variant: var(--extended-breadcrumb-level-marker-font-variant);
+  font-weight: var(--extended-breadcrumb-level-marker-font-weight);
+  letter-spacing: var(--extended-breadcrumb-level-marker-letter-spacing);
+  margin-inline-end: var(--extended-breadcrumb-level-marker-gap);
+  opacity: var(--extended-breadcrumb-level-marker-opacity);
+  text-align: end;
+  white-space: nowrap;
+  width: var(--extended-breadcrumb-level-marker-width);
+}
+
+.extended-breadcrumb-guide-path {
+  fill: none;
+  stroke: var(--extended-breadcrumb-guide-color);
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  stroke-opacity: var(--extended-breadcrumb-guide-opacity);
+  stroke-width: var(--extended-breadcrumb-guide-thickness);
+  vector-effect: non-scaling-stroke;
+}
+
+.extended-breadcrumb-guide-line-dashed .extended-breadcrumb-guide-path {
+  stroke-dasharray: var(--extended-breadcrumb-guide-dash-length)
+    var(--extended-breadcrumb-guide-dash-gap);
+}
+
+.extended-breadcrumb-guide-line-dotted .extended-breadcrumb-guide-path {
+  stroke-dasharray: 0.01 var(--extended-breadcrumb-guide-dot-gap);
+  stroke-linecap: round;
+}
+
+.extended-breadcrumb-thread-path {
+  fill: none;
+  opacity: var(--extended-breadcrumb-thread-opacity);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: var(--extended-breadcrumb-thread-thickness);
+  vector-effect: non-scaling-stroke;
+}
+
+.extended-breadcrumb-thread-cap-square .extended-breadcrumb-thread-path {
+  stroke-linecap: square;
+}
+
+.extended-breadcrumb-thread-cap-flat .extended-breadcrumb-thread-path {
+  stroke-linecap: butt;
+}
+
+.extended-breadcrumb-thread-depth-1 {
+  stroke: var(--extended-breadcrumb-thread-effective-color-1);
+}
+
+.extended-breadcrumb-thread-depth-2 {
+  stroke: var(--extended-breadcrumb-thread-effective-color-2);
+}
+
+.extended-breadcrumb-thread-depth-3 {
+  stroke: var(--extended-breadcrumb-thread-effective-color-3);
+}
+
+.extended-breadcrumb-thread-depth-4 {
+  stroke: var(--extended-breadcrumb-thread-effective-color-4);
+}
+
+.extended-breadcrumb-thread-depth-5 {
+  stroke: var(--extended-breadcrumb-thread-effective-color-5);
+}
+
+.extended-breadcrumb-thread-depth-6 {
+  stroke: var(--extended-breadcrumb-thread-effective-color-6);
+}
+
+.extended-breadcrumb-thread-depth-7 {
+  stroke: var(--extended-breadcrumb-thread-effective-color-7);
+}
+
+.extended-breadcrumb-thread-depth-8 {
+  stroke: var(--extended-breadcrumb-thread-effective-color-8);
+}
+
+
+.extended-breadcrumb-popover {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  z-index: var(--layer-popover, 1000);
+  box-sizing: border-box;
+  width: max-content;
+  min-width: min(var(--extended-breadcrumb-min-width), calc(100vw - 2 * var(--extended-breadcrumb-viewport-gap)));
+  max-width: min(var(--extended-breadcrumb-max-width), calc(100vw - 2 * var(--extended-breadcrumb-viewport-gap)));
+  max-height: min(var(--extended-breadcrumb-max-height), calc(100vh - 2 * var(--extended-breadcrumb-viewport-gap)));
+  padding: var(--extended-breadcrumb-padding);
+  overflow: hidden;
+  color: var(--extended-breadcrumb-text-color);
+  background: var(--extended-breadcrumb-background);
+  border: var(--extended-breadcrumb-border-thickness) solid var(--extended-breadcrumb-border-color);
+  border-radius: var(--extended-breadcrumb-radius);
+  box-shadow: 0 var(--extended-breadcrumb-shadow-y) var(--extended-breadcrumb-shadow-blur) rgba(0, 0, 0, var(--extended-breadcrumb-shadow-opacity));
+}
+.extended-breadcrumb-title {
+  flex: 0 0 auto;
+  margin-bottom: var(--extended-breadcrumb-title-gap);
+  color: var(--extended-breadcrumb-title-color);
+  font-size: var(--extended-breadcrumb-title-size);
+  font-weight: var(--extended-breadcrumb-title-weight);
+  letter-spacing: var(--extended-breadcrumb-title-letter-spacing);
+  text-transform: uppercase;
+}
+.extended-breadcrumb-title-normal .extended-breadcrumb-title { text-transform: none; }
+.extended-breadcrumb-tree {
+  flex: 1 1 auto;
+  overflow: auto;
+  scrollbar-gutter: stable;
+  min-height: 0;
+  min-width: 0;
+}
+.extended-breadcrumb-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--extended-breadcrumb-row-gap);
+  padding: 2px;
+}
+.extended-breadcrumb-guides { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 2; }
+.extended-breadcrumb-popover button.extended-breadcrumb-row {
+  display: flex;
+  align-items: center;
+  position: relative;
+  min-width: 0;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  padding-block: var(--extended-breadcrumb-row-padding-y);
+  padding-inline-end: var(--extended-breadcrumb-row-padding-x);
+  padding-inline-start: calc(var(--extended-breadcrumb-row-padding-x) + max(var(--extended-breadcrumb-guide-connector-length), var(--extended-breadcrumb-thread-connector-length)) + var(--extended-breadcrumb-depth) * var(--extended-breadcrumb-indent));
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: calc(var(--extended-breadcrumb-radius) / 2);
+  box-shadow: none;
+  font-family: inherit;
+  font-size: var(--extended-breadcrumb-font-size);
+  font-weight: var(--extended-breadcrumb-font-weight);
+  line-height: var(--extended-breadcrumb-line-height);
+  text-align: start;
+  cursor: var(--cursor-link);
+}
+.extended-breadcrumb-label {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.extended-breadcrumb-expand .extended-breadcrumb-label {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.extended-breadcrumb-popover button.extended-breadcrumb-row.is-current {
+  color: var(--extended-breadcrumb-current-color);
+  background: color-mix(in srgb, var(--extended-breadcrumb-current-color) calc(var(--extended-breadcrumb-current-background-opacity) * 1%), transparent);
+}
+.extended-breadcrumb-popover button.extended-breadcrumb-row:is(.is-active, :focus-visible) {
+  color: var(--extended-breadcrumb-current-color);
+  background: var(--extended-breadcrumb-hover-color);
+  outline: var(--extended-breadcrumb-main-outline-thickness) solid color-mix(in srgb, var(--extended-breadcrumb-current-color) calc(var(--extended-breadcrumb-main-outline-opacity) * 100%), transparent);
+  outline-offset: var(--extended-breadcrumb-main-outline-offset);
+}
+.extended-breadcrumb-main-highlight,
+[data-extended-breadcrumb-highlight] {
+  background: color-mix(in srgb, var(--extended-breadcrumb-main-color) calc(var(--extended-breadcrumb-main-opacity) * 100%), transparent) !important;
+  border-radius: var(--extended-breadcrumb-main-radius);
+  outline: var(--extended-breadcrumb-main-outline-thickness) solid color-mix(in srgb, var(--extended-breadcrumb-main-color) calc(var(--extended-breadcrumb-main-outline-opacity) * 100%), transparent);
+  outline-offset: var(--extended-breadcrumb-main-outline-offset);
+}
+.extended-breadcrumb-reading-host { position: relative; }
+.extended-breadcrumb-reading-marker {
+  user-select: none;
+  position: absolute;
+  inset-inline-end: calc(100% + 0.3em);
+  top: 0;
+  width: 4ch;
+  text-align: end;
+  font-size: var(--font-smallest);
+  font-weight: var(--extended-heading-level-marker-weight);
+  font-variant: var(--extended-heading-level-marker-font-variant);
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+body {
+  --extended-editor-breadcrumb-level-marker-font-size: 1em;
+  --extended-editor-breadcrumb-level-marker-font-weight: inherit;
+  --extended-editor-breadcrumb-level-marker-color: inherit;
+  --extended-editor-breadcrumb-level-marker-font-style: inherit;
+  --extended-editor-breadcrumb-level-marker-font-variant: all-small-caps;
+  --extended-editor-breadcrumb-level-marker-letter-spacing: 0em;
+  --extended-editor-breadcrumb-level-marker-opacity: 1;
+  --extended-editor-breadcrumb-level-marker-width: 3ch;
+  --extended-editor-breadcrumb-level-marker-gap: 0.35em;
+  --extended-editor-breadcrumb-guide-color: var(--text-muted);
+  --extended-editor-breadcrumb-guide-opacity: 0.72;
+  --extended-editor-breadcrumb-guide-thickness: 1.5px;
+  --extended-editor-breadcrumb-guide-dash-length: 6px;
+  --extended-editor-breadcrumb-guide-dash-gap: 4px;
+  --extended-editor-breadcrumb-guide-dot-gap: 4px;
+  --extended-editor-breadcrumb-guide-connector-length: 18px;
+  --extended-editor-breadcrumb-guide-marker-gap: 4px;
+  --extended-editor-breadcrumb-guide-first-branch-rise: 10px;
+  --extended-editor-breadcrumb-guide-connector-offset: 0px;
+  --extended-editor-breadcrumb-thread-opacity: 1;
+  --extended-editor-breadcrumb-thread-thickness: 4px;
+  --extended-editor-breadcrumb-thread-corner-radius: 8px;
+  --extended-editor-breadcrumb-thread-connector-length: 28px;
+  --extended-editor-breadcrumb-thread-marker-gap: 4px;
+  --extended-editor-breadcrumb-thread-vertical-offset: 0px;
+  --extended-editor-breadcrumb-thread-color-1: #ff5a00;
+  --extended-editor-breadcrumb-thread-color-2: #ffc400;
+  --extended-editor-breadcrumb-thread-color-3: #a8e600;
+  --extended-editor-breadcrumb-thread-color-4: #00c8df;
+  --extended-editor-breadcrumb-thread-color-5: #5794ff;
+  --extended-editor-breadcrumb-thread-color-6: #a66cff;
+  --extended-editor-breadcrumb-thread-color-7: #e64fa3;
+  --extended-editor-breadcrumb-thread-color-8: #e64fa3;
+  --extended-editor-breadcrumb-thread-fallback-color-light: #777777;
+  --extended-editor-breadcrumb-thread-fallback-color-dark: #888888;
+  --extended-editor-breadcrumb-thread-fallback-color: var(
+    --extended-editor-breadcrumb-thread-fallback-color-dark
+  );
+  --extended-editor-breadcrumb-thread-override-color-light: #777777;
+  --extended-editor-breadcrumb-thread-override-color-dark: #888888;
+  --extended-editor-breadcrumb-thread-override-color: var(
+    --extended-editor-breadcrumb-thread-override-color-dark
+  );
+  --extended-editor-breadcrumb-thread-effective-color-1: var(
+    --extended-editor-breadcrumb-thread-color-1
+  );
+  --extended-editor-breadcrumb-thread-effective-color-2: var(
+    --extended-editor-breadcrumb-thread-color-2
+  );
+  --extended-editor-breadcrumb-thread-effective-color-3: var(
+    --extended-editor-breadcrumb-thread-color-3
+  );
+  --extended-editor-breadcrumb-thread-effective-color-4: var(
+    --extended-editor-breadcrumb-thread-color-4
+  );
+  --extended-editor-breadcrumb-thread-effective-color-5: var(
+    --extended-editor-breadcrumb-thread-color-5
+  );
+  --extended-editor-breadcrumb-thread-effective-color-6: var(
+    --extended-editor-breadcrumb-thread-color-6
+  );
+  --extended-editor-breadcrumb-thread-effective-color-7: var(
+    --extended-editor-breadcrumb-thread-color-7
+  );
+  --extended-editor-breadcrumb-thread-effective-color-8: var(
+    --extended-editor-breadcrumb-thread-color-8
+  );
+}
+
+body.theme-light {
+  --extended-editor-breadcrumb-thread-fallback-color: var(
+    --extended-editor-breadcrumb-thread-fallback-color-light
+  );
+  --extended-editor-breadcrumb-thread-override-color: var(
+    --extended-editor-breadcrumb-thread-override-color-light
+  );
+}
+
+body:is(
+    .extended-editor-breadcrumb-thread-cap-round,
+    .extended-editor-breadcrumb-thread-cap-square,
+    .extended-editor-breadcrumb-thread-cap-flat
+  ):not(.extended-editor-breadcrumb-thread-color-1-enabled) {
+  --extended-editor-breadcrumb-thread-effective-color-1: transparent;
+}
+
+body:is(
+    .extended-editor-breadcrumb-thread-cap-round,
+    .extended-editor-breadcrumb-thread-cap-square,
+    .extended-editor-breadcrumb-thread-cap-flat
+  ):not(.extended-editor-breadcrumb-thread-color-2-enabled) {
+  --extended-editor-breadcrumb-thread-effective-color-2: transparent;
+}
+
+body:is(
+    .extended-editor-breadcrumb-thread-cap-round,
+    .extended-editor-breadcrumb-thread-cap-square,
+    .extended-editor-breadcrumb-thread-cap-flat
+  ):not(.extended-editor-breadcrumb-thread-color-3-enabled) {
+  --extended-editor-breadcrumb-thread-effective-color-3: transparent;
+}
+
+body:is(
+    .extended-editor-breadcrumb-thread-cap-round,
+    .extended-editor-breadcrumb-thread-cap-square,
+    .extended-editor-breadcrumb-thread-cap-flat
+  ):not(.extended-editor-breadcrumb-thread-color-4-enabled) {
+  --extended-editor-breadcrumb-thread-effective-color-4: transparent;
+}
+
+body:is(
+    .extended-editor-breadcrumb-thread-cap-round,
+    .extended-editor-breadcrumb-thread-cap-square,
+    .extended-editor-breadcrumb-thread-cap-flat
+  ):not(.extended-editor-breadcrumb-thread-color-5-enabled) {
+  --extended-editor-breadcrumb-thread-effective-color-5: transparent;
+}
+
+body:is(
+    .extended-editor-breadcrumb-thread-cap-round,
+    .extended-editor-breadcrumb-thread-cap-square,
+    .extended-editor-breadcrumb-thread-cap-flat
+  ):not(.extended-editor-breadcrumb-thread-color-6-enabled) {
+  --extended-editor-breadcrumb-thread-effective-color-6: transparent;
+}
+
+body:is(
+    .extended-editor-breadcrumb-thread-cap-round,
+    .extended-editor-breadcrumb-thread-cap-square,
+    .extended-editor-breadcrumb-thread-cap-flat
+  ):not(.extended-editor-breadcrumb-thread-color-7-enabled) {
+  --extended-editor-breadcrumb-thread-effective-color-7: transparent;
+}
+
+body:is(
+    .extended-editor-breadcrumb-thread-cap-round,
+    .extended-editor-breadcrumb-thread-cap-square,
+    .extended-editor-breadcrumb-thread-cap-flat
+  ):not(.extended-editor-breadcrumb-thread-color-8-enabled) {
+  --extended-editor-breadcrumb-thread-effective-color-8: transparent;
+}
+
+body:is(
+    .extended-editor-breadcrumb-thread-cap-round,
+    .extended-editor-breadcrumb-thread-cap-square,
+    .extended-editor-breadcrumb-thread-cap-flat
+  ).extended-editor-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-editor-breadcrumb-thread-color-1-enabled
+  ) {
+  --extended-editor-breadcrumb-thread-effective-color-1: var(
+    --extended-editor-breadcrumb-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-editor-breadcrumb-thread-cap-round,
+    .extended-editor-breadcrumb-thread-cap-square,
+    .extended-editor-breadcrumb-thread-cap-flat
+  ).extended-editor-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-editor-breadcrumb-thread-color-2-enabled
+  ) {
+  --extended-editor-breadcrumb-thread-effective-color-2: var(
+    --extended-editor-breadcrumb-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-editor-breadcrumb-thread-cap-round,
+    .extended-editor-breadcrumb-thread-cap-square,
+    .extended-editor-breadcrumb-thread-cap-flat
+  ).extended-editor-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-editor-breadcrumb-thread-color-3-enabled
+  ) {
+  --extended-editor-breadcrumb-thread-effective-color-3: var(
+    --extended-editor-breadcrumb-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-editor-breadcrumb-thread-cap-round,
+    .extended-editor-breadcrumb-thread-cap-square,
+    .extended-editor-breadcrumb-thread-cap-flat
+  ).extended-editor-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-editor-breadcrumb-thread-color-4-enabled
+  ) {
+  --extended-editor-breadcrumb-thread-effective-color-4: var(
+    --extended-editor-breadcrumb-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-editor-breadcrumb-thread-cap-round,
+    .extended-editor-breadcrumb-thread-cap-square,
+    .extended-editor-breadcrumb-thread-cap-flat
+  ).extended-editor-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-editor-breadcrumb-thread-color-5-enabled
+  ) {
+  --extended-editor-breadcrumb-thread-effective-color-5: var(
+    --extended-editor-breadcrumb-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-editor-breadcrumb-thread-cap-round,
+    .extended-editor-breadcrumb-thread-cap-square,
+    .extended-editor-breadcrumb-thread-cap-flat
+  ).extended-editor-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-editor-breadcrumb-thread-color-6-enabled
+  ) {
+  --extended-editor-breadcrumb-thread-effective-color-6: var(
+    --extended-editor-breadcrumb-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-editor-breadcrumb-thread-cap-round,
+    .extended-editor-breadcrumb-thread-cap-square,
+    .extended-editor-breadcrumb-thread-cap-flat
+  ).extended-editor-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-editor-breadcrumb-thread-color-7-enabled
+  ) {
+  --extended-editor-breadcrumb-thread-effective-color-7: var(
+    --extended-editor-breadcrumb-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-editor-breadcrumb-thread-cap-round,
+    .extended-editor-breadcrumb-thread-cap-square,
+    .extended-editor-breadcrumb-thread-cap-flat
+  ).extended-editor-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-editor-breadcrumb-thread-color-8-enabled
+  ) {
+  --extended-editor-breadcrumb-thread-effective-color-8: var(
+    --extended-editor-breadcrumb-thread-fallback-color
+  );
+}
+
+body.extended-editor-breadcrumb-thread-override-colors-enabled {
+  --extended-editor-breadcrumb-thread-effective-color-1: var(
+    --extended-editor-breadcrumb-thread-override-color
+  );
+  --extended-editor-breadcrumb-thread-effective-color-2: var(
+    --extended-editor-breadcrumb-thread-override-color
+  );
+  --extended-editor-breadcrumb-thread-effective-color-3: var(
+    --extended-editor-breadcrumb-thread-override-color
+  );
+  --extended-editor-breadcrumb-thread-effective-color-4: var(
+    --extended-editor-breadcrumb-thread-override-color
+  );
+  --extended-editor-breadcrumb-thread-effective-color-5: var(
+    --extended-editor-breadcrumb-thread-override-color
+  );
+  --extended-editor-breadcrumb-thread-effective-color-6: var(
+    --extended-editor-breadcrumb-thread-override-color
+  );
+  --extended-editor-breadcrumb-thread-effective-color-7: var(
+    --extended-editor-breadcrumb-thread-override-color
+  );
+  --extended-editor-breadcrumb-thread-effective-color-8: var(
+    --extended-editor-breadcrumb-thread-override-color
+  );
+}
+
+body.extended-editor-breadcrumb-style-overrides .extended-breadcrumb-popover[data-pane="editor"] {
+  --extended-breadcrumb-level-marker-font-size: var(--extended-editor-breadcrumb-level-marker-font-size);
+  --extended-breadcrumb-level-marker-font-weight: var(--extended-editor-breadcrumb-level-marker-font-weight);
+  --extended-breadcrumb-level-marker-color: var(--extended-editor-breadcrumb-level-marker-color);
+  --extended-breadcrumb-level-marker-font-style: var(--extended-editor-breadcrumb-level-marker-font-style);
+  --extended-breadcrumb-level-marker-font-variant: var(--extended-editor-breadcrumb-level-marker-font-variant);
+  --extended-breadcrumb-level-marker-letter-spacing: var(--extended-editor-breadcrumb-level-marker-letter-spacing);
+  --extended-breadcrumb-level-marker-opacity: var(--extended-editor-breadcrumb-level-marker-opacity);
+  --extended-breadcrumb-level-marker-width: var(--extended-editor-breadcrumb-level-marker-width);
+  --extended-breadcrumb-level-marker-gap: var(--extended-editor-breadcrumb-level-marker-gap);
+  --extended-breadcrumb-guide-color: var(--extended-editor-breadcrumb-guide-color);
+  --extended-breadcrumb-guide-opacity: var(--extended-editor-breadcrumb-guide-opacity);
+  --extended-breadcrumb-guide-thickness: var(--extended-editor-breadcrumb-guide-thickness);
+  --extended-breadcrumb-guide-dash-length: var(--extended-editor-breadcrumb-guide-dash-length);
+  --extended-breadcrumb-guide-dash-gap: var(--extended-editor-breadcrumb-guide-dash-gap);
+  --extended-breadcrumb-guide-dot-gap: var(--extended-editor-breadcrumb-guide-dot-gap);
+  --extended-breadcrumb-guide-connector-length: var(--extended-editor-breadcrumb-guide-connector-length);
+  --extended-breadcrumb-guide-marker-gap: var(--extended-editor-breadcrumb-guide-marker-gap);
+  --extended-breadcrumb-guide-first-branch-rise: var(--extended-editor-breadcrumb-guide-first-branch-rise);
+  --extended-breadcrumb-guide-connector-offset: var(--extended-editor-breadcrumb-guide-connector-offset);
+  --extended-breadcrumb-thread-opacity: var(--extended-editor-breadcrumb-thread-opacity);
+  --extended-breadcrumb-thread-thickness: var(--extended-editor-breadcrumb-thread-thickness);
+  --extended-breadcrumb-thread-corner-radius: var(--extended-editor-breadcrumb-thread-corner-radius);
+  --extended-breadcrumb-thread-connector-length: var(--extended-editor-breadcrumb-thread-connector-length);
+  --extended-breadcrumb-thread-marker-gap: var(--extended-editor-breadcrumb-thread-marker-gap);
+  --extended-breadcrumb-thread-vertical-offset: var(--extended-editor-breadcrumb-thread-vertical-offset);
+  --extended-breadcrumb-thread-color-1: var(--extended-editor-breadcrumb-thread-color-1);
+  --extended-breadcrumb-thread-color-2: var(--extended-editor-breadcrumb-thread-color-2);
+  --extended-breadcrumb-thread-color-3: var(--extended-editor-breadcrumb-thread-color-3);
+  --extended-breadcrumb-thread-color-4: var(--extended-editor-breadcrumb-thread-color-4);
+  --extended-breadcrumb-thread-color-5: var(--extended-editor-breadcrumb-thread-color-5);
+  --extended-breadcrumb-thread-color-6: var(--extended-editor-breadcrumb-thread-color-6);
+  --extended-breadcrumb-thread-color-7: var(--extended-editor-breadcrumb-thread-color-7);
+  --extended-breadcrumb-thread-color-8: var(--extended-editor-breadcrumb-thread-color-8);
+  --extended-breadcrumb-thread-fallback-color-light: var(--extended-editor-breadcrumb-thread-fallback-color-light);
+  --extended-breadcrumb-thread-fallback-color-dark: var(--extended-editor-breadcrumb-thread-fallback-color-dark);
+  --extended-breadcrumb-thread-fallback-color: var(--extended-editor-breadcrumb-thread-fallback-color);
+  --extended-breadcrumb-thread-override-color-light: var(--extended-editor-breadcrumb-thread-override-color-light);
+  --extended-breadcrumb-thread-override-color-dark: var(--extended-editor-breadcrumb-thread-override-color-dark);
+  --extended-breadcrumb-thread-override-color: var(--extended-editor-breadcrumb-thread-override-color);
+  --extended-breadcrumb-thread-effective-color-1: var(--extended-editor-breadcrumb-thread-effective-color-1);
+  --extended-breadcrumb-thread-effective-color-2: var(--extended-editor-breadcrumb-thread-effective-color-2);
+  --extended-breadcrumb-thread-effective-color-3: var(--extended-editor-breadcrumb-thread-effective-color-3);
+  --extended-breadcrumb-thread-effective-color-4: var(--extended-editor-breadcrumb-thread-effective-color-4);
+  --extended-breadcrumb-thread-effective-color-5: var(--extended-editor-breadcrumb-thread-effective-color-5);
+  --extended-breadcrumb-thread-effective-color-6: var(--extended-editor-breadcrumb-thread-effective-color-6);
+  --extended-breadcrumb-thread-effective-color-7: var(--extended-editor-breadcrumb-thread-effective-color-7);
+  --extended-breadcrumb-thread-effective-color-8: var(--extended-editor-breadcrumb-thread-effective-color-8);
+}
+body.extended-editor-breadcrumb-style-overrides.extended-editor-breadcrumb-guide-line-solid .extended-breadcrumb-popover[data-pane="editor"] .extended-breadcrumb-guide-path { stroke-dasharray: none; stroke-linecap: square; }
+body.extended-editor-breadcrumb-style-overrides.extended-editor-breadcrumb-guide-line-dashed .extended-breadcrumb-popover[data-pane="editor"] .extended-breadcrumb-guide-path { stroke-dasharray: var(--extended-editor-breadcrumb-guide-dash-length) var(--extended-editor-breadcrumb-guide-dash-gap); stroke-linecap: square; }
+body.extended-editor-breadcrumb-style-overrides.extended-editor-breadcrumb-guide-line-dotted .extended-breadcrumb-popover[data-pane="editor"] .extended-breadcrumb-guide-path { stroke-dasharray: 0.01 var(--extended-editor-breadcrumb-guide-dot-gap); stroke-linecap: round; }
+body.extended-editor-breadcrumb-style-overrides.extended-editor-breadcrumb-thread-cap-round .extended-breadcrumb-popover[data-pane="editor"] .extended-breadcrumb-thread-path { stroke-linecap: round; }
+body.extended-editor-breadcrumb-style-overrides.extended-editor-breadcrumb-thread-cap-square .extended-breadcrumb-popover[data-pane="editor"] .extended-breadcrumb-thread-path { stroke-linecap: square; }
+body.extended-editor-breadcrumb-style-overrides.extended-editor-breadcrumb-thread-cap-flat .extended-breadcrumb-popover[data-pane="editor"] .extended-breadcrumb-thread-path { stroke-linecap: butt; }
+
+body {
+  --extended-outline-breadcrumb-level-marker-font-size: 1em;
+  --extended-outline-breadcrumb-level-marker-font-weight: inherit;
+  --extended-outline-breadcrumb-level-marker-color: inherit;
+  --extended-outline-breadcrumb-level-marker-font-style: inherit;
+  --extended-outline-breadcrumb-level-marker-font-variant: all-small-caps;
+  --extended-outline-breadcrumb-level-marker-letter-spacing: 0em;
+  --extended-outline-breadcrumb-level-marker-opacity: 1;
+  --extended-outline-breadcrumb-level-marker-width: 3ch;
+  --extended-outline-breadcrumb-level-marker-gap: 0.35em;
+  --extended-outline-breadcrumb-guide-color: var(--text-muted);
+  --extended-outline-breadcrumb-guide-opacity: 0.72;
+  --extended-outline-breadcrumb-guide-thickness: 1.5px;
+  --extended-outline-breadcrumb-guide-dash-length: 6px;
+  --extended-outline-breadcrumb-guide-dash-gap: 4px;
+  --extended-outline-breadcrumb-guide-dot-gap: 4px;
+  --extended-outline-breadcrumb-guide-connector-length: 18px;
+  --extended-outline-breadcrumb-guide-marker-gap: 4px;
+  --extended-outline-breadcrumb-guide-first-branch-rise: 10px;
+  --extended-outline-breadcrumb-guide-connector-offset: 0px;
+  --extended-outline-breadcrumb-thread-opacity: 1;
+  --extended-outline-breadcrumb-thread-thickness: 4px;
+  --extended-outline-breadcrumb-thread-corner-radius: 8px;
+  --extended-outline-breadcrumb-thread-connector-length: 28px;
+  --extended-outline-breadcrumb-thread-marker-gap: 4px;
+  --extended-outline-breadcrumb-thread-vertical-offset: 0px;
+  --extended-outline-breadcrumb-thread-color-1: #ff5a00;
+  --extended-outline-breadcrumb-thread-color-2: #ffc400;
+  --extended-outline-breadcrumb-thread-color-3: #a8e600;
+  --extended-outline-breadcrumb-thread-color-4: #00c8df;
+  --extended-outline-breadcrumb-thread-color-5: #5794ff;
+  --extended-outline-breadcrumb-thread-color-6: #a66cff;
+  --extended-outline-breadcrumb-thread-color-7: #e64fa3;
+  --extended-outline-breadcrumb-thread-color-8: #e64fa3;
+  --extended-outline-breadcrumb-thread-fallback-color-light: #777777;
+  --extended-outline-breadcrumb-thread-fallback-color-dark: #888888;
+  --extended-outline-breadcrumb-thread-fallback-color: var(
+    --extended-outline-breadcrumb-thread-fallback-color-dark
+  );
+  --extended-outline-breadcrumb-thread-override-color-light: #777777;
+  --extended-outline-breadcrumb-thread-override-color-dark: #888888;
+  --extended-outline-breadcrumb-thread-override-color: var(
+    --extended-outline-breadcrumb-thread-override-color-dark
+  );
+  --extended-outline-breadcrumb-thread-effective-color-1: var(
+    --extended-outline-breadcrumb-thread-color-1
+  );
+  --extended-outline-breadcrumb-thread-effective-color-2: var(
+    --extended-outline-breadcrumb-thread-color-2
+  );
+  --extended-outline-breadcrumb-thread-effective-color-3: var(
+    --extended-outline-breadcrumb-thread-color-3
+  );
+  --extended-outline-breadcrumb-thread-effective-color-4: var(
+    --extended-outline-breadcrumb-thread-color-4
+  );
+  --extended-outline-breadcrumb-thread-effective-color-5: var(
+    --extended-outline-breadcrumb-thread-color-5
+  );
+  --extended-outline-breadcrumb-thread-effective-color-6: var(
+    --extended-outline-breadcrumb-thread-color-6
+  );
+  --extended-outline-breadcrumb-thread-effective-color-7: var(
+    --extended-outline-breadcrumb-thread-color-7
+  );
+  --extended-outline-breadcrumb-thread-effective-color-8: var(
+    --extended-outline-breadcrumb-thread-color-8
+  );
+}
+
+body.theme-light {
+  --extended-outline-breadcrumb-thread-fallback-color: var(
+    --extended-outline-breadcrumb-thread-fallback-color-light
+  );
+  --extended-outline-breadcrumb-thread-override-color: var(
+    --extended-outline-breadcrumb-thread-override-color-light
+  );
+}
+
+body:is(
+    .extended-outline-breadcrumb-thread-cap-round,
+    .extended-outline-breadcrumb-thread-cap-square,
+    .extended-outline-breadcrumb-thread-cap-flat
+  ):not(.extended-outline-breadcrumb-thread-color-1-enabled) {
+  --extended-outline-breadcrumb-thread-effective-color-1: transparent;
+}
+
+body:is(
+    .extended-outline-breadcrumb-thread-cap-round,
+    .extended-outline-breadcrumb-thread-cap-square,
+    .extended-outline-breadcrumb-thread-cap-flat
+  ):not(.extended-outline-breadcrumb-thread-color-2-enabled) {
+  --extended-outline-breadcrumb-thread-effective-color-2: transparent;
+}
+
+body:is(
+    .extended-outline-breadcrumb-thread-cap-round,
+    .extended-outline-breadcrumb-thread-cap-square,
+    .extended-outline-breadcrumb-thread-cap-flat
+  ):not(.extended-outline-breadcrumb-thread-color-3-enabled) {
+  --extended-outline-breadcrumb-thread-effective-color-3: transparent;
+}
+
+body:is(
+    .extended-outline-breadcrumb-thread-cap-round,
+    .extended-outline-breadcrumb-thread-cap-square,
+    .extended-outline-breadcrumb-thread-cap-flat
+  ):not(.extended-outline-breadcrumb-thread-color-4-enabled) {
+  --extended-outline-breadcrumb-thread-effective-color-4: transparent;
+}
+
+body:is(
+    .extended-outline-breadcrumb-thread-cap-round,
+    .extended-outline-breadcrumb-thread-cap-square,
+    .extended-outline-breadcrumb-thread-cap-flat
+  ):not(.extended-outline-breadcrumb-thread-color-5-enabled) {
+  --extended-outline-breadcrumb-thread-effective-color-5: transparent;
+}
+
+body:is(
+    .extended-outline-breadcrumb-thread-cap-round,
+    .extended-outline-breadcrumb-thread-cap-square,
+    .extended-outline-breadcrumb-thread-cap-flat
+  ):not(.extended-outline-breadcrumb-thread-color-6-enabled) {
+  --extended-outline-breadcrumb-thread-effective-color-6: transparent;
+}
+
+body:is(
+    .extended-outline-breadcrumb-thread-cap-round,
+    .extended-outline-breadcrumb-thread-cap-square,
+    .extended-outline-breadcrumb-thread-cap-flat
+  ):not(.extended-outline-breadcrumb-thread-color-7-enabled) {
+  --extended-outline-breadcrumb-thread-effective-color-7: transparent;
+}
+
+body:is(
+    .extended-outline-breadcrumb-thread-cap-round,
+    .extended-outline-breadcrumb-thread-cap-square,
+    .extended-outline-breadcrumb-thread-cap-flat
+  ):not(.extended-outline-breadcrumb-thread-color-8-enabled) {
+  --extended-outline-breadcrumb-thread-effective-color-8: transparent;
+}
+
+body:is(
+    .extended-outline-breadcrumb-thread-cap-round,
+    .extended-outline-breadcrumb-thread-cap-square,
+    .extended-outline-breadcrumb-thread-cap-flat
+  ).extended-outline-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-outline-breadcrumb-thread-color-1-enabled
+  ) {
+  --extended-outline-breadcrumb-thread-effective-color-1: var(
+    --extended-outline-breadcrumb-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-outline-breadcrumb-thread-cap-round,
+    .extended-outline-breadcrumb-thread-cap-square,
+    .extended-outline-breadcrumb-thread-cap-flat
+  ).extended-outline-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-outline-breadcrumb-thread-color-2-enabled
+  ) {
+  --extended-outline-breadcrumb-thread-effective-color-2: var(
+    --extended-outline-breadcrumb-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-outline-breadcrumb-thread-cap-round,
+    .extended-outline-breadcrumb-thread-cap-square,
+    .extended-outline-breadcrumb-thread-cap-flat
+  ).extended-outline-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-outline-breadcrumb-thread-color-3-enabled
+  ) {
+  --extended-outline-breadcrumb-thread-effective-color-3: var(
+    --extended-outline-breadcrumb-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-outline-breadcrumb-thread-cap-round,
+    .extended-outline-breadcrumb-thread-cap-square,
+    .extended-outline-breadcrumb-thread-cap-flat
+  ).extended-outline-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-outline-breadcrumb-thread-color-4-enabled
+  ) {
+  --extended-outline-breadcrumb-thread-effective-color-4: var(
+    --extended-outline-breadcrumb-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-outline-breadcrumb-thread-cap-round,
+    .extended-outline-breadcrumb-thread-cap-square,
+    .extended-outline-breadcrumb-thread-cap-flat
+  ).extended-outline-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-outline-breadcrumb-thread-color-5-enabled
+  ) {
+  --extended-outline-breadcrumb-thread-effective-color-5: var(
+    --extended-outline-breadcrumb-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-outline-breadcrumb-thread-cap-round,
+    .extended-outline-breadcrumb-thread-cap-square,
+    .extended-outline-breadcrumb-thread-cap-flat
+  ).extended-outline-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-outline-breadcrumb-thread-color-6-enabled
+  ) {
+  --extended-outline-breadcrumb-thread-effective-color-6: var(
+    --extended-outline-breadcrumb-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-outline-breadcrumb-thread-cap-round,
+    .extended-outline-breadcrumb-thread-cap-square,
+    .extended-outline-breadcrumb-thread-cap-flat
+  ).extended-outline-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-outline-breadcrumb-thread-color-7-enabled
+  ) {
+  --extended-outline-breadcrumb-thread-effective-color-7: var(
+    --extended-outline-breadcrumb-thread-fallback-color
+  );
+}
+
+body:is(
+    .extended-outline-breadcrumb-thread-cap-round,
+    .extended-outline-breadcrumb-thread-cap-square,
+    .extended-outline-breadcrumb-thread-cap-flat
+  ).extended-outline-breadcrumb-thread-fallback-colors-enabled:not(
+    .extended-outline-breadcrumb-thread-color-8-enabled
+  ) {
+  --extended-outline-breadcrumb-thread-effective-color-8: var(
+    --extended-outline-breadcrumb-thread-fallback-color
+  );
+}
+
+body.extended-outline-breadcrumb-thread-override-colors-enabled {
+  --extended-outline-breadcrumb-thread-effective-color-1: var(
+    --extended-outline-breadcrumb-thread-override-color
+  );
+  --extended-outline-breadcrumb-thread-effective-color-2: var(
+    --extended-outline-breadcrumb-thread-override-color
+  );
+  --extended-outline-breadcrumb-thread-effective-color-3: var(
+    --extended-outline-breadcrumb-thread-override-color
+  );
+  --extended-outline-breadcrumb-thread-effective-color-4: var(
+    --extended-outline-breadcrumb-thread-override-color
+  );
+  --extended-outline-breadcrumb-thread-effective-color-5: var(
+    --extended-outline-breadcrumb-thread-override-color
+  );
+  --extended-outline-breadcrumb-thread-effective-color-6: var(
+    --extended-outline-breadcrumb-thread-override-color
+  );
+  --extended-outline-breadcrumb-thread-effective-color-7: var(
+    --extended-outline-breadcrumb-thread-override-color
+  );
+  --extended-outline-breadcrumb-thread-effective-color-8: var(
+    --extended-outline-breadcrumb-thread-override-color
+  );
+}
+
+body.extended-outline-breadcrumb-style-overrides .extended-breadcrumb-popover[data-pane="outline"] {
+  --extended-breadcrumb-level-marker-font-size: var(--extended-outline-breadcrumb-level-marker-font-size);
+  --extended-breadcrumb-level-marker-font-weight: var(--extended-outline-breadcrumb-level-marker-font-weight);
+  --extended-breadcrumb-level-marker-color: var(--extended-outline-breadcrumb-level-marker-color);
+  --extended-breadcrumb-level-marker-font-style: var(--extended-outline-breadcrumb-level-marker-font-style);
+  --extended-breadcrumb-level-marker-font-variant: var(--extended-outline-breadcrumb-level-marker-font-variant);
+  --extended-breadcrumb-level-marker-letter-spacing: var(--extended-outline-breadcrumb-level-marker-letter-spacing);
+  --extended-breadcrumb-level-marker-opacity: var(--extended-outline-breadcrumb-level-marker-opacity);
+  --extended-breadcrumb-level-marker-width: var(--extended-outline-breadcrumb-level-marker-width);
+  --extended-breadcrumb-level-marker-gap: var(--extended-outline-breadcrumb-level-marker-gap);
+  --extended-breadcrumb-guide-color: var(--extended-outline-breadcrumb-guide-color);
+  --extended-breadcrumb-guide-opacity: var(--extended-outline-breadcrumb-guide-opacity);
+  --extended-breadcrumb-guide-thickness: var(--extended-outline-breadcrumb-guide-thickness);
+  --extended-breadcrumb-guide-dash-length: var(--extended-outline-breadcrumb-guide-dash-length);
+  --extended-breadcrumb-guide-dash-gap: var(--extended-outline-breadcrumb-guide-dash-gap);
+  --extended-breadcrumb-guide-dot-gap: var(--extended-outline-breadcrumb-guide-dot-gap);
+  --extended-breadcrumb-guide-connector-length: var(--extended-outline-breadcrumb-guide-connector-length);
+  --extended-breadcrumb-guide-marker-gap: var(--extended-outline-breadcrumb-guide-marker-gap);
+  --extended-breadcrumb-guide-first-branch-rise: var(--extended-outline-breadcrumb-guide-first-branch-rise);
+  --extended-breadcrumb-guide-connector-offset: var(--extended-outline-breadcrumb-guide-connector-offset);
+  --extended-breadcrumb-thread-opacity: var(--extended-outline-breadcrumb-thread-opacity);
+  --extended-breadcrumb-thread-thickness: var(--extended-outline-breadcrumb-thread-thickness);
+  --extended-breadcrumb-thread-corner-radius: var(--extended-outline-breadcrumb-thread-corner-radius);
+  --extended-breadcrumb-thread-connector-length: var(--extended-outline-breadcrumb-thread-connector-length);
+  --extended-breadcrumb-thread-marker-gap: var(--extended-outline-breadcrumb-thread-marker-gap);
+  --extended-breadcrumb-thread-vertical-offset: var(--extended-outline-breadcrumb-thread-vertical-offset);
+  --extended-breadcrumb-thread-color-1: var(--extended-outline-breadcrumb-thread-color-1);
+  --extended-breadcrumb-thread-color-2: var(--extended-outline-breadcrumb-thread-color-2);
+  --extended-breadcrumb-thread-color-3: var(--extended-outline-breadcrumb-thread-color-3);
+  --extended-breadcrumb-thread-color-4: var(--extended-outline-breadcrumb-thread-color-4);
+  --extended-breadcrumb-thread-color-5: var(--extended-outline-breadcrumb-thread-color-5);
+  --extended-breadcrumb-thread-color-6: var(--extended-outline-breadcrumb-thread-color-6);
+  --extended-breadcrumb-thread-color-7: var(--extended-outline-breadcrumb-thread-color-7);
+  --extended-breadcrumb-thread-color-8: var(--extended-outline-breadcrumb-thread-color-8);
+  --extended-breadcrumb-thread-fallback-color-light: var(--extended-outline-breadcrumb-thread-fallback-color-light);
+  --extended-breadcrumb-thread-fallback-color-dark: var(--extended-outline-breadcrumb-thread-fallback-color-dark);
+  --extended-breadcrumb-thread-fallback-color: var(--extended-outline-breadcrumb-thread-fallback-color);
+  --extended-breadcrumb-thread-override-color-light: var(--extended-outline-breadcrumb-thread-override-color-light);
+  --extended-breadcrumb-thread-override-color-dark: var(--extended-outline-breadcrumb-thread-override-color-dark);
+  --extended-breadcrumb-thread-override-color: var(--extended-outline-breadcrumb-thread-override-color);
+  --extended-breadcrumb-thread-effective-color-1: var(--extended-outline-breadcrumb-thread-effective-color-1);
+  --extended-breadcrumb-thread-effective-color-2: var(--extended-outline-breadcrumb-thread-effective-color-2);
+  --extended-breadcrumb-thread-effective-color-3: var(--extended-outline-breadcrumb-thread-effective-color-3);
+  --extended-breadcrumb-thread-effective-color-4: var(--extended-outline-breadcrumb-thread-effective-color-4);
+  --extended-breadcrumb-thread-effective-color-5: var(--extended-outline-breadcrumb-thread-effective-color-5);
+  --extended-breadcrumb-thread-effective-color-6: var(--extended-outline-breadcrumb-thread-effective-color-6);
+  --extended-breadcrumb-thread-effective-color-7: var(--extended-outline-breadcrumb-thread-effective-color-7);
+  --extended-breadcrumb-thread-effective-color-8: var(--extended-outline-breadcrumb-thread-effective-color-8);
+}
+body.extended-outline-breadcrumb-style-overrides.extended-outline-breadcrumb-guide-line-solid .extended-breadcrumb-popover[data-pane="outline"] .extended-breadcrumb-guide-path { stroke-dasharray: none; stroke-linecap: square; }
+body.extended-outline-breadcrumb-style-overrides.extended-outline-breadcrumb-guide-line-dashed .extended-breadcrumb-popover[data-pane="outline"] .extended-breadcrumb-guide-path { stroke-dasharray: var(--extended-outline-breadcrumb-guide-dash-length) var(--extended-outline-breadcrumb-guide-dash-gap); stroke-linecap: square; }
+body.extended-outline-breadcrumb-style-overrides.extended-outline-breadcrumb-guide-line-dotted .extended-breadcrumb-popover[data-pane="outline"] .extended-breadcrumb-guide-path { stroke-dasharray: 0.01 var(--extended-outline-breadcrumb-guide-dot-gap); stroke-linecap: round; }
+body.extended-outline-breadcrumb-style-overrides.extended-outline-breadcrumb-thread-cap-round .extended-breadcrumb-popover[data-pane="outline"] .extended-breadcrumb-thread-path { stroke-linecap: round; }
+body.extended-outline-breadcrumb-style-overrides.extended-outline-breadcrumb-thread-cap-square .extended-breadcrumb-popover[data-pane="outline"] .extended-breadcrumb-thread-path { stroke-linecap: square; }
+body.extended-outline-breadcrumb-style-overrides.extended-outline-breadcrumb-thread-cap-flat .extended-breadcrumb-popover[data-pane="outline"] .extended-breadcrumb-thread-path { stroke-linecap: butt; }
+
+/*
+# Third-party notices
+
+## Nested Properties Advanced 2.0.0
+
+Heading hover breadcrumb interactions, navigation, timeout behavior, and appearance controls are adapted from [Nested Properties Advanced 2.0.0](https://github.com/obsidiest/obsidian-nested-properties-advanced/tree/2.0.0), commit `73d7b2236cc3060fc266594c670587fb600651c5`. Its license follows.
+
+MIT License
+
+Copyright (c) 2026 Michael Naumov
+Copyright (c) 2026 obsidiest (https://github.com/obsidiest)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/

@@ -6,9 +6,10 @@ const production = globalThis.process.argv[2] === "production";
 const manifest = JSON.parse(
   readFileSync(new URL("./manifest.json", import.meta.url), "utf8"),
 );
+const thirdPartyNotices = readFileSync(new URL("./THIRD-PARTY-NOTICES.md", import.meta.url), "utf8");
 
 const context = await esbuild.context({
-  banner: { js: `/* Extended Headings v${manifest.version} | MIT | obsidiest */` },
+  banner: { js: `/* Extended Headings v${manifest.version} | MIT | obsidiest */\n/*\n${thirdPartyNotices}\n*/` },
   entryPoints: ["src/main.ts"],
   bundle: true,
   external: ["obsidian", "electron", "@codemirror/autocomplete", "@codemirror/collab", "@codemirror/commands", "@codemirror/language", "@codemirror/lint", "@codemirror/search", "@codemirror/state", "@codemirror/view", "@lezer/common", "@lezer/highlight", "@lezer/lr", ...builtinModules],

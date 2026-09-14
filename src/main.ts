@@ -1,3 +1,5 @@
+import { HeadingBreadcrumb } from "./heading-breadcrumb";
+import { breadcrumbHighlightField } from "./breadcrumb-editor";
 import { MarkdownView, Notice, Plugin } from "obsidian";
 import { CoreIntegration } from "./core-integration";
 import { CoreOutlineRenderer } from "./core-outline-svg";
@@ -22,6 +24,7 @@ import {
 
 export default class ExtendedHeadingsPlugin extends Plugin {
   settings: ExtendedHeadingsSettings = DEFAULT_SETTINGS;
+  private headingBreadcrumb: HeadingBreadcrumb | null = null;
   private coreIntegration: CoreIntegration | null = null;
   private coreOutlineRenderer: CoreOutlineRenderer | null = null;
   private styleSettingsPrecisionControls: StyleSettingsPrecisionControls | null = null;
@@ -55,10 +58,13 @@ export default class ExtendedHeadingsPlugin extends Plugin {
       }),
     );
 
-    this.registerEditorExtension(createEditorExtension(() => this.settings));
-    this.registerMarkdownPostProcessor((element) =>
-      renderExtendedHeadings(element, () => this.settings),
-    );
+    this.registerEditorExtension([createEditorExtension(() => this.settings), breadcrumbHighlightField]);
+    this.headingBreadcrumb = new HeadingBreadcrumb(this);
+    this.headingBreadcrumb.start();
+    this.registerMarkdownPostProcessor((element, context) => {
+      renderExtendedHeadings(element, () => this.settings);
+      this.headingBreadcrumb?.processReading(element, context);
+    });
     this.registerView(
       EXTENDED_OUTLINE_VIEW,
       (leaf) => new ExtendedOutlineView(leaf, this),
@@ -92,6 +98,10 @@ export default class ExtendedHeadingsPlugin extends Plugin {
       this.app,
       () => this.settings.maximumLevel,
     );
+    this.register(headingRename.installNativeCommand());
+    this.registerEvent(this.app.workspace.on("editor-menu", (menu, editor, view) => {
+      if (view instanceof MarkdownView) headingRename.adaptNativeMenu(menu, editor, view);
+    }));
     const references = new ReferenceCommandService(
       this.app,
       () => this.settings.maximumLevel,
@@ -260,6 +270,7 @@ export default class ExtendedHeadingsPlugin extends Plugin {
   }
 
   onunload(): void {
+    this.headingBreadcrumb?.destroy();
     this.styleSettingsPrecisionControls?.stop();
     this.coreOutlineRenderer?.destroy();
     this.coreIntegration?.stop();
@@ -272,7 +283,14 @@ export default class ExtendedHeadingsPlugin extends Plugin {
     ]) document.body.removeClass(className);
   }
 
+  async breadcrumbSettingsChanged(): Promise<void> {
+    await this.saveData(this.settings);
+    this.headingBreadcrumb?.refresh();
+    this.coreOutlineRenderer?.refreshAll();
+  }
+
   async settingsChanged(reindex: boolean): Promise<void> {
+    this.headingBreadcrumb?.refresh();
     await this.saveData(this.settings);
     this.app.workspace.updateOptions();
     this.syncBodyClasses();

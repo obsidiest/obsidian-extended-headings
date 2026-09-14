@@ -2,6 +2,9 @@ import {
   type App,
   type Editor,
   type EditorChange,
+  type Command,
+  type Menu,
+  type MenuItem,
   MarkdownView,
   Modal,
   Notice,
@@ -10,15 +13,16 @@ import {
   stripHeading,
   type TFile,
 } from "obsidian";
-import { parseHeadingLine, type ParsedHeading } from "./headings";
+import { parseHeadingLine, scanHeadings, type ParsedHeading } from "./headings";
 import {
-  headingSubpathMatches,
+  headingRenameSegment,
   normalizeHeadingAnchor,
+  renamedHeadingAnchor,
   replaceReferenceHeadingSubpath,
 } from "./reference-utils";
 
 interface CommandManager {
-  executeCommandById(id: string): boolean;
+  commands: Record<string, Command>;
 }
 
 interface AppWithCommands extends App {
@@ -102,19 +106,42 @@ export class HeadingRenameService {
     const heading = this.headingAtCursor(editor);
     if (!heading || !view.file) return;
 
-    if (heading.level <= 6) {
-      const executed = (this.app as AppWithCommands).commands?.executeCommandById(
-        "editor:rename-heading",
-      );
-      if (!executed) new Notice("Obsidian's native heading rename command is unavailable");
-      return;
-    }
-
     new RenameExtendedHeadingModal(
       this.app,
       heading.rawBody,
       (value) => this.renameExtendedHeading(editor, view, heading, value),
     ).open();
+  }
+
+  /** Keep the native command ID/hotkey, with a reversible handler for ATX
+   * headings. Native rename matches only a single fragment, so it cannot
+   * update the nested paths produced by Copy link / Copy embed.
+   */
+  installNativeCommand(): () => void {
+    const command = (this.app as AppWithCommands).commands?.commands["editor:rename-heading"];
+    const original = command?.editorCheckCallback;
+    if (!command || !original) return () => {};
+    const handler: NonNullable<Command["editorCheckCallback"]> = (checking, editor, view) => {
+      if (view instanceof MarkdownView && this.canRename(editor)) {
+        if (!checking) this.renameAtCursor(editor, view);
+        return true;
+      }
+      return Boolean(original(checking, editor, view));
+    };
+    command.editorCheckCallback = handler;
+    return () => {
+      if (command.editorCheckCallback === handler) command.editorCheckCallback = original;
+    };
+  }
+
+  adaptNativeMenu(menu: Menu, editor: Editor, view: MarkdownView): void {
+    if (!this.canRename(editor)) return;
+    const command = (this.app as AppWithCommands).commands?.commands["editor:rename-heading"];
+    // Menu items are not enumerated by the public API. Only replace the
+    // exact localized native item when this guarded compatibility hook exists.
+    const items = (menu as Menu & { items?: (MenuItem & { titleEl?: HTMLElement })[] }).items;
+    const native = command && items?.find((item) => item.titleEl?.textContent === command.name);
+    if (native?.onClick) native.onClick(() => this.renameAtCursor(editor, view));
   }
 
   private headingAtCursor(editor: Editor): ParsedHeading | null {
@@ -130,7 +157,8 @@ export class HeadingRenameService {
 
   private collectReferenceEdits(
     targetFile: TFile,
-    oldAnchor: string,
+    headings: { line: number; level: number; anchor: string }[],
+    targetLine: number,
     newAnchor: string,
   ): Map<string, { file: TFile; edits: ReferenceEdit[] }> {
     const byFile = new Map<string, { file: TFile; edits: ReferenceEdit[] }>();
@@ -140,12 +168,13 @@ export class HeadingRenameService {
       const edits: ReferenceEdit[] = [];
       for (const reference of referencesFor(cache)) {
         const link = parseLinktext(reference.link);
-        if (!headingSubpathMatches(link.subpath, oldAnchor)) continue;
         const destination = link.path
           ? this.app.metadataCache.getFirstLinkpathDest(link.path, sourceFile.path)
           : sourceFile;
         if (destination?.path !== targetFile.path) continue;
-        const replacement = replaceReferenceHeadingSubpath(reference.original, newAnchor);
+        const segment = headingRenameSegment(link.subpath, headings, targetLine);
+        if (segment === null) continue;
+        const replacement = replaceReferenceHeadingSubpath(reference.original, newAnchor, segment);
         if (!replacement || replacement === reference.original) continue;
         edits.push({
           from: {
@@ -184,6 +213,10 @@ export class HeadingRenameService {
     requestedValue: string,
   ): Promise<boolean> {
     const newRawBody = requestedValue.trim();
+    if (/[\r\n]/.test(requestedValue)) {
+      new Notice("A heading name must stay on one line");
+      return false;
+    }
     if (!newRawBody) {
       new Notice("A heading name cannot be empty");
       return false;
@@ -195,23 +228,25 @@ export class HeadingRenameService {
       editor.getLine(originalHeading.line),
       originalHeading.line,
       0,
-      7,
+      1,
       this.maximumLevel(),
     );
-    if (!current || current.level !== originalHeading.level) {
+    if (!current || current.level !== originalHeading.level || current.rawBody !== originalHeading.rawBody) {
       new Notice("The heading changed before it could be renamed");
       return false;
     }
 
     const oldAnchor = normalizeHeadingAnchor(stripHeading(current.rawBody));
-    const newAnchor = normalizeHeadingAnchor(stripHeading(newRawBody));
-    if (!newAnchor) {
+    const newAnchor = renamedHeadingAnchor(newRawBody);
+    if (!normalizeHeadingAnchor(newAnchor)) {
       new Notice("The new heading has no linkable text");
       return false;
     }
 
     const editsByFile = oldAnchor
-      ? this.collectReferenceEdits(targetFile, oldAnchor, newAnchor)
+      ? this.collectReferenceEdits(targetFile, scanHeadings(editor.getValue(), 1, this.maximumLevel()).map(
+        (heading) => ({ line: heading.line, level: heading.level, anchor: stripHeading(heading.rawBody) }),
+      ), current.line, newAnchor)
       : new Map<string, { file: TFile; edits: ReferenceEdit[] }>();
     const openViews = new Map<string, MarkdownView>();
     for (const leaf of this.app.workspace.getLeavesOfType("markdown")) {

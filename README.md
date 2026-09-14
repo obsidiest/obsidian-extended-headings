@@ -1,6 +1,6 @@
 # Extended Headings
 
-Extended Headings extends Obsidian's ATX heading workflow from H1–H6 through H12. It adds editing, styling, folding, outlines, heading navigation, heading-level markers (in the editor gutter and outline pane, respectively), heading shifting, block-or-heading reference commands, Outline pane heading tree indentation guide lines (both static guides and dynamic threading), Outline pane Markdown Rendering, and Outline pane SVG rendering.
+Extended Headings extends Obsidian's ATX heading workflow from H1–H6 through H12. It adds editing, styling, folding, outlines, heading navigation, heading-level markers (in the editor gutter and outline pane, respectively), heading shifting, block-or-heading reference commands, Outline pane heading tree indentation guide lines (both static guides and dynamic threading), Outline pane Markdown Rendering, Outline pane SVG rendering, and heading hover breadcrumbs.
 
 ```markdown
 ###### Native H6
@@ -17,9 +17,9 @@ The default maximum is H12. It can be lowered to H7 under **Settings → Communi
 - **Latest compatibility target:** Obsidian 1.13.7 (Desktop, public release).
 - **Minimum supported Obsidian version:** 1.13.0.
 
-The compatibility target records the newest Obsidian base-program version audited and tested when this release was prepared. Version 0.4.9 deliberately raises the minimum from 1.7.2 to 1.13.0 so the plugin can use Obsidian's searchable declarative settings API without retaining a second legacy settings renderer. Earlier releases remain mapped to their historical minimum versions in `versions.json`.
+The compatibility target records the Obsidian version used for the compatibility audit. For 2.0.0, automated tests and Chromium/CodeMirror checks are separate from device testing inside Obsidian; see [2.0.0 validation](docs/testing-2.0.0.md). Version 0.4.9 deliberately raises the minimum from 1.7.2 to 1.13.0 so the plugin can use Obsidian's searchable declarative settings API without retaining a second legacy settings renderer. Earlier releases remain mapped to their historical minimum versions in `versions.json`.
 
-Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 1.0.1 has not been device-tested on Obsidian Mobile.
+Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 2.0.0 has not been device-tested on Obsidian Mobile.
 
 ## Features
 
@@ -44,7 +44,8 @@ Extended Headings declares mobile compatibility because its runtime uses Obsidia
 - A configurable lower heading limit and optional Tab/Shift+Tab override.
 - Formatting-cleanup and child-list behaviors inspired by Heading Shifter.
 - `H1`–`H12` markers in the editor gutter.
-- H1–H12-aware rename, copy-link, and copy-embed commands.
+- H1–H12-aware rename, copy-link, and copy-embed commands, including ancestor segments in nested links and embeds.
+- A clickable, scrollable heading hover breadcrumb in Live Preview, Source, and Reading mode, with independent Editor/Outline activation and decoration controls.
 - Heading- or block-specific copy actions in the editor context menu.
 - Minimal-style typography controls for every extended level from H7 through H12.
 - An **Editor Gutter** Style Settings section with global heading-level-marker and hash-marker size, weight, and font-variant controls across all H1–H12 heading levels.
@@ -123,6 +124,38 @@ The **Default Outline Pane** Style Settings section supplies heading typography 
 
 H7 through H12 each also have a collapsible section with font size, weight, individual light/dark color, variant, style, and divider controls. The default size and weight for every extended level are `0.9em` and `500`; H7 also defaults to the `normal` font variant and style. A shared H7+ color remains the fallback until an individual level color is set. Unless overridden by the global controls, ATX hashes inherit the selected font size, weight, style, and variant for their corresponding heading level.
 
+## Heading Hover Breadcrumb
+
+Hover an H1–H12 level marker to open the heading's ancestor hierarchy. The originating heading stays highlighted in the popover. Hovering another entry previews and highlights that heading in the editor and default Outline without moving the editor caret. Click an entry to navigate; in Source and Live Preview the caret moves to the heading line. The popover scrolls independently, and its focused entries support **Up**, **Down**, **Home**, **End**, **Enter**, and **Space**. **Esc** closes it.
+
+The **Heading Hover Breadcrumb** section appears last in the main settings. Subordinate controls become inaccessible whenever a required parent is off; stored values are retained.
+
+| Control | Default | Behavior |
+| --- | --- | --- |
+| Heading Hover Breadcrumb | On | Enables the entire feature. |
+| Full-Width Heading Field Heading Hover Breadcrumb Activation | Off | Enables full-row activation in each enabled pane. Both the global toggle and that pane's subordinate toggle must be on. |
+| Editor / Outline Pane Full-Width Heading Field Heading Hover Breadcrumb Activation | Off / Off | Activates anywhere across the heading field in the corresponding pane. Takes precedence over marker activation in that pane. |
+| Full-Width Heading Marker Heading Hover Breadcrumb Activation | On | Activates across the Hn marker area, excluding the heading hashes. |
+| Editor / Outline Pane Full-Width Heading Marker Heading Hover Breadcrumb Activation | On / On | Enables marker activation independently for each pane. |
+| Editor Pane / Outline Pane Heading Hover Breadcrumb | On / On | Enables the popover in each pane. |
+| Heading Hover Breadcrumb in Live Preview / Source Mode / Reading Mode | On / On / On | Controls activation for the note's viewing mode. |
+| Expand Long Heading Titles in Heading Hover Breadcrumb | On | Wraps full titles; turn off for single-line ellipsis truncation. |
+| Heading Hover Breadcrumb Heading Markers | On | Shows H1–H12 labels in the popover; the Editor and Outline subordinate toggles both default on. |
+| Heading Hover Breadcrumb Static Tree Indentation Guides | On | Shows tree spines and branch connectors; the Editor and Outline subordinate toggles both default on. |
+| Heading Hover Breadcrumb Threading | Off | Enables threading inside the popover; the Editor and Outline subordinate toggles both default off. |
+
+Breadcrumb threading has separate global, Editor, and Outline controls for all of the regular, root-level, orphan, combined root-level ⟺ orphan, all-branches, and selected-heading submodes described in the Outline settings above. Regular, root-level, and orphan active paths and the root/orphan/combined master submodes default on. **Active Root-Level ⟺ Orphan Heading Threading** defaults off globally; its per-pane defaults remain on for use when the global option is enabled. All-branches and selected-heading activation default off. Turn on the global **and** desired pane's breadcrumb-threading toggles to use them. A pane's submode also requires its global counterpart. Root modes add the relevant root entries to the ancestor path; all-branches modes include the applicable branch entries. These settings are independent of threading in the main Outline.
+
+In Source and Live Preview, marker activation covers the left editor margin through the complete visible Hn marker, including glyphs that extend outside their gutter cell. It requires the existing marker visibility settings and excludes heading hashes. Reading mode supplies Hn hover markers beside headings while marker activation is enabled. Outline marker activation requires **Show Outline pane heading level markers**. With marker and field activation both off for a pane, it has no hover trigger.
+
+The **Heading Hover Breadcrumb Popover Timeout** controls adapt Nested Properties Advanced's dismissal behavior. The global timeout defaults to **0.01 seconds**, with its control enabled. Each viewing mode has an optional independent override, disabled by default and also initialized to **0.01 seconds**. Decimal values are supported. The timeout is a dismissal delay, not a lifetime while interacting: entering the popover or its connecting gap cancels it, and scrolling or previewing ancestors keeps the popover open. Ordinary main-pane scrolling outside the popover uses the same delay. Changing notes/modes, editing the document, leaving the window, or pressing Esc still dismisses it. Hover previews and dismissal preserve the editor caret.
+
+In **Style Settings → Extended Headings → Heading Hover Breadcrumb**, customize popover typography, dimensions, spacing, scrolling area, colors, current/hover appearance, borders, corners, shadow, and main-heading highlights. Marker typography includes size, weight, color, style, variant, letter spacing, opacity, reserved width, and gap; **All small caps** is the default variant. Static guides and threading expose all of the Outline's corresponding pattern, geometry, opacity, thickness, palette, fallback, and override controls. **Editor Pane Breadcrumb Decorations** and **Outline Pane Breadcrumb Decorations** can override the shared marker/guide/thread appearance independently, using the same defaults and precise numerical inputs.
+
+The breadcrumb reuses a heading model until that note's editor document changes. It has no timer polling or vault-wide breadcrumb scan. Popover geometry is measured only while open; Reading-section registrations, window listeners, timers, observers, and highlights are cleaned up when their owners disappear. This does not change the existing Outline renderer or its performance warning above.
+
+The default maximum popover height is **400 px**, enough for twelve short ancestor titles at the default typography. Taller lists scroll within the configured maximum height and available window space. Existing custom height values remain in effect.
+
 ## Commands and hotkeys
 
 Commands operate on every heading in the selected line range, or on the heading line containing the cursor when nothing is selected.
@@ -138,11 +171,13 @@ Commands operate on every heading in the selected line range, or on the heading 
 | Insert heading one level deeper | None | Inserts a heading one level below the surrounding section. |
 | Insert heading one level higher | None | Inserts a heading one level above the surrounding section. |
 | Insert extended heading one level deeper | None | Inserts the next extended level beneath H6–H11. |
-| Rename this heading (H1–H12) | None | Uses Obsidian's native workflow for H1–H6 and updates matching vault links for H7–H12. |
+| Rename this heading (H1–H12) | None | Renames H1–H12 headings and updates the matching segment of short or fully nested vault links and embeds, including descendant paths. |
 | Copy embed to current block or heading (H1–H12) | None | Copies a fully nested heading embed by default or creates/reuses a block ID and copies its embed. |
 | Copy link to current block or heading (H1–H12) | None | Copies a fully nested heading link by default or creates/reuses a block ID and copies its link. |
 | Open extended outline | None | Opens the plugin's supported-API outline pane. |
 | Reindex headings | None | Rebuilds the experimental core-heading bridge. |
+
+In 2.0.0, the plugin command and Obsidian's **Rename this heading…** editor command/context-menu action share the nested-path-aware rename handler for supported ATX headings. The native command ID and assigned hotkeys are retained, and its original handler is restored when the plugin unloads. Each affected link keeps its note destination, unaffected ancestor/descendant segments, explicit alias or Markdown label, and embed syntax. When names repeat, resolution follows the heading path and source order rather than renaming every identical label.
 
 Extended Headings deliberately assigns no default hotkeys, preventing conflicts with Obsidian and other plugins. Assign desired combinations under **Settings → Hotkeys**. To reproduce the original workflow, use:
 
@@ -222,7 +257,7 @@ If you received the combined distribution ZIP, the contents of `_source` are the
 - Default Outline markers, guides, threads, and SVG rendering change only the Outline pane's transient DOM. SVG source is sanitized with Obsidian's HTML sanitizer; none of these features rewrite note content or inject unsanitized HTML.
 - Heading-shift, set-heading, and contextual-insert commands modify only the active editor selection or cursor line when explicitly invoked.
 - Copying a reference to an ordinary block may append a block ID to that block when none exists.
-- Renaming an H7–H12 heading may update matching heading links and embeds in Markdown files throughout the vault after explicit confirmation through the command.
+- Renaming an H1–H12 heading may update matching heading links and embeds in Markdown files throughout the vault after explicit confirmation through the command.
 
 Keep Obsidian's File Recovery enabled and maintain ordinary vault backups before testing a new release.
 
@@ -260,6 +295,7 @@ I had hoped someone capable and sufficiently ambitious might create a plugin lik
 - Version 0.4.14 H1–H12 marker controls, precise Style Settings inputs, heading-marker and parenthesized-Outline-SVG fixes, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 - Version 0.4.15 intrinsic H10–H12 gutter sizing, arbitrary-value and caret-stable Style Settings inputs, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 - Version 0.4.16 targeted H10–H12 Minimal-padding correction, restoration of the 0.4.14 H1–H9 marker layout, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
+- Version 2.0.0 heading hover breadcrumbs, nested-heading rename corrections, validation, and release preparation developed with **Codex, OpenAI**, under obsidiest's direction.
 - Version 1.0.0 default-Outline Markdown rendering, robust formatted/link/embed heading matching, markers, static guides, full-row individual/root-level/orphan/combined threading, Outline and Editor Gutter Style Settings, regression coverage, documentation, and release preparation generated with **GPT-5.6 Sol (Max), OpenAI**, under obsidiest's direction.
 
 Incorporates features inspired by the following Obsidian community plugins:
@@ -268,6 +304,8 @@ Incorporates features inspired by the following Obsidian community plugins:
 - [Lapel](https://github.com/liamcain/obsidian-lapel)
 - [Copy Block Link](https://github.com/mgmeyers/obsidian-copy-block-link)
 - [List Tree Indentation Guides](https://github.com/obsidiest/obsidian-list-tree-indentation-guides) v1.0.6 (static-guide and threading interaction/appearance reference; MIT licensed)
+
+- [Nested Properties Advanced](https://github.com/obsidiest/obsidian-nested-properties-advanced/releases/tag/2.0.0) v2.0.0 (hover breadcrumb interaction, timeout, navigation, and appearance reference; MIT licensed). See [third-party notices](THIRD-PARTY-NOTICES.md).
 
 Primary implementation references:
 

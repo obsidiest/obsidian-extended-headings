@@ -13,6 +13,9 @@ const NUMERIC_SELECT_IDS = new Set([
   "extended-hash-marker-weight",
   "extended-outline-heading-font-weight",
   "extended-outline-level-marker-font-weight",
+  "extended-breadcrumb-level-marker-font-weight",
+  "extended-editor-breadcrumb-level-marker-font-weight",
+  "extended-outline-breadcrumb-level-marker-font-weight",
 ]);
 
 type QueryableNode = ParentNode & {
@@ -37,7 +40,17 @@ export class StyleSettingsPrecisionControls {
       (typeof MutationObserver === "undefined" ? null : MutationObserver);
     if (!Observer) return;
 
-    const observer = new Observer(() => {
+    const observer = new Observer((mutations) => {
+      // Breadcrumb paths are replaced while navigating the popup. They never
+      // contain Style Settings controls, so avoid a document-wide settings
+      // search for each of those decoration-only mutations.
+      if (mutations.every((mutation) => {
+        const target = mutation.target as Element;
+        if (target.nodeType === 1 && target.closest(".extended-breadcrumb-popover")) return true;
+        const nodes = [...Array.from(mutation.addedNodes), ...Array.from(mutation.removedNodes)];
+        return mutation.type === "childList" && nodes.length > 0 && nodes.every((node) =>
+          node.nodeType === 1 && (node as Element).matches(".extended-breadcrumb-popover, .extended-breadcrumb-reading-marker"));
+      })) return;
       enhanceStyleSettingsNumberControls(ownerDocument);
     });
     observer.observe(ownerDocument.body, {

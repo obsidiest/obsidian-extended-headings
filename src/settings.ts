@@ -1,3 +1,4 @@
+import { DEFAULT_BREADCRUMB_SETTINGS, breadcrumbSettingDefinitions, validBreadcrumbTimeout, type BreadcrumbSettings, type BreadcrumbBooleanKey, type BreadcrumbNumberKey } from "./breadcrumb-settings";
 import {
   App,
   Notice,
@@ -7,7 +8,7 @@ import {
 import type { ChildListBehavior } from "./heading-commands";
 import type ExtendedHeadingsPlugin from "./main";
 
-export interface ExtendedHeadingsSettings {
+export interface ExtendedHeadingsSettings extends BreadcrumbSettings {
   maximumLevel: number;
   hideMarkersInLivePreview: boolean;
   coreIntegration: boolean;
@@ -47,6 +48,7 @@ export interface ExtendedHeadingsSettings {
 }
 
 export const DEFAULT_SETTINGS: ExtendedHeadingsSettings = {
+  ...DEFAULT_BREADCRUMB_SETTINGS,
   maximumLevel: 12,
   hideMarkersInLivePreview: true,
   coreIntegration: true,
@@ -578,6 +580,7 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
           },
         ],
       },
+      ...breadcrumbSettingDefinitions(() => this.plugin.settings),
     ];
   }
 
@@ -590,6 +593,17 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
   }
 
   async setControlValue(key: string, value: unknown): Promise<void> {
+    if (Object.prototype.hasOwnProperty.call(DEFAULT_BREADCRUMB_SETTINGS, key)) {
+      const original = DEFAULT_BREADCRUMB_SETTINGS[key as keyof BreadcrumbSettings];
+      if (typeof original === "boolean" && typeof value === "boolean") {
+        this.plugin.settings[key as BreadcrumbBooleanKey] = value;
+      } else if (typeof original === "number" && validBreadcrumbTimeout(value)) {
+        this.plugin.settings[key as BreadcrumbNumberKey] = value;
+      } else return;
+      await this.plugin.breadcrumbSettingsChanged();
+      if (typeof original === "boolean") this.update();
+      return;
+    }
     let reindex = false;
 
     switch (key) {

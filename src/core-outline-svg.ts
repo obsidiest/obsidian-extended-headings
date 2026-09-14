@@ -41,6 +41,7 @@ export interface OutlineSvgMatch {
 }
 
 export interface OutlineHeadingSpec {
+  line?: number;
   alternateLabels?: string[];
   label: string;
   level: number;
@@ -690,6 +691,7 @@ export class CoreOutlineRenderer {
   private hasEnabledFeature(): boolean {
     const settings = this.plugin.settings;
     return (
+      (settings.headingHoverBreadcrumb && settings.outlineHeadingHoverBreadcrumb) ||
       settings.renderInlineSvgsInDefaultOutline ||
       settings.renderMarkdownInDefaultOutline ||
       settings.showOutlinePaneHeadingLevelMarkers ||
@@ -932,6 +934,8 @@ export class CoreOutlineRenderer {
 
         row.classList.add(OUTLINE_ROW_CLASS);
         row.dataset.extendedHeadingLevel = String(spec.level);
+        if (spec.line !== undefined) row.dataset.extendedBreadcrumbLine = String(spec.line);
+        row.dataset.extendedBreadcrumbFile = file.path;
         row.dataset.extendedHeadingRoot = String(modelItem.rootIndex);
         row.dataset.extendedHeadingOrphan = String(modelItem.orphan);
         row.dataset.extendedHeadingSpecIndex = String(match.specIndex);
@@ -1100,6 +1104,7 @@ export class CoreOutlineRenderer {
       return {
         ...(alternateLabels.length > 0 ? { alternateLabels } : {}),
         label,
+        line: heading.line,
         level: heading.level,
         ...(hasRenderableOutlineMarkdown(heading.rawBody)
           ? { markdown: outlineMarkdownFromHeadingBody(heading.rawBody) }
@@ -1673,6 +1678,8 @@ export class CoreOutlineRenderer {
     )) {
       row.classList.remove(OUTLINE_ROW_CLASS);
       delete row.dataset.extendedHeadingLevel;
+      delete row.dataset.extendedBreadcrumbLine;
+      delete row.dataset.extendedBreadcrumbFile;
       delete row.dataset.extendedHeadingRoot;
       delete row.dataset.extendedHeadingOrphan;
       delete row.dataset.extendedHeadingSpecIndex;
