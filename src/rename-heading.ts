@@ -70,10 +70,10 @@ class RenameExtendedHeadingModal extends Modal {
       void this.handleSubmit(input.value, rename);
     });
 
-    input.addEventListener("keydown", (event) => {
+    form.addEventListener("keydown", (event) => {
       // Visual wrapping must not add a new Markdown line. Let composition
       // confirmation reach the IME, including engines that report keyCode 229.
-      if (event.key !== "Enter" || event.isComposing || event.keyCode === 229) return;
+      if (event.target !== input || event.key !== "Enter" || event.isComposing || event.keyCode === 229) return;
       event.preventDefault();
       if (!event.repeat && !rename.disabled) form.requestSubmit(rename);
     });
