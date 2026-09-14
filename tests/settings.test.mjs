@@ -75,7 +75,7 @@ test("enables Outline pane Markdown rendering by default", () => {
 test("describes heading markers without Lapel compatibility wording", () => {
   assert.match(
     settings,
-    /desc: "Show H1–H12 heading level markers in the editor gutter\."/,
+    /desc: "Show H1–H12 heading level markers in the editor gutter and H7–H12 markers inside linked embeds\."/,
   );
   assert.doesNotMatch(settings, /desc: "[^"]*Lapel-compatible[^"]*"/);
 });

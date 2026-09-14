@@ -30,3 +30,9 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
+      - name: Install browser test tools
+        run: |
+          npm install --prefix "$RUNNER_TEMP/extended-headings-browser" --no-package-lock --no-audit --no-fund playwright@1.63.0
+          node "$RUNNER_TEMP/extended-headings-browser/node_modules/playwright/cli.js" install --with-deps chromium
+      - name: Browser regression tests
+        run: PLAYWRIGHT_MODULE="$RUNNER_TEMP/extended-headings-browser/node_modules/playwright" npm run test:browser

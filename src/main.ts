@@ -97,6 +97,7 @@ export default class ExtendedHeadingsPlugin extends Plugin {
     const headingRename = new HeadingRenameService(
       this.app,
       () => this.settings.maximumLevel,
+      () => this.settings.expandLongRenameHeadingTitles,
     );
     this.register(headingRename.installNativeCommand());
     this.registerEvent(this.app.workspace.on("editor-menu", (menu, editor, view) => {

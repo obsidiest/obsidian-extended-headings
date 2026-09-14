@@ -45,6 +45,7 @@ Extended Headings declares mobile compatibility because its runtime uses Obsidia
 - Formatting-cleanup and child-list behaviors inspired by Heading Shifter.
 - `H1`–`H12` markers in the editor gutter.
 - H1–H12-aware rename, copy-link, and copy-embed commands, including ancestor segments in nested links and embeds.
+- Default-on automatic wrapping and expansion of long titles in the rename dialog, with a main-settings toggle.
 - A clickable, scrollable heading hover breadcrumb in Live Preview, Source, and Reading mode, with independent Editor/Outline activation and decoration controls.
 - Heading- or block-specific copy actions in the editor context menu.
 - Minimal-style typography controls for every extended level from H7 through H12.
@@ -88,6 +89,7 @@ Outline Pane Markdown and SVG Rendering Toggles ENABLED
 | Outline Pane Markdown Rendering | On | Renders inline Markdown formatting in H1–H12 default-Outline labels while keeping embedded links compact. |
 | Outline Pane – Expand Long Heading Titles | On | Wraps Markdown-rendered long heading titles onto additional lines; turn it off to use single-line ellipsis truncation. Available only while Outline Pane Markdown Rendering is enabled. |
 | Render inline SVGs in default Outline | On | Renders sanitized inline SVGs from H1–H12 heading source beside their labels in Obsidian's default Outline. |
+| Expand long heading titles in rename dialog | On | Wraps and fits the H1–H12 rename field immediately, then resizes it as you edit or resize the dialog. Enter renames; visual wrapping adds no line breaks to the heading. Disable for a single-line field. |
 | Copy fully nested heading paths | On | Includes every ancestor heading in copied heading links and embeds; disable it to copy only the shorter target-heading link. |
 | Lower limit of heading | `1` | Sets the shallowest level that **Decrease headings** may reach; `0` permits conversion to a paragraph. |
 | Enable override Tab behavior | Off | Makes Tab and Shift+Tab shift headings when the active selection contains a heading. |

@@ -3701,7 +3701,23 @@ body.extended-headings-show-level-markers .internal-embed .extended-heading-embe
 .markdown-preview-view [data-extended-hidden-by] { display: none; }
 
 .extended-outline { padding: 0.25rem; }
-.extended-heading-rename-input { width: 100%; }
+.extended-heading-rename-input {
+  box-sizing: border-box;
+  width: 100%;
+}
+textarea.extended-heading-rename-input {
+  display: block;
+  height: auto;
+  min-height: var(--input-height, 2.25em);
+  max-height: min(50vh, 24rem);
+  overflow-x: hidden;
+  overflow-y: auto;
+  resize: none;
+  font: inherit;
+  line-height: var(--line-height-normal, 1.5);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
 .extended-outline-empty { color: var(--text-muted); padding: 0.75rem; }
 .extended-outline-list { display: flex; flex-direction: column; gap: 1px; }
 .extended-outline-item {

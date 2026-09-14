@@ -35,7 +35,12 @@ try {
       .breadcrumb-test-has-outline { right: 420px; }
       .breadcrumb-test-outline { position: fixed; right: 16px; top: 40px; width: 370px; height: 690px; overflow: auto; }
       .breadcrumb-test-outline .tree-item-self { min-height: 36px; padding: 4px; display: flex; }
-      .breadcrumb-test-embed { margin: 30px; max-width: 600px; padding: 10px; }` });
+      .breadcrumb-test-embed { margin: 30px; max-width: 600px; padding: 10px; }
+      .rename-test-modal { position: fixed; top: 30px; left: 50%; transform: translateX(-50%);
+        box-sizing: border-box; width: min(600px, calc(100vw - 32px)); padding: 20px; }
+      .rename-test-modal .modal-content { margin: 0; }
+      .rename-test-modal .extended-heading-rename-input { padding: 8px; border: 2px solid #888; }
+      .rename-test-modal .modal-button-container { display: flex; justify-content: end; margin-top: 20px; }` });
     await page.addScriptTag({ content: bundle.outputFiles[0].text });
     await page.evaluate(() => window.setupBreadcrumb());
     await page.locator('.cm-heading-marker[data-level="12"]').hover();
@@ -236,6 +241,56 @@ try {
       await page.evaluate(() => document.body.classList.remove("extended-headings-show-level-markers"));
       assert.equal(await page.locator(".extended-heading-embed-marker:visible").count(), 0); checks++;
     }
+    // Check real textarea layout before any click, then editing, narrow
+    // layouts, bounded scrolling, keyboard submission, and the off switch.
+    const renameTitle = "Test Heading 2 - Filler Text for this Example (More Filler Text) (Filler Text) (Filler Text) (Filler Text)";
+    const settleRename = () => page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    const renameBox = () => page.locator(".extended-heading-rename-input").evaluate((input) => {
+      const rect = input.getBoundingClientRect(), style = getComputedStyle(input);
+      return { tag: input.tagName, height: rect.height, width: rect.width, client: input.clientHeight,
+        scroll: input.scrollHeight, scrollWidth: input.scrollWidth, clientWidth: input.clientWidth,
+        lineHeight: Number.parseFloat(style.lineHeight), value: input.value,
+        focused: document.activeElement === input, end: input.selectionEnd };
+    });
+    for (const level of [1, 6, 7, 10, 11, 12]) {
+      await page.evaluate(({ title, level }) => window.setupRenameModal(title, true, level), { title: renameTitle, level });
+      await settleRename();
+      const box = await renameBox();
+      assert.equal(box.tag, "TEXTAREA");
+      assert.equal(box.value, renameTitle);
+      assert.ok(box.height > box.lineHeight * 2, JSON.stringify(box));
+      assert.ok(box.scroll <= box.client + 1, JSON.stringify(box));
+      assert.ok(box.scrollWidth <= box.clientWidth + 1, JSON.stringify(box));
+      assert.ok(box.focused && box.end === renameTitle.length);
+      checks += 6;
+    }
+    const originalRename = await renameBox();
+    await page.locator(".extended-heading-rename-input").fill("Short");
+    const shortRename = await renameBox();
+    assert.ok(shortRename.height < originalRename.height); checks++;
+    await page.locator(".extended-heading-rename-input").fill(renameTitle);
+    const restoredRename = await renameBox();
+    assert.ok(Math.abs(restoredRename.height - originalRename.height) <= 1); checks++;
+    await page.locator(".rename-test-modal").evaluate((modal) => { modal.style.width = "260px"; });
+    await settleRename();
+    const narrowRename = await renameBox();
+    assert.ok(narrowRename.height > restoredRename.height, JSON.stringify(narrowRename));
+    assert.ok(narrowRename.scroll <= narrowRename.client + 1); checks += 2;
+    await page.locator(".extended-heading-rename-input").fill("Unbroken".repeat(200));
+    const hugeRename = await renameBox();
+    assert.ok(hugeRename.scroll > hugeRename.client, JSON.stringify(hugeRename));
+    assert.ok(hugeRename.height <= 425);
+    assert.ok(hugeRename.scrollWidth <= hugeRename.clientWidth + 1); checks += 3;
+    await page.locator(".extended-heading-rename-input").fill(renameTitle);
+    await page.locator(".extended-heading-rename-input").press("Enter");
+    assert.deepEqual(await page.evaluate(() => window.renameTest.submissions), [renameTitle]);
+    assert.equal((await renameBox()).value, renameTitle); checks += 2;
+    await page.locator('.rename-test-modal button[type="button"]').click();
+    assert.equal(await page.locator(".rename-test-modal").count(), 0); checks++;
+    await page.evaluate((title) => window.setupRenameModal(title, false), renameTitle);
+    await settleRename();
+    assert.equal((await renameBox()).tag, "INPUT");
+    assert.equal((await renameBox()).value, renameTitle); checks += 2;
     assert.deepEqual(errors, []);
     await page.close();
   }

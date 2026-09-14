@@ -39,10 +39,13 @@ interface ReferenceEdit {
 }
 
 class RenameExtendedHeadingModal extends Modal {
+  private releaseInput: (() => void) | null = null;
+
   constructor(
     app: App,
     private readonly initialValue: string,
     private readonly submit: (value: string) => Promise<boolean>,
+    private readonly expandLongTitles: boolean,
   ) {
     super(app);
   }
@@ -51,9 +54,9 @@ class RenameExtendedHeadingModal extends Modal {
     this.setTitle("Rename this heading");
     this.contentEl.empty();
     const form = this.contentEl.createEl("form");
-    const input = form.createEl("input", {
-      attr: { type: "text", "aria-label": "New heading text" },
-    });
+    const input = this.expandLongTitles
+      ? form.createEl("textarea", { attr: { rows: "1", wrap: "soft", "aria-label": "New heading text" } })
+      : form.createEl("input", { attr: { type: "text", "aria-label": "New heading text" } });
     input.addClasses(["text-input", "extended-heading-rename-input"]);
     input.value = this.initialValue;
 
@@ -67,13 +70,69 @@ class RenameExtendedHeadingModal extends Modal {
       void this.handleSubmit(input.value, rename);
     });
 
-    window.setTimeout(() => {
+    input.addEventListener("keydown", (event) => {
+      // Visual wrapping must not add a new Markdown line. Let composition
+      // confirmation reach the IME, including engines that report keyCode 229.
+      if (event.key !== "Enter" || event.isComposing || event.keyCode === 229) return;
+      event.preventDefault();
+      if (!event.repeat && !rename.disabled) form.requestSubmit(rename);
+    });
+    this.prepareInput(input);
+  }
+
+  onClose(): void {
+    this.releaseInput?.();
+    this.releaseInput = null;
+    this.contentEl.empty();
+  }
+
+  private prepareInput(input: HTMLInputElement | HTMLTextAreaElement): void {
+    const win = input.ownerDocument.defaultView;
+    if (!win) return;
+    let disposed = false;
+    let width = 0;
+    const resize = () => {
+      if (disposed || !this.expandLongTitles || !input.isConnected) return;
+      const nextWidth = input.getBoundingClientRect().width;
+      if (nextWidth <= 0) return;
+      width = nextWidth;
+      // scrollHeight includes padding, but not borders. Reset first so the
+      // field can also shrink when text is removed or the dialog gets wider.
+      input.style.removeProperty("height");
+      const style = win.getComputedStyle(input);
+      const border = (Number.parseFloat(style.borderTopWidth) || 0)
+        + (Number.parseFloat(style.borderBottomWidth) || 0);
+      input.style.height = `${Math.ceil(input.scrollHeight + border)}px`;
+    };
+    const observer = this.expandLongTitles ? new win.ResizeObserver(() => {
+      // Height changes caused by our own measurement must not form a loop.
+      if (input.getBoundingClientRect().width !== width) resize();
+    }) : null;
+    if (observer) {
+      observer.observe(input);
+      input.addEventListener("input", resize);
+      win.addEventListener("resize", resize);
+    }
+    resize();
+    let frame: number | null = win.requestAnimationFrame(() => {
+      frame = null;
+      if (disposed || !input.isConnected) return;
       input.focus();
       input.select();
-    }, 0);
+      // onOpen can precede attachment; measure again before the next paint.
+      resize();
+    });
+    this.releaseInput = () => {
+      disposed = true;
+      if (frame !== null) win.cancelAnimationFrame(frame);
+      observer?.disconnect();
+      input.removeEventListener("input", resize);
+      win.removeEventListener("resize", resize);
+    };
   }
 
   private async handleSubmit(value: string, button: HTMLButtonElement): Promise<void> {
+    if (button.disabled) return;
     button.disabled = true;
     const accepted = await this.submit(value);
     if (accepted) this.close();
@@ -96,6 +155,7 @@ export class HeadingRenameService {
   constructor(
     private readonly app: App,
     private readonly maximumLevel: () => number,
+    private readonly expandLongTitles: () => boolean = () => true,
   ) {}
 
   canRename(editor: Editor): boolean {
@@ -110,6 +170,7 @@ export class HeadingRenameService {
       this.app,
       heading.rawBody,
       (value) => this.renameExtendedHeading(editor, view, heading, value),
+      this.expandLongTitles(),
     ).open();
   }
 

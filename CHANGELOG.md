@@ -2,6 +2,8 @@
 
 ## 2.1.0
 
+- Added the default-on **Expand long heading titles in rename dialog** setting. The shared H1–H12 rename field now wraps and sizes itself on opening, typing, and resizing; Enter still submits a single-line Markdown heading. Disabling the setting restores the single-line field. The plugin command and intercepted native command/context menu use the same behavior.
+
 - Added the Heading Hover Breadcrumb Navigation subsection with independent controls for main-UI navigation before and after the popover timeout. Before-timeout preview defaults on; after-timeout navigation defaults off. The controls cover both panes and all viewing modes, preserve the editor caret during hover, and use the existing dismissal delay.
 - Made hover previews temporary by default. Timeout restores the prior view unless after-timeout navigation is enabled; explicit clicks commit navigation regardless of the hover settings. Cancellation and note/mode/document changes do not trigger deferred navigation.
 - Fixed missing H7–H12 heading-level markers in internal linked embeds. Complete labels use the existing editor-marker visibility and typography settings, with separate space for markers, fold buttons, and wrapped inline heading content. Detached embed rendering and H10–H12 labels are covered.

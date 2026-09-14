@@ -5,6 +5,7 @@ import { HeadingBreadcrumb } from "../../src/heading-breadcrumb";
 import { DEFAULT_BREADCRUMB_SETTINGS } from "../../src/breadcrumb-settings";
 import { breadcrumbHighlightField } from "../../src/breadcrumb-editor";
 import { renderExtendedHeadings } from "../../src/reading";
+import { HeadingRenameService } from "../../src/rename-heading";
 Object.assign(window, {
     renderExtendedHeadings,
     createEl: (tag) => document.createElement(tag),
@@ -74,3 +75,20 @@ Object.assign(window, { setupBreadcrumb: (settingsOverrides = {}, options = {}) 
         Object.assign(window, { breadcrumbTest: { cm, manager, settings, view, handlers } });
         cleanup = () => { manager.destroy(); cm.destroy(); };
     } });
+
+Object.assign(window, { setupRenameModal: (title, expand = true, level = 12) => {
+    cleanup();
+    document.body.replaceChildren();
+    const app = {};
+    const submissions = [];
+    const service = new HeadingRenameService(app, () => 12, () => expand);
+    service.renameExtendedHeading = async (_editor, _view, _heading, value) => {
+        submissions.push(value);
+        return false;
+    };
+    const editor = { getCursor: () => ({ line: 0, ch: 0 }), getLine: () => "#".repeat(level) + " " + title };
+    const view = Object.assign(new MarkdownView(), { file: { path: "Test.md" } });
+    service.renameAtCursor(editor, view);
+    Object.assign(window, { renameTest: { modal: app.renameModal, submissions } });
+    cleanup = () => app.renameModal.close();
+} });
