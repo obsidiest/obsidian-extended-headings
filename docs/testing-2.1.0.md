@@ -20,6 +20,10 @@ The new main setting **Expand long heading titles in rename dialog** defaults on
 
 Enter submits instead of inserting a newline; IME confirmation and held-key repeats do not submit. The existing rename validation still rejects actual line breaks. The field preserves the original Markdown text, and disabling the toggle retains a single-line input. Each dialog reads the current setting, and closing cancels pending focus work and disconnects layout observers.
 
+### Rename notifications
+
+The additional screenshot shows `Heading renamed; 0 links updated`. The shared rename service unconditionally emitted its success notice after renaming, even when no references changed. It now shows that success notice only when at least one link was updated. No-backlink renames are silent for H1–H12 through both command routes; failed-update notices remain visible even when zero updates succeeded.
+
 ## Automated checks
 
 Run `npm run check`, `npm run lint`, `npm test`, and `npm run build`.
@@ -30,6 +34,7 @@ Current results are recorded by the [PR #11 checks](https://github.com/obsidiest
 
 The focused regressions cover:
 
+- Silent successful renames without backlinks at every level H1–H12, plus retained notifications for updated links and failed writes.
 - Rename dialogs at every level H1–H12, default and saved toggle values, initial sizing before a click, attachment timing, growth/shrinkage, width changes, owner-window focus, Enter/repeat/IME handling, duplicate-submit prevention, and cancellation cleanup. JSDOM injects layout measurements; those tests do not establish pixel geometry.
 - Browser measurements of the actual rename textarea before a click, title edits, narrow layouts, long unbroken titles, bounded scrolling, keyboard submission, and the disabled single-line mode.
 - All four navigation combinations in both panes across Source, Live Preview, and Reading mode, with unchanged caret positions.
@@ -43,9 +48,10 @@ The focused regressions cover:
 
 This environment does not run the user's Windows Obsidian workspace or Obsidian Mobile. Before release, verify:
 
-1. The supplied long-title rename case at all heading levels, immediately on opening and while editing, with the default-on toggle and with it disabled. Test the plugin command and native hotkey/context-menu routes, Enter, Escape/Cancel, narrow and pop-out windows, and IME text entry.
-2. Both navigation toggles in each pane and viewing mode, including keyboard focus, click followed by hover, Escape, and different dismissal delays.
-3. Heading and full-note embeds containing H7–H12, especially H10–H12, with folding and marker visibility on/off. Check the supplied overlap case and a detached/pop-out pane.
-4. Switching notes/modes/windows during a preview, editing the source, and independently switching an Outline pane's note. Confirm no delayed jump into unrelated content.
+1. Rename headings without backlinks through both commands and confirm no success popup appears. Verify that link-update and failure notifications still appear when applicable.
+2. The supplied long-title rename case at all heading levels, immediately on opening and while editing, with the default-on toggle and with it disabled. Test the plugin command and native hotkey/context-menu routes, Enter, Escape/Cancel, narrow and pop-out windows, and IME text entry.
+3. Both navigation toggles in each pane and viewing mode, including keyboard focus, click followed by hover, Escape, and different dismissal delays.
+4. Heading and full-note embeds containing H7–H12, especially H10–H12, with folding and marker visibility on/off. Check the supplied overlap case and a detached/pop-out pane.
+5. Switching notes/modes/windows during a preview, editing the source, and independently switching an Outline pane's note. Confirm no delayed jump into unrelated content.
 
 The existing README performance warning remains in place; these changes make no large-workspace performance claim.

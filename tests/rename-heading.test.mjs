@@ -4,7 +4,8 @@ import { sourceLoader } from "./helpers/load-source.mjs";
 
 class MarkdownView { requestSave() {} }
 class Modal {}
-class Notice { constructor(message) { this.message = message; } }
+const notices = [];
+class Notice { constructor(message) { this.message = message; notices.push(message); } }
 const obsidian = {
   MarkdownView, Modal, Notice,
   stripHeading: (s) => s.replace(/[!"#$%&()*+,.:;<=>?@^`{|}~\x2f\x5b\]\\]/g, " ").replace(/\s+/g, " ").trim(),
@@ -162,3 +163,51 @@ test("renaming rejects a stale heading and multiline input without touching docu
   assert.equal(await service.renameExtendedHeading(editor, view, original, "New\n# Another"), false);
   assert.equal(editor.getValue(), "## Changed");
 });
+
+for (let level = 1; level <= 12; level++) {
+  test("H" + level + " successful rename with no backlinks is silent", async () => {
+    notices.length = 0;
+    const target = { path: "Target.md" };
+    const initial = "#".repeat(level) + " Old";
+    const editor = editorFor(initial);
+    const view = Object.assign(new MarkdownView(), { file: target, editor });
+    const app = {
+      vault: { getMarkdownFiles: () => [target] },
+      metadataCache: { getFileCache: () => ({}) },
+      workspace: { getLeavesOfType: () => [{ view }] },
+    };
+    const service = new HeadingRenameService(app, () => 12);
+    assert.equal(await service.renameExtendedHeading(editor, view, scanHeadings(initial, 1, 12)[0], "New"), true);
+    assert.equal(editor.getValue(), "#".repeat(level) + " New");
+    assert.deepEqual(notices, [], "no Heading renamed; 0 links updated notification");
+  });
+}
+
+for (const fail of [false, true]) {
+  test("rename still reports " + (fail ? "failed updates even when no links were changed" : "a changed backlink"), async () => {
+    notices.length = 0;
+    const target = { path: "Target.md" }, linked = { path: "Linked.md" };
+    const original = "[[Target#Old]]";
+    let data = original;
+    const editor = editorFor("####### Old");
+    const view = Object.assign(new MarkdownView(), { file: target, editor });
+    const app = {
+      vault: {
+        getMarkdownFiles: () => [target, linked],
+        process: async (_file, callback) => { if (fail) throw new Error("write failed"); data = callback(data); },
+      },
+      metadataCache: {
+        getFileCache: (file) => file === linked ? { links: [reference(original)] } : {},
+        getFirstLinkpathDest: () => target,
+      },
+      workspace: { getLeavesOfType: () => [{ view }] },
+    };
+    const service = new HeadingRenameService(app, () => 12);
+    assert.equal(await service.renameExtendedHeading(editor, view, scanHeadings(editor.getValue(), 1, 12)[0], "New"), true);
+    assert.equal(data, fail ? original : "[[Target#New]]");
+    assert.equal(notices.length, 1);
+    assert.equal(notices[0], fail
+      ? "Heading renamed; 0 links updated, but 1 files could not be updated"
+      : "Heading renamed; 1 link updated");
+  });
+}

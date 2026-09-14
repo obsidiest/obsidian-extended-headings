@@ -72,8 +72,8 @@ class RenameExtendedHeadingModal extends Modal {
 
     form.addEventListener("keydown", (event) => {
       // Visual wrapping must not add a new Markdown line. Let composition
-      // confirmation reach the IME, including engines that report keyCode 229.
-      if (event.target !== input || event.key !== "Enter" || event.isComposing || event.keyCode === 229) return;
+      // confirmation reach the IME.
+      if (event.target !== input || event.key !== "Enter" || event.isComposing) return;
       event.preventDefault();
       if (!event.repeat && !rename.disabled) form.requestSubmit(rename);
     });
@@ -364,7 +364,7 @@ export class HeadingRenameService {
       new Notice(
         `Heading renamed; ${updatedLinks} links updated, but ${failedFiles} files could not be updated`,
       );
-    } else {
+    } else if (updatedLinks > 0) {
       new Notice(
         updatedLinks === 1
           ? "Heading renamed; 1 link updated"

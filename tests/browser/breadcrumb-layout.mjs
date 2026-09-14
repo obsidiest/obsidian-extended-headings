@@ -38,6 +38,7 @@ try {
       .breadcrumb-test-embed { margin: 30px; max-width: 600px; padding: 10px; }
       .rename-test-modal { position: fixed; top: 30px; left: 50%; transform: translateX(-50%);
         box-sizing: border-box; width: min(600px, calc(100vw - 32px)); padding: 20px; }
+      .rename-test-modal.rename-test-narrow { width: 260px; }
       .rename-test-modal .modal-content { margin: 0; }
       .rename-test-modal .extended-heading-rename-input { padding: 8px; border: 2px solid #888; }
       .rename-test-modal .modal-button-container { display: flex; justify-content: end; margin-top: 20px; }` });
@@ -244,7 +245,7 @@ try {
     // Check real textarea layout before any click, then editing, narrow
     // layouts, bounded scrolling, keyboard submission, and the off switch.
     const renameTitle = "Test Heading 2 - Filler Text for this Example (More Filler Text) (Filler Text) (Filler Text) (Filler Text)";
-    const settleRename = () => page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    const settleRename = () => page.evaluate(() => new Promise((resolve) => window.requestAnimationFrame(() => window.requestAnimationFrame(resolve))));
     const renameBox = () => page.locator(".extended-heading-rename-input").evaluate((input) => {
       const rect = input.getBoundingClientRect(), style = getComputedStyle(input);
       return { tag: input.tagName, height: rect.height, width: rect.width, client: input.clientHeight,
@@ -271,7 +272,7 @@ try {
     await page.locator(".extended-heading-rename-input").fill(renameTitle);
     const restoredRename = await renameBox();
     assert.ok(Math.abs(restoredRename.height - originalRename.height) <= 1); checks++;
-    await page.locator(".rename-test-modal").evaluate((modal) => { modal.style.width = "260px"; });
+    await page.locator(".rename-test-modal").evaluate((modal) => { modal.classList.add("rename-test-narrow"); });
     await settleRename();
     const narrowRename = await renameBox();
     assert.ok(narrowRename.height > restoredRename.height, JSON.stringify(narrowRename));

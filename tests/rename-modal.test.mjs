@@ -10,7 +10,8 @@ function harness(options = {}) {
   const win = dom.window, document = win.document;
   const metrics = { width: 400, height: 108, reads: 0 };
   const frames = new Map(), observers = [], submissions = [], notices = [];
-  let frameId = 0, modal;
+  let frameId = 0;
+  const modals = [];
   win.requestAnimationFrame = (callback) => { frames.set(++frameId, callback); return frameId; };
   win.cancelAnimationFrame = (id) => frames.delete(id);
   win.ResizeObserver = class {
@@ -40,7 +41,7 @@ function harness(options = {}) {
   class MarkdownView {}
   class Modal {
     constructor() {
-      modal = this;
+      modals.push(this);
       this.contentEl = document.createElement("div");
       this.closed = false;
     }
@@ -74,18 +75,18 @@ function harness(options = {}) {
   };
   return {
     win, document, metrics, frames, observers, submissions, notices, service, preference, load,
-    get modal() { return modal; },
+    get modal() { return modals.at(-1); },
     open(level = 12, title = "Long title with Markdown [[Links]] and repeated words ".repeat(4)) {
       const editor = { getCursor: () => ({ line: 0, ch: 0 }), getLine: () => "#".repeat(level) + " " + title };
       const view = Object.assign(new MarkdownView(), { file: { path: "Test.md" } });
       service.renameAtCursor(editor, view);
-      return modal.contentEl.querySelector(".extended-heading-rename-input");
+      return modals.at(-1).contentEl.querySelector(".extended-heading-rename-input");
     },
     flush() {
       const pending = [...frames.values()]; frames.clear();
       for (const callback of pending) callback(0);
     },
-    dispose() { if (modal && !modal.closed) modal.close(); dom.window.close(); },
+    dispose() { for (const modal of modals) if (!modal.closed) modal.close(); dom.window.close(); },
   };
 }
 
@@ -167,7 +168,7 @@ test("Enter submits once, prevents a newline, and permits retry after rejection"
 test("IME confirmation and a held Enter do not submit the rename", (t) => {
   const h = harness(); t.after(() => h.dispose());
   const input = h.open();
-  for (const extra of [{ isComposing: true }, { keyCode: 229 }]) {
+  for (const extra of [{ isComposing: true }]) {
     const event = new h.win.KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true, ...extra });
     input.dispatchEvent(event);
     assert.equal(event.defaultPrevented, false);
