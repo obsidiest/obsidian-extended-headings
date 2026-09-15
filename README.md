@@ -77,6 +77,12 @@ Outline Pane Static Heading Tree Indentation Guides Toggle DISABLED - Outline Pa
 Outline Pane Markdown and SVG Rendering Toggles ENABLED
 <img width="2558" height="1438" alt="Outline Pane Markdown and SVG Rendering Enabled" src="https://github.com/user-attachments/assets/2bc4b36c-f0ae-4609-95e0-089eed86f780" />
 
+Editor Pane Heading Hover Breadcrumb ENABLED - With Default Settings
+<img width="2558" height="1438" alt="Editor Pane Heading Hover Breadcrumb Enabled - With Default Settings" src="https://github.com/user-attachments/assets/7a1c71df-b1c6-4713-acfe-7ebfd3cc3a30" />
+
+Outline Pane Heading Hover Breadcrumb ENABLED - With Default Settings
+<img width="2558" height="1438" alt="Outline Pane Heading Hover Breadcrumb Enabled - With Default Settings" src="https://github.com/user-attachments/assets/99f57571-9535-4c07-b794-5fc607c65481" />
+
 
 ## Settings
 
