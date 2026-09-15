@@ -1,6 +1,6 @@
 {
   "name": "obsidian-extended-headings",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Extend ATX heading support through H12.",
   "type": "module",
   "private": true,

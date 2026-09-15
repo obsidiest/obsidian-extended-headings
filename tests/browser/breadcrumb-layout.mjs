@@ -34,7 +34,15 @@ try {
       .breadcrumb-test-editor .markdown-source-view { height: 100%; }
       .breadcrumb-test-has-outline { right: 420px; }
       .breadcrumb-test-outline { position: fixed; right: 16px; top: 40px; width: 370px; height: 690px; overflow: auto; }
-      .breadcrumb-test-outline .tree-item-self { min-height: 36px; padding: 4px; display: flex; }` });
+      .breadcrumb-test-outline .tree-item-self { min-height: 36px; padding: 4px; display: flex; }
+      .breadcrumb-test-embed { margin: 30px; max-width: 600px; padding: 10px; }
+      body.breadcrumb-test-marker-typography { --extended-heading-level-marker-size: 1.5em; --extended-heading-level-marker-weight: 700; }
+      .rename-test-modal { position: fixed; top: 30px; left: 50%; transform: translateX(-50%);
+        box-sizing: border-box; width: min(600px, calc(100vw - 32px)); padding: 20px; }
+      .rename-test-modal.rename-test-narrow { width: 260px; }
+      .rename-test-modal .modal-content { margin: 0; }
+      .rename-test-modal .extended-heading-rename-input { padding: 8px; border: 2px solid #888; }
+      .rename-test-modal .modal-button-container { display: flex; justify-content: end; margin-top: 20px; }` });
     await page.addScriptTag({ content: bundle.outputFiles[0].text });
     await page.evaluate(() => window.setupBreadcrumb());
     await page.locator('.cm-heading-marker[data-level="12"]').hover();
@@ -158,7 +166,171 @@ try {
         assert.equal(await popup.count(), 1); checks++;
         await popup.waitFor({ state: "detached", timeout: 2000 }); checks++;
       }
+      // Verify actual CodeMirror scrolling, including restoration of a viewport
+      // whose originating heading has been virtualized out during preview.
+      const navigationText = ["# Root", ...Array(80).fill("Body text"), "## Child", ...Array(80).fill("Body text"), "############ Deep", ...Array(40).fill("Body text")].join("\n");
+      const settle = () => page.evaluate(() => new Promise((resolve) => window.requestAnimationFrame(() => window.requestAnimationFrame(resolve))));
+      for (const before of [true, false]) for (const after of [false, true]) {
+        await page.evaluate(({ text, before, after }) => {
+          window.setupBreadcrumb({ breadcrumbNavigateBeforeTimeout: before, breadcrumbNavigateAfterTimeout: after,
+            globalBreadcrumbTimeoutSeconds: 0.05 }, { text });
+          const { cm } = window.breadcrumbTest;
+          cm.dispatch({ effects: cm.constructor.scrollIntoView(cm.state.doc.line(163).from, { y: "center" }) });
+        }, { text: navigationText, before, after });
+        await page.locator('.cm-heading-marker[data-level="12"]').hover();
+        const originalScroll = await page.evaluate(() => window.breadcrumbTest.cm.scrollDOM.scrollTop);
+        assert.ok(originalScroll > 1000); checks++;
+        await popup.locator(".extended-breadcrumb-row").first().hover(); await settle();
+        let scroll = await page.evaluate(() => window.breadcrumbTest.cm.scrollDOM.scrollTop);
+        assert.ok(before ? scroll < 10 : Math.abs(scroll - originalScroll) < 2, JSON.stringify({ before, after, scroll, originalScroll })); checks++;
+        await page.mouse.move(1195, 845); await popup.waitFor({ state: "detached" }); await settle();
+        scroll = await page.evaluate(() => window.breadcrumbTest.cm.scrollDOM.scrollTop);
+        assert.ok(after ? scroll < 10 : Math.abs(scroll - originalScroll) < 2, JSON.stringify({ before, after, scroll, originalScroll })); checks++;
+        assert.equal(await page.evaluate(() => window.breadcrumbTest.cm.state.selection.main.head), 0); checks++;
+      }
+      await page.evaluate((text) => {
+        window.setupBreadcrumb({ globalBreadcrumbTimeoutSeconds: 0.05 }, { text });
+        const { cm } = window.breadcrumbTest;
+        cm.dispatch({ effects: cm.constructor.scrollIntoView(cm.state.doc.line(163).from, { y: "center" }) });
+      }, navigationText);
+      await page.locator('.cm-heading-marker[data-level="12"]').hover();
+      await popup.locator(".extended-breadcrumb-row").first().hover(); await settle();
+      // A click may queue a scroll which has not yet been measured when the
+      // pointer enters another row. Timeout must still return to the click.
+      await popup.evaluate((element) => {
+        const rows = element.querySelectorAll(".extended-breadcrumb-row");
+        rows[1].click(); rows[0].dispatchEvent(new PointerEvent("pointerenter"));
+      });
+      await settle(); await page.mouse.move(1195, 845);
+      await popup.waitFor({ state: "detached" }); await settle();
+      const committed = await page.evaluate(() => {
+        const { cm } = window.breadcrumbTest, line = cm.state.doc.line(82);
+        return { caret: cm.state.selection.main.head, line: line.from, scroll: cm.scrollDOM.scrollTop };
+      });
+      assert.equal(committed.caret, committed.line); checks++;
+      assert.ok(committed.scroll > 1000, JSON.stringify(committed)); checks++;
     }
+    // Process while detached, then attach without reprocessing: all twelve
+    // markers must fit, and a pre-existing Reading fold must become invisible.
+    for (const folding of [true, false]) {
+      await page.evaluate((folding) => {
+        window.setupBreadcrumb(); window.breadcrumbTest.manager.destroy();
+        window.breadcrumbTest.cm.destroy(); document.body.replaceChildren();
+        document.body.classList.add("extended-headings-show-level-markers");
+        const section = document.createElement("div"); section.className = "markdown-preview-section";
+        for (let level = 1; level <= 12; level++) {
+          const heading = document.createElement(level <= 6 ? `h${level}` : "p");
+          const title = `Heading level ${level} with a long title that should wrap within the embed`;
+          if (level > 6) heading.append(`${"#".repeat(level)} `);
+          else heading.dataset.heading = title;
+          const link = document.createElement("a"); link.href = "#target"; link.className = "internal-link";
+          link.textContent = title; heading.append(link);
+          section.append(heading);
+        }
+        window.renderExtendedHeadings(section, () => ({ maximumLevel: 12, readingModeFolding: folding }));
+        const embed = document.createElement("div"); embed.className = "internal-embed markdown-embed breadcrumb-test-embed";
+        embed.append(section); document.body.append(embed);
+        const ordinary = document.createElement("div"); ordinary.className = "breadcrumb-test-reading";
+        const native = document.createElement("h4"); native.textContent = "Ordinary native heading";
+        const extended = document.createElement("p"); extended.textContent = "####### Ordinary extended heading";
+        ordinary.append(native, extended); document.body.append(ordinary);
+        window.renderExtendedHeadings(ordinary, () => ({ maximumLevel: 12, readingModeFolding: folding }));
+      }, folding);
+      const embeddedHeadings = page.locator(".breadcrumb-test-embed .extended-heading-reading, .breadcrumb-test-embed .extended-heading-embed-host");
+      const boxes = await embeddedHeadings.evaluateAll((headings) => headings.map((heading) => {
+        const marker = heading.querySelector(".extended-heading-embed-marker"), content = heading.querySelector(".extended-heading-reading-content, .extended-heading-embed-content"), fold = heading.querySelector(".extended-heading-fold");
+        const rect = (el) => { const r = el.getBoundingClientRect(); return { left: r.left, right: r.right, width: r.width }; };
+        return { level: heading.getAttribute("aria-level") ?? heading.tagName.slice(1), label: marker.textContent,
+          heading: rect(heading), marker: rect(marker), content: rect(content), labelBox: rect(marker.firstElementChild),
+          scrollWidth: content.scrollWidth, clientWidth: content.clientWidth,
+          foldDisplay: fold ? getComputedStyle(fold).display : "none", link: content.querySelector("a")?.getAttribute("href") };
+      }));
+      assert.equal(boxes.length, 12); checks++;
+      for (const box of boxes) {
+        assert.equal(box.label, `H${box.level}`);
+        assert.ok(box.marker.width > 0 && box.marker.left >= box.heading.left - 1);
+        assert.ok(box.marker.right <= box.content.left);
+        assert.ok(box.labelBox.right <= box.marker.right + 1);
+        assert.equal(box.foldDisplay, "none");
+        assert.ok(box.content.right <= box.heading.right + 1);
+        assert.ok(box.scrollWidth <= box.clientWidth + 1);
+        assert.equal(box.link, "#target");
+        checks += 8;
+      }
+      assert.equal(await page.locator(".breadcrumb-test-embed .extended-heading-fold:visible").count(), 0); checks++;
+      assert.equal(await page.locator(".breadcrumb-test-reading .extended-heading-embed-marker:visible").count(), 0); checks++;
+      assert.equal(await page.locator(".breadcrumb-test-reading .extended-heading-fold:visible").count(), folding ? 1 : 0); checks++;
+      const nativeLayout = await page.locator(".breadcrumb-test-reading h4").evaluate((heading) => ({
+        display: getComputedStyle(heading).display,
+        contentDisplay: getComputedStyle(heading.querySelector(".extended-heading-embed-content")).display,
+      }));
+      assert.notEqual(nativeLayout.display, "grid"); assert.equal(nativeLayout.contentDisplay, "contents"); checks += 2;
+      await page.evaluate(() => document.body.classList.add("breadcrumb-test-marker-typography"));
+      for (const style of await embeddedHeadings.locator(".extended-heading-embed-marker").evaluateAll((markers) => markers.map((marker) => ({
+        size: parseFloat(getComputedStyle(marker.firstElementChild).fontSize) / parseFloat(getComputedStyle(marker).fontSize),
+        weight: getComputedStyle(marker).fontWeight,
+      })))) {
+        assert.equal(style.size, 1.5); assert.equal(style.weight, "700"); checks += 2;
+      }
+      if (process.env.EMBED_SCREENSHOT && width === 1200 && folding) await page.screenshot({ path: process.env.EMBED_SCREENSHOT, fullPage: true });
+      await page.evaluate(() => document.body.classList.remove("extended-headings-show-level-markers"));
+      assert.equal(await page.locator(".extended-heading-embed-marker:visible").count(), 0); checks++;
+      for (const offset of await embeddedHeadings.evaluateAll((headings) => headings.map((heading) =>
+        heading.querySelector(".extended-heading-reading-content, .extended-heading-embed-content").getBoundingClientRect().left - heading.getBoundingClientRect().left))) {
+        assert.ok(Math.abs(offset) < 1, `Hidden markers must not leave a gap: ${offset}`); checks++;
+      }
+      await page.evaluate(() => document.body.classList.remove("breadcrumb-test-marker-typography"));
+    }
+    // Check real textarea layout before any click, then editing, narrow
+    // layouts, bounded scrolling, keyboard submission, and the off switch.
+    const renameTitle = "Test Heading 2 - Filler Text for this Example (More Filler Text) (Filler Text) (Filler Text) (Filler Text)";
+    const settleRename = () => page.evaluate(() => new Promise((resolve) => window.requestAnimationFrame(() => window.requestAnimationFrame(resolve))));
+    const renameBox = () => page.locator(".extended-heading-rename-input").evaluate((input) => {
+      const rect = input.getBoundingClientRect(), style = getComputedStyle(input);
+      return { tag: input.tagName, height: rect.height, width: rect.width, client: input.clientHeight,
+        scroll: input.scrollHeight, scrollWidth: input.scrollWidth, clientWidth: input.clientWidth,
+        lineHeight: Number.parseFloat(style.lineHeight), value: input.value,
+        focused: document.activeElement === input, end: input.selectionEnd };
+    });
+    for (const level of [1, 6, 7, 10, 11, 12]) {
+      await page.evaluate(({ title, level }) => window.setupRenameModal(title, true, level), { title: renameTitle, level });
+      await settleRename();
+      const box = await renameBox();
+      assert.equal(box.tag, "TEXTAREA");
+      assert.equal(box.value, renameTitle);
+      assert.ok(box.height > box.lineHeight * 2, JSON.stringify(box));
+      assert.ok(box.scroll <= box.client + 1, JSON.stringify(box));
+      assert.ok(box.scrollWidth <= box.clientWidth + 1, JSON.stringify(box));
+      assert.ok(box.focused && box.end === renameTitle.length);
+      checks += 6;
+    }
+    const originalRename = await renameBox();
+    await page.locator(".extended-heading-rename-input").fill("Short");
+    const shortRename = await renameBox();
+    assert.ok(shortRename.height < originalRename.height); checks++;
+    await page.locator(".extended-heading-rename-input").fill(renameTitle);
+    const restoredRename = await renameBox();
+    assert.ok(Math.abs(restoredRename.height - originalRename.height) <= 1); checks++;
+    await page.locator(".rename-test-modal").evaluate((modal) => { modal.classList.add("rename-test-narrow"); });
+    await settleRename();
+    const narrowRename = await renameBox();
+    assert.ok(narrowRename.height > restoredRename.height, JSON.stringify(narrowRename));
+    assert.ok(narrowRename.scroll <= narrowRename.client + 1); checks += 2;
+    await page.locator(".extended-heading-rename-input").fill("Unbroken".repeat(200));
+    const hugeRename = await renameBox();
+    assert.ok(hugeRename.scroll > hugeRename.client, JSON.stringify(hugeRename));
+    assert.ok(hugeRename.height <= 425);
+    assert.ok(hugeRename.scrollWidth <= hugeRename.clientWidth + 1); checks += 3;
+    await page.locator(".extended-heading-rename-input").fill(renameTitle);
+    await page.locator(".extended-heading-rename-input").press("Enter");
+    assert.deepEqual(await page.evaluate(() => window.renameTest.submissions), [renameTitle]);
+    assert.equal((await renameBox()).value, renameTitle); checks += 2;
+    await page.locator('.rename-test-modal button[type="button"]').click();
+    assert.equal(await page.locator(".rename-test-modal").count(), 0); checks++;
+    await page.evaluate((title) => window.setupRenameModal(title, false), renameTitle);
+    await settleRename();
+    assert.equal((await renameBox()).tag, "INPUT");
+    assert.equal((await renameBox()).value, renameTitle); checks += 2;
     assert.deepEqual(errors, []);
     await page.close();
   }

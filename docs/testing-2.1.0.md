@@ -1,0 +1,66 @@
+# 2.1.0 validation
+
+Based on the released 2.0.0 tree at `e04de845d4866c749abf1f7ec45b01edf1de11e0`. The latest embed follow-up continues draft PR #11 from `d6bd8361cebc52e8d5021a036d12f6ad147fa122`, retaining the rename and breadcrumb-navigation work.
+
+## Behavior and implementation
+
+The released breadcrumb scrolled on hover without restoring the previous view. The two new navigation toggles separate temporary preview from retaining/applying navigation on timed dismissal. Before-timeout preview defaults on; after-timeout navigation defaults off. Both belong to the new Heading Hover Breadcrumb Navigation subsection and are disabled under the feature master toggle. Existing settings are preserved when the new defaults are loaded.
+
+Preview restoration uses CodeMirror's scroll snapshot for Source/Live Preview and Obsidian's Reading scroll API for Reading mode. Outline ancestor scroll positions are recorded only when previewing an Outline breadcrumb. No additional timers, polling, document scans, or background indexing were added. The existing mode-aware dismissal timer applies deferred navigation only when it actually expires; Escape and lifecycle cleanup cannot trigger it. A source document, file, mode, or hidden-view change invalidates restoration.
+
+Clicks always commit their heading. Subsequent hover previews return to that clicked heading instead of undoing the click. A Chromium regression reproduced a click/hover in the same frame: CodeMirror's pending click scroll had not yet reached the DOM, so a fresh snapshot still captured the preceding preview. Restoration now uses the committed source line after a click. Clicking outside the popover cancels queued hover work so it cannot override the user's next main-UI interaction. Hover highlighting, threading, keyboard navigation, and independent popover scrolling remain available with both navigation toggles disabled.
+
+### Embed follow-up from d6bd836
+
+The latest supplied screenshot shows an embedded H4 without a marker and an embedded H12 with a separate fold button. The renderer at `d6bd836` only created markers while converting H7–H12 paragraphs; native H1–H6 elements were untouched. It also created the Reading fold button whenever folding was enabled, regardless of embed context. Before implementation, five regression cases failed for missing native markers, unnecessary folds, and a detached fold affecting the containing note. The maximum-level and ordinary Reading-folding controls passed.
+
+The renderer now prepares H1–H12 markers, including native heading roots and detached fragments. CSS shows them only inside internal embeds and follows the existing editor-marker visibility and typography settings. Native inline nodes are moved into a wrapper that uses `display: contents` outside embeds; link handlers, heading attributes, native collapse controls, and heading semantics are preserved. The marker and title occupy two grid columns inside embeds, with no empty gap when markers are disabled. Marker text does not enter the heading's `data-heading` identity.
+
+Connected embeds do not receive the extra extended-heading fold button. A fragment processed before attachment may already contain one: embed CSS hides it immediately, subsequent processing removes it, and the fold handler refuses to act inside embeds. Ordinary Reading-view folding remains available. Embeds do not activate breadcrumbs against the containing note's source lines.
+
+### Rename dialog
+
+The supplied screenshots show the plugin's rename field remaining on one line before and after a click, while the native dialog with the plugin disabled expands after clicking. The shared rename modal in `src/rename-heading.ts` created an `input type="text"` with only a width rule. That element cannot wrap. Both the plugin command and the intercepted native command/context menu use that modal, explaining the native-action difference.
+
+The new main setting **Expand long heading titles in rename dialog** defaults on. It creates a one-row, soft-wrapping textarea and measures its content plus borders immediately and again in the opening animation frame, including when Obsidian attaches the modal after `onOpen`. Input events and width/window changes update its height; a width guard avoids ResizeObserver feedback loops. The owning document/window supplies layout, focus, observers, and cleanup. Very tall titles scroll within a viewport-relative height limit so the buttons remain reachable.
+
+Enter submits instead of inserting a newline; IME confirmation and held-key repeats do not submit. The existing rename validation still rejects actual line breaks. The field preserves the original Markdown text, and disabling the toggle retains a single-line input. Each dialog reads the current setting, and closing cancels pending focus work and disconnects layout observers.
+
+### Rename notifications
+
+The additional screenshot shows `Heading renamed; 0 links updated`. The shared rename service unconditionally emitted its success notice after renaming, even when no references changed. It now shows that success notice only when at least one link was updated. No-backlink renames are silent for H1–H12 through both command routes; failed-update notices remain visible even when zero updates succeeded.
+
+## Automated checks
+
+Run `npm run check`, `npm run lint`, `npm test`, and `npm run build`.
+
+The original preparation notes reported 187 local tests and 280 Chromium assertions with Obsidian/Minimal styles. The actual [GitHub Validate run for a35d13f](https://github.com/obsidiest/obsidian-extended-headings/actions/runs/34801827327) passed 186/187 tests: a stale settings-description assertion still expected the text before linked embeds were added. The continuation corrects that exact assertion.
+
+Current results are recorded by the [PR #11 checks](https://github.com/obsidiest/obsidian-extended-headings/pull/11/checks). CI now runs the existing browser suite as well as type checking, zero-warning lint, unit/DOM tests, and the production build. Playwright 1.63.0 is installed in a separate temporary directory, leaving the plugin dependency lockfile unchanged. CI browser checks use the plugin stylesheet and a small fixture stylesheet; they do not include the user's Minimal theme or a live Obsidian installation.
+
+The embed follow-up passed local type checking, zero-warning lint, the production build, all **225 automated tests**, and **808 browser assertions** in Chromium 138.0.7204.0 at both viewport widths. That local browser run also loaded the available Obsidian and Minimal CSS files; it still used mocked application shells and did not run Obsidian itself.
+
+The focused regressions cover:
+
+- Silent successful renames without backlinks at every level H1–H12, plus retained notifications for updated links and failed writes.
+- Rename dialogs at every level H1–H12, default and saved toggle values, initial sizing before a click, attachment timing, growth/shrinkage, width changes, owner-window focus, Enter/repeat/IME handling, duplicate-submit prevention, and cancellation cleanup. JSDOM injects layout measurements; those tests do not establish pixel geometry.
+- Browser measurements of the actual rename textarea before a click, title edits, narrow layouts, long unbroken titles, bounded scrolling, keyboard submission, and the disabled single-line mode.
+- All four navigation combinations in both panes across Source, Live Preview, and Reading mode, with unchanged caret positions.
+- Exact settings names/defaults, parent dependencies, persistence, fractional per-mode timeout overrides, zero timeout, cancellation/re-entry, and no navigation on merely opening a popover.
+- Click precedence, preview after clicking, and cancellation on Escape, blur, settings changes, unload, note/mode/document changes, or a hidden owner view.
+- Embedded H1–H12 labels with folding enabled and disabled, the configured maximum heading level, retained link nodes/handlers, stable heading identity, native heading roots/collapse controls, and repeated postprocessing without duplicate markers.
+- Removal of connected embed fold controls, blocked folding after detached attachment, and retained folding outside embeds.
+
+`npm run test:browser` uses Chromium and real CodeMirror with development-only Obsidian workspace and modal-shell mocks. It checks actual preview/restore scroll positions after the original heading leaves CodeMirror's viewport, click/hover timing, and H1–H12 embed marker/title geometry at 1200 px and 360 px viewport widths. The embed fixture attaches detached fragments without reprocessing, checks that extra fold buttons are invisible, verifies marker typography and visibility settings, and retains ordinary Reading-view layout/folds. Existing 2.0.0 clipping, marker activation, popover timeout, and scroll tests are retained. See [the browser setup instructions](testing-2.0.0.md#automated-coverage) for optional local dependency paths.
+
+## Remaining application checks
+
+This environment does not run the user's Windows Obsidian workspace or Obsidian Mobile. Before release, verify:
+
+1. Rename headings without backlinks through both commands and confirm no success popup appears. Verify that link-update and failure notifications still appear when applicable.
+2. The supplied long-title rename case at all heading levels, immediately on opening and while editing, with the default-on toggle and with it disabled. Test the plugin command and native hotkey/context-menu routes, Enter, Escape/Cancel, narrow and pop-out windows, and IME text entry.
+3. Both navigation toggles in each pane and viewing mode, including keyboard focus, click followed by hover, Escape, and different dismissal delays.
+4. Heading and full-note embeds containing H1–H12, especially the supplied H4/H12 comparison and H10–H12 labels, with folding and marker visibility on/off. Confirm all enabled markers are present and no extra extended-heading fold button appears. Repeat in a pop-out pane; check ordinary Reading-view folding outside embeds.
+5. Switching notes/modes/windows during a preview, editing the source, and independently switching an Outline pane's note. Confirm no delayed jump into unrelated content.
+
+The existing README performance warning remains in place; these changes make no large-workspace performance claim.

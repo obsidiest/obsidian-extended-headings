@@ -75,7 +75,7 @@ test("enables Outline pane Markdown rendering by default", () => {
 test("describes heading markers without Lapel compatibility wording", () => {
   assert.match(
     settings,
-    /desc: "Show H1–H12 heading level markers in the editor gutter\."/,
+    /desc: "Show H1–H12 heading level markers in the editor gutter and inside linked embeds\."/,
   );
   assert.doesNotMatch(settings, /desc: "[^"]*Lapel-compatible[^"]*"/);
 });
@@ -142,7 +142,7 @@ test("enables Outline static guides and path threading with requested defaults",
 });
 
 test("manifest describes the plugin's overall purpose", () => {
-  assert.equal(manifest.version, "2.0.0");
+  assert.equal(manifest.version, "2.1.0");
   assert.equal(
     manifest.description,
     "Extends ATX heading support through H12 with consistent editing, styling, folding, outlines, links, navigation, and heading-level markers.",

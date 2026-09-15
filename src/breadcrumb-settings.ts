@@ -26,7 +26,7 @@ type TimeoutToggle = `${BreadcrumbMode | "global"}BreadcrumbTimeoutEnabled`;
 export type BreadcrumbNumberKey = `${BreadcrumbMode | "global"}BreadcrumbTimeoutSeconds`;
 export type BreadcrumbBooleanKey = ScopeKey | ThreadKey | ModeKey | TimeoutToggle
   | "headingHoverBreadcrumb" | "editorHeadingHoverBreadcrumb" | "outlineHeadingHoverBreadcrumb"
-  | "breadcrumbExpandTitles";
+  | "breadcrumbExpandTitles" | "breadcrumbNavigateBeforeTimeout" | "breadcrumbNavigateAfterTimeout";
 export type BreadcrumbSettings = Record<BreadcrumbBooleanKey, boolean> & Record<BreadcrumbNumberKey, number>;
 
 const defaults = {
@@ -34,6 +34,8 @@ const defaults = {
   editorHeadingHoverBreadcrumb: true,
   outlineHeadingHoverBreadcrumb: true,
   breadcrumbExpandTitles: true,
+  breadcrumbNavigateBeforeTimeout: true,
+  breadcrumbNavigateAfterTimeout: false,
   breadcrumbLivePreview: true,
   breadcrumbSource: true,
   breadcrumbReading: true,
@@ -142,6 +144,11 @@ export function breadcrumbSettingDefinitions(getSettings: () => BreadcrumbSettin
       }
     }
   }
+  items.push(subheading("Heading Hover Breadcrumb Navigation"),
+    toggle("breadcrumbNavigateBeforeTimeout", "Hover Over a Given Breadcrumb Heading to Change the Screen Focus to the Corresponding Heading in the Main UI Before the Breadcrumb Popover Timeout", globalOff,
+      "Preview hovered or keyboard-focused headings while the popover is open, without moving the editor caret. If navigation after timeout is off, restore the prior view when the popover closes. Clicking always navigates permanently."),
+    toggle("breadcrumbNavigateAfterTimeout", "Hover Over a Given Breadcrumb Heading to Change the Screen Focus to the Corresponding Heading in the Main UI After the Breadcrumb Popover Timeout", globalOff,
+      "Keep or apply the last hovered or keyboard-focused heading when the dismissal timer expires. With navigation before timeout off, scrolling is deferred until then. Escape and other cancellation events never apply deferred navigation."));
   items.push(subheading("Heading Hover Breadcrumb Popover Timeout"));
   for (const [mode, label] of [["global", "Global"], ["livePreview", "Live Preview Mode"], ["source", "Source Mode"], ["reading", "Reading Mode"]] as const) {
     const key: BreadcrumbNumberKey = `${mode}BreadcrumbTimeoutSeconds`;

@@ -10,7 +10,7 @@ interface DomPoint {
 let foldId = 0;
 
 function locateTextOffset(root: HTMLElement, target: number): DomPoint {
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const walker = root.ownerDocument.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   let consumed = 0;
   let last: Text | null = null;
   while (walker.nextNode()) {
@@ -24,7 +24,7 @@ function locateTextOffset(root: HTMLElement, target: number): DomPoint {
 }
 
 function cloneTextRange(root: HTMLElement, from: number, to: number): DocumentFragment {
-  const range = document.createRange();
+  const range = root.ownerDocument.createRange();
   const start = locateTextOffset(root, from);
   const end = locateTextOffset(root, to);
   range.setStart(start.node, start.offset);
@@ -57,38 +57,78 @@ function appendParagraph(source: HTMLParagraphElement, fragment: DocumentFragmen
   source.before(paragraph);
 }
 
+function createEmbedMarker(document: Document, level: number): HTMLSpanElement {
+  const win = document.win as Window & { createSpan: typeof createSpan };
+  const marker = win.createSpan();
+  marker.className = "extended-heading-embed-marker";
+  marker.setAttribute("aria-hidden", "true");
+  const label = win.createSpan();
+  label.textContent = `H${level}`;
+  marker.append(label);
+  return marker;
+}
+
+function prepareNativeEmbedHeading(heading: HTMLElement): void {
+  if (heading.classList.contains("extended-heading-embed-host")) return;
+  const win = heading.ownerDocument.win as Window & { createSpan: typeof createSpan };
+  const content = win.createSpan();
+  content.className = "extended-heading-embed-content";
+  // Move the original inline nodes so links keep their handlers. Native fold
+  // controls and any existing breadcrumb marker must remain direct children.
+  for (const node of Array.from(heading.childNodes)) {
+    if (node.nodeType === node.ELEMENT_NODE && (node as Element).matches(
+      ".heading-collapse-indicator, .extended-breadcrumb-reading-marker",
+    )) continue;
+    content.append(node);
+  }
+  heading.classList.add("extended-heading-embed-host");
+  heading.append(createEmbedMarker(heading.ownerDocument, Number(heading.tagName.slice(1))), content);
+}
+
 function appendHeading(
   source: HTMLParagraphElement,
   heading: ParsedHeading,
   fragment: DocumentFragment,
   settings: ExtendedHeadingsSettings,
 ): void {
-  const element = createDiv({
-    cls: `extended-heading-reading extended-heading-${heading.level}`,
-  });
+  const document = source.ownerDocument;
+  const win = document.win as Window & { createDiv: typeof createDiv; createSpan: typeof createSpan; createEl: typeof createEl };
+  const element = win.createDiv();
+  element.className = `extended-heading-reading extended-heading-${heading.level}`;
   element.setAttribute("role", "heading");
   element.setAttribute("aria-level", String(heading.level));
   element.dataset.heading = fragment.textContent?.trim() ?? heading.rawBody;
   element.tabIndex = -1;
 
-  if (settings.readingModeFolding) {
-    const fold = createEl("button", {
-      cls: "extended-heading-fold",
-      text: "⌄",
-      attr: {
-        type: "button",
-        "aria-label": "Fold heading",
-        "aria-expanded": "true",
-      },
-    });
+  // A transclusion has no CodeMirror gutter. Create its marker even when the
+  // postprocessor runs before the fragment is attached to an embed; CSS limits
+  // its visibility to embeds and follows the existing marker toggle.
+  element.append(createEmbedMarker(document, heading.level));
+
+  if (settings.readingModeFolding && !source.closest(".internal-embed")) {
+    const fold = win.createEl("button");
+    fold.className = "extended-heading-fold"; fold.textContent = "⌄";
+    fold.type = "button";
+    fold.setAttribute("aria-label", "Fold heading");
+    fold.setAttribute("aria-expanded", "true");
     element.append(fold);
   }
-  element.append(fragment);
+  const content = win.createSpan();
+  content.className = "extended-heading-reading-content";
+  content.append(fragment); element.append(content);
   source.before(element);
 }
 
 export function renderExtendedHeadings(root: HTMLElement, getSettings: () => ExtendedHeadingsSettings): void {
   const settings = getSettings();
+  // Obsidian can postprocess a detached fragment, including a heading root.
+  // Prepare native headings too; their marker and layout only appear in embeds.
+  const nativeSelector = "h1, h2, h3, h4, h5, h6";
+  if (root.matches(nativeSelector)) prepareNativeEmbedHeading(root);
+  root.querySelectorAll<HTMLElement>(nativeSelector).forEach(prepareNativeEmbedHeading);
+  for (const fold of Array.from(root.querySelectorAll(".extended-heading-reading > .extended-heading-fold"))) {
+    if (fold.closest(".internal-embed")) fold.remove();
+  }
   for (const paragraph of Array.from(root.querySelectorAll("p"))) {
     if (paragraph.dataset.extendedHeadingsProcessed === "true") continue;
     const text = paragraph.textContent ?? "";
@@ -133,6 +173,9 @@ function containingBlock(element: HTMLElement, preview: HTMLElement): HTMLElemen
 }
 
 export function toggleReadingFold(button: HTMLButtonElement): void {
+  // Detached fragments may already contain a fold control when embedded. CSS
+  // hides it on attachment; it must never fold blocks in the containing note.
+  if (button.closest(".internal-embed")) return;
   const heading = button.closest<HTMLElement>(".extended-heading-reading");
   const preview = button.closest<HTMLElement>(".markdown-preview-view");
   if (!heading || !preview) return;

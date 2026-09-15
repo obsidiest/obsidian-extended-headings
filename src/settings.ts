@@ -17,6 +17,7 @@ export interface ExtendedHeadingsSettings extends BreadcrumbSettings {
   renderInlineSvgsInDefaultOutline: boolean;
   readingModeFolding: boolean;
   copyFullyNestedHeadingPaths: boolean;
+  expandLongRenameHeadingTitles: boolean;
   lowerHeadingLimit: number;
   overrideTabBehavior: boolean;
   showEditorGutterHeadingLevelMarkers: boolean;
@@ -57,6 +58,7 @@ export const DEFAULT_SETTINGS: ExtendedHeadingsSettings = {
   renderInlineSvgsInDefaultOutline: true,
   readingModeFolding: true,
   copyFullyNestedHeadingPaths: true,
+  expandLongRenameHeadingTitles: true,
   lowerHeadingLimit: 1,
   overrideTabBehavior: false,
   showEditorGutterHeadingLevelMarkers: true,
@@ -190,6 +192,16 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
         },
       },
       {
+        name: "Expand long heading titles in rename dialog",
+        desc: "Wrap long H1–H12 titles and automatically fit the rename field when the dialog opens and while editing. Enter renames the heading. Disable to use a single-line field.",
+        aliases: ["rename this heading", "wrap heading titles", "auto expand", "multiline input"],
+        control: {
+          type: "toggle",
+          key: "expandLongRenameHeadingTitles",
+          defaultValue: DEFAULT_SETTINGS.expandLongRenameHeadingTitles,
+        },
+      },
+      {
         name: "Copy fully nested heading paths",
         desc: "Include every ancestor heading when copying a heading link or embed so repeated heading titles resolve precisely. Disable this to copy only the shorter target-heading link.",
         aliases: ["copy link", "copy embed", "ancestor headings", "duplicate headings"],
@@ -232,7 +244,7 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
         items: [
           {
             name: "Show Editor Gutter heading level markers",
-            desc: "Show H1–H12 heading level markers in the editor gutter.",
+            desc: "Show H1–H12 heading level markers in the editor gutter and inside linked embeds.",
             aliases: ["Lapel", "gutter"],
             control: {
               type: "toggle",
@@ -652,6 +664,7 @@ export class ExtendedHeadingsSettingTab extends PluginSettingTab {
       case "renderInlineSvgsInDefaultOutline":
       case "readingModeFolding":
       case "copyFullyNestedHeadingPaths":
+      case "expandLongRenameHeadingTitles":
       case "overrideTabBehavior":
       case "showEditorGutterHeadingLevelMarkers":
       case "showOutlinePaneHeadingLevelMarkers":

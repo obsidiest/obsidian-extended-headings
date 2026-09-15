@@ -10,6 +10,8 @@ const { scanHeadings } = load("headings");
 test("breadcrumb defaults, activation precedence, and every setting dependency", () => {
   const settings = { ...defaults };
   assert.equal(settings.breadcrumbThreadMixedActive, false);
+  assert.equal(settings.breadcrumbNavigateBeforeTimeout, true);
+  assert.equal(settings.breadcrumbNavigateAfterTimeout, false);
   for (const pane of ["editor", "outline"]) {
     for (const mode of ["livePreview", "source", "reading"]) assert.equal(breadcrumbEnabled(settings, pane, mode), true);
     assert.equal(breadcrumbActivation(settings, pane), "marker");
@@ -35,6 +37,29 @@ test("breadcrumb defaults, activation precedence, and every setting dependency",
   assert.equal(item("editorBreadcrumbThreadRootAll").disabled(), false);
   settings.breadcrumbThreadRoot = false;
   assert.equal(item("editorBreadcrumbThreadRootAll").disabled(), true);
+});
+
+test("navigation controls have the requested labels, independent defaults, and persist through the settings tab", async () => {
+  const loader = sourceLoader({ obsidian: { PluginSettingTab: class { update() {} } } });
+  const { ExtendedHeadingsSettingTab, DEFAULT_SETTINGS } = loader("settings");
+  let saves = 0;
+  const plugin = { settings: { ...DEFAULT_SETTINGS }, breadcrumbSettingsChanged: async () => saves++ };
+  const tab = new ExtendedHeadingsSettingTab({}, plugin);
+  const items = tab.getSettingDefinitions().at(-1).items;
+  assert.ok(items.some((item) => item.name === "Heading Hover Breadcrumb Navigation"));
+  for (const [key, label, initial] of [
+    ["breadcrumbNavigateBeforeTimeout", "Before", true],
+    ["breadcrumbNavigateAfterTimeout", "After", false],
+  ]) {
+    const control = items.find((item) => item.control?.key === key);
+    assert.equal(control.name, `Hover Over a Given Breadcrumb Heading to Change the Screen Focus to the Corresponding Heading in the Main UI ${label} the Breadcrumb Popover Timeout`);
+    assert.equal(control.control.defaultValue, initial);
+    assert.equal(control.control.disabled(), false);
+    await tab.setControlValue(key, !initial);
+    assert.equal(tab.getControlValue(key), !initial);
+  }
+  assert.equal(saves, 2);
+  assert.equal(plugin.settings.headingHoverBreadcrumb, true);
 });
 
 test("breadcrumb is the last main-settings section and its timeout values reach runtime", async () => {

@@ -3641,6 +3641,52 @@ body:not(.extended-headings-markers-before) .cm-extended-heading-gutter { order:
   position: relative;
 }
 
+.extended-heading-reading-content,
+.extended-heading-embed-content { display: contents; }
+.extended-heading-embed-marker { display: none; }
+
+/* Embeds have no editor gutter. Keep H1-H12 markers and inline titles in
+   separate columns within the embed boundary, without an extra fold control. */
+.internal-embed .extended-heading-reading,
+.internal-embed .extended-heading-embed-host {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: 0;
+}
+
+body.extended-headings-show-level-markers .internal-embed .extended-heading-reading,
+body.extended-headings-show-level-markers .internal-embed .extended-heading-embed-host {
+  column-gap: 0.25em;
+}
+
+body.extended-headings-show-level-markers .internal-embed .extended-heading-embed-marker {
+  display: block;
+  grid-column: 1;
+  grid-row: 1;
+  color: var(--text-faint);
+  font-size: var(--font-smallest);
+  font-weight: var(--extended-heading-level-marker-weight);
+  font-variant: var(--extended-heading-level-marker-font-variant);
+  white-space: nowrap;
+  user-select: none;
+}
+.extended-heading-embed-marker > span { font-size: var(--extended-heading-level-marker-size); }
+.internal-embed .extended-heading-reading > .extended-heading-fold {
+  display: none;
+}
+.internal-embed .extended-heading-reading > .extended-heading-reading-content,
+.internal-embed .extended-heading-embed-host > .extended-heading-embed-content {
+  display: block;
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+/* A detached Reading fragment can acquire a breadcrumb marker before it is
+   mounted inside an embed. It must not overlap the embed's level marker. */
+.internal-embed .extended-breadcrumb-reading-marker { display: none; }
+
 .extended-heading-fold {
   align-items: center;
   background: transparent;
@@ -3660,7 +3706,23 @@ body:not(.extended-headings-markers-before) .cm-extended-heading-gutter { order:
 .markdown-preview-view [data-extended-hidden-by] { display: none; }
 
 .extended-outline { padding: 0.25rem; }
-.extended-heading-rename-input { width: 100%; }
+.extended-heading-rename-input {
+  box-sizing: border-box;
+  width: 100%;
+}
+textarea.extended-heading-rename-input {
+  display: block;
+  height: auto;
+  min-height: var(--input-height, 2.25em);
+  max-height: min(50vh, 24rem);
+  overflow-x: hidden;
+  overflow-y: auto;
+  resize: none;
+  font: inherit;
+  line-height: var(--line-height-normal, 1.5);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
 .extended-outline-empty { color: var(--text-muted); padding: 0.75rem; }
 .extended-outline-list { display: flex; flex-direction: column; gap: 1px; }
 .extended-outline-item {

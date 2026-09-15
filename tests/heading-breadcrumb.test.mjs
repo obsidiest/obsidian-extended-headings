@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { setImmediate } from "node:timers";
 import { JSDOM } from "jsdom";
-import { EditorState } from "@codemirror/state";
+import { EditorState, StateEffect } from "@codemirror/state";
 import { sourceLoader } from "./helpers/load-source.mjs";
 
 class MarkdownView {
@@ -26,7 +26,8 @@ function fixture(mode = "source", text = "# Root\n## Child\n############ Deep") 
   if (mode === "livePreview") root.querySelector(".markdown-source-view").classList.add("is-live-preview");
   const state = EditorState.create({ doc: text });
   let caret = 0, focused = 0;
-  const effects = [];
+  const effects = [], navigation = [];
+  const restoreScroll = StateEffect.define();
   const lines = text.split("\n").map((text, i) => {
     const el = document.createElement("div"); el.className = "cm-line"; el.textContent = text;
     el.dataset.line = String(i); root.querySelector(".cm-content").append(el); return el;
@@ -43,11 +44,24 @@ function fixture(mode = "source", text = "# Root\n## Child\n############ Deep") 
       return { from: state.doc.line(i + 1).from, top: i * 30, bottom: (i + 1) * 30 };
     },
     domAtPos: (pos) => ({ node: lines[state.doc.lineAt(pos).number - 1] }),
-    dispatch: (transaction) => { if (transaction.selection) caret = transaction.selection.anchor; effects.push(transaction.effects); },
+    scrollSnapshot: () => restoreScroll.of({ left: cm.scrollDOM.scrollLeft, top: cm.scrollDOM.scrollTop }),
+    dispatch: (transaction) => {
+      if (transaction.selection) caret = transaction.selection.anchor;
+      const effect = transaction.effects;
+      effects.push(effect);
+      if (effect?.is(restoreScroll)) {
+        cm.scrollDOM.scrollLeft = effect.value.left; cm.scrollDOM.scrollTop = effect.value.top;
+      } else if (effect?.value?.range) {
+        navigation.push(state.doc.lineAt(effect.value.range.head).number - 1);
+        cm.scrollDOM.scrollTop = navigation.at(-1) * 30;
+      }
+    },
   };
+  const reading = root.querySelector(".markdown-preview-view");
   const view = Object.assign(new MarkdownView(), { containerEl: root, mode: mode === "reading" ? "preview" : "source",
     file: { path: "Test.md" }, editor: { cm, getValue: () => text, focus: () => focused++ },
-    leaf: { setEphemeralState: (estate) => effects.push(estate) },
+    previewMode: { containerEl: reading, getScroll: () => reading.scrollTop / 30, applyScroll: (line) => { reading.scrollTop = line * 30; } },
+    leaf: { setEphemeralState: (estate) => { effects.push(estate); navigation.push(estate.line); reading.scrollTop = estate.line * 30; } },
   });
   const handlers = new Map();
   const plugin = { settings,
@@ -73,7 +87,7 @@ function fixture(mode = "source", text = "# Root\n## Child\n############ Deep") 
   };
   const manager = new HeadingBreadcrumb(plugin); manager.start();
   const move = (element, line = 1, x = 25) => element.dispatchEvent(new win.MouseEvent("pointermove", { bubbles: true, clientY: 115 + line * 30, clientX: x }));
-  return { manager, view, settings, document, win, handlers, lines, effects, move, load,
+  return { manager, view, settings, document, win, handlers, lines, effects, navigation, move, load,
     caret: () => caret, focused: () => focused,
     close: () => { manager.destroy(); win.close(); },
   };
@@ -156,6 +170,174 @@ function clock(win) {
     time += milliseconds;
     for (const [key, task] of tasks) if (task.at <= time) { tasks.delete(key); task.callback(); }
   };
+}
+
+function navigationFixture(mode = "source", pane = "editor") {
+  const f = fixture(mode);
+  const { document, view, manager, win } = f;
+  const reading = document.querySelector(".markdown-preview-view");
+  if (mode === "reading") {
+    for (const [index, level] of [1, 2, 12].entries()) {
+      const heading = document.createElement(level > 6 ? "div" : `h${level}`);
+      if (level > 6) { heading.className = "extended-heading-reading"; heading.setAttribute("aria-level", String(level)); }
+      heading.dataset.line = String(index); heading.textContent = ["Root", "Child", "Deep"][index]; reading.append(heading);
+    }
+    manager.processReading(reading, { sourcePath: "Test.md", addChild() {},
+      getSectionInfo: () => ({ text: view.editor.getValue(), lineStart: 0, lineEnd: 2 }) });
+  }
+  const outline = document.querySelector('[data-type="outline"]');
+  for (let index = 0; index < 3; index++) {
+    const row = document.createElement("div"); row.className = "tree-item-self";
+    row.dataset.extendedBreadcrumbFile = "Test.md"; row.dataset.extendedBreadcrumbLine = String(index); row.dataset.line = String(index);
+    const marker = document.createElement("span"); marker.className = "extended-heading-outline-level-marker";
+    marker.textContent = `H${[1, 2, 12][index]}`; marker.dataset.line = String(index); row.append(marker); outline.append(row);
+    row.scrollIntoView = () => { outline.scrollTop = index * 30; outline.scrollLeft = 0; };
+  }
+  const scroller = mode === "reading" ? reading : view.editor.cm.scrollDOM;
+  scroller.scrollTop = 390; scroller.scrollLeft = 17;
+  outline.scrollTop = 280; outline.scrollLeft = 13;
+  const advance = clock(win);
+  const open = () => {
+    const marker = pane === "outline" ? outline.querySelectorAll(".extended-heading-outline-level-marker")[2]
+      : mode === "reading" ? reading.querySelectorAll(".extended-breadcrumb-reading-marker")[2]
+        : document.querySelectorAll(".cm-heading-marker")[2];
+    f.move(marker, 2);
+    return document.querySelector(".extended-breadcrumb-popover");
+  };
+  const hover = (index) => document.querySelectorAll(".extended-breadcrumb-row")[index].dispatchEvent(new win.MouseEvent("pointerenter"));
+  const leave = () => f.move(document.body, 0, 750);
+  return { ...f, scroller, outline, advance, open, hover, leave };
+}
+
+for (const mode of ["livePreview", "source", "reading"]) {
+  for (const pane of ["editor", "outline"]) {
+    for (const before of [true, false]) for (const after of [false, true]) {
+      test(`${mode}/${pane}: navigation before=${before}, after=${after} respects timeout and preserves the caret`, () => {
+        const f = navigationFixture(mode, pane);
+        try {
+          Object.assign(f.settings, { breadcrumbNavigateBeforeTimeout: before, breadcrumbNavigateAfterTimeout: after,
+            globalBreadcrumbTimeoutSeconds: 1 });
+          const popup = f.open(); assert.ok(popup);
+          f.hover(0); f.hover(1);
+          assert.ok(popup.querySelectorAll(".extended-breadcrumb-row")[1].classList.contains("is-active"));
+          assert.equal(f.scroller.scrollTop, before ? 30 : 390);
+          assert.equal(f.outline.scrollTop, before && pane === "outline" ? 30 : 280);
+          f.leave(); f.advance(999);
+          assert.ok(popup.isConnected);
+          assert.equal(f.scroller.scrollTop, before ? 30 : 390);
+          f.advance(1);
+          assert.equal(popup.isConnected, false);
+          assert.equal(f.scroller.scrollTop, after ? 30 : 390);
+          assert.equal(f.scroller.scrollLeft, 17);
+          assert.equal(f.outline.scrollTop, after && pane === "outline" ? 30 : 280);
+          assert.equal(f.outline.scrollLeft, after && pane === "outline" ? 0 : 13);
+          assert.equal(f.caret(), 0); assert.equal(f.focused(), 0);
+        } finally { f.close(); }
+      });
+    }
+  }
+}
+
+test("deferred navigation waits for the effective per-mode timeout and is cancelled on re-entry", () => {
+  const f = navigationFixture();
+  try {
+    Object.assign(f.settings, { breadcrumbNavigateBeforeTimeout: false, breadcrumbNavigateAfterTimeout: true,
+      sourceBreadcrumbTimeoutEnabled: true, sourceBreadcrumbTimeoutSeconds: 0.35 });
+    f.open(); f.hover(0); f.leave(); f.advance(349);
+    assert.equal(f.navigation.length, 0);
+    f.move(f.document.body, 5, 100); // Inside the popover: cancel the old timer.
+    f.advance(1000); assert.equal(f.navigation.length, 0);
+    f.hover(1); f.leave(); f.advance(349); assert.equal(f.navigation.length, 0);
+    f.advance(1); assert.deepEqual(f.navigation, [1]);
+    f.settings.sourceBreadcrumbTimeoutSeconds = 0;
+    f.open(); f.hover(0); f.leave(); assert.deepEqual(f.navigation, [1, 0]);
+  } finally { f.close(); }
+});
+
+test("opening without hovering a breadcrumb entry never navigates on timeout", () => {
+  const f = navigationFixture();
+  try {
+    f.settings.breadcrumbNavigateAfterTimeout = true;
+    f.open(); f.leave(); f.advance(10);
+    assert.equal(f.scroller.scrollTop, 390); assert.deepEqual(f.navigation, []);
+  } finally { f.close(); }
+});
+
+for (const before of [true, false]) for (const after of [true, false]) {
+  test(`explicit click commits navigation with before=${before}, after=${after}`, () => {
+    const f = navigationFixture();
+    try {
+      Object.assign(f.settings, { breadcrumbNavigateBeforeTimeout: before, breadcrumbNavigateAfterTimeout: after });
+      const popup = f.open(); f.hover(0);
+      popup.querySelectorAll(".extended-breadcrumb-row")[1].click();
+      assert.equal(f.scroller.scrollTop, 30); assert.equal(f.caret(), "# Root\n".length);
+      f.leave(); f.advance(10);
+      assert.equal(f.scroller.scrollTop, 30); assert.equal(f.focused(), 1);
+    } finally { f.close(); }
+  });
+}
+
+test("hovering after a click restores the clicked position, not the original position", () => {
+  const f = navigationFixture();
+  try {
+    const popup = f.open(); popup.querySelectorAll(".extended-breadcrumb-row")[1].click();
+    f.hover(0); assert.equal(f.scroller.scrollTop, 0);
+    f.leave(); f.advance(10);
+    assert.equal(f.scroller.scrollTop, 30); assert.equal(f.caret(), "# Root\n".length);
+  } finally { f.close(); }
+});
+
+test("clicking outside cancels queued hover navigation without undoing the user's main-UI interaction", () => {
+  const f = navigationFixture();
+  try {
+    f.settings.breadcrumbNavigateAfterTimeout = true;
+    const popup = f.open(); f.hover(1); f.leave();
+    const count = f.navigation.length;
+    f.lines[2].dispatchEvent(new f.win.MouseEvent("pointerdown", { bubbles: true }));
+    f.scroller.scrollTop = 200; // The outside click navigated elsewhere.
+    f.advance(1000);
+    assert.equal(popup.isConnected, false); assert.equal(f.navigation.length, count);
+    assert.equal(f.scroller.scrollTop, 200);
+  } finally { f.close(); }
+});
+
+test("embedded headings never activate breadcrumbs against the containing note's source", () => {
+  const f = navigationFixture("reading");
+  try {
+    const reading = f.document.querySelector(".markdown-preview-view");
+    const embed = f.document.createElement("div"); embed.className = "internal-embed";
+    reading.before(embed); embed.append(reading);
+    // Simulate a fragment registered before it was attached to a same-note
+    // embed; source-file equality alone would not protect against this case.
+    f.settings.breadcrumbFieldActivation = true; f.settings.editorBreadcrumbFieldActivation = true;
+    assert.equal(f.open(), null);
+    f.settings.breadcrumbFieldActivation = false;
+    assert.equal(f.open(), null);
+    f.manager.refresh();
+    assert.equal(reading.querySelectorAll(".extended-breadcrumb-reading-marker").length, 0);
+  } finally { f.close(); }
+});
+
+for (const reason of ["escape", "blur", "settings", "destroy", "file", "mode", "edit", "hidden"]) {
+  test(`${reason} cancels deferred navigation and never restores into a changed note or mode`, () => {
+    const f = navigationFixture();
+    try {
+      f.settings.breadcrumbNavigateAfterTimeout = true;
+      const popup = f.open(); f.hover(1); f.leave();
+      const count = f.navigation.length;
+      if (reason === "escape") f.document.dispatchEvent(new f.win.KeyboardEvent("keydown", { key: "Escape" }));
+      if (reason === "blur") f.win.dispatchEvent(new f.win.Event("blur"));
+      if (reason === "settings") f.manager.refresh();
+      if (reason === "destroy") f.manager.destroy();
+      if (reason === "file") { f.view.file = { path: "Other.md" }; f.handlers.get("file-open")(); }
+      if (reason === "mode") { f.view.mode = "preview"; f.handlers.get("layout-change")(); }
+      if (reason === "edit") { f.view.editor.cm.state = EditorState.create({ doc: "# Another" }); f.handlers.get("editor-change")(f.view.editor, f.view); }
+      if (reason === "hidden") { f.view.containerEl.getBoundingClientRect = () => new f.win.DOMRect(); f.handlers.get("layout-change")(); }
+      f.advance(1000); assert.equal(popup.isConnected, false);
+      assert.equal(f.navigation.length, count, "cancellation never commits deferred navigation");
+      assert.equal(f.scroller.scrollTop, ["file", "mode", "edit", "hidden"].includes(reason) ? 30 : 390);
+    } finally { f.close(); }
+  });
 }
 
 test("configured dismissal delay applies to scrolling and changes with the numeric setting", () => {
