@@ -93,7 +93,7 @@ Outline Pane Markdown and SVG Rendering Toggles ENABLED
 | Copy fully nested heading paths | On | Includes every ancestor heading in copied heading links and embeds; disable it to copy only the shorter target-heading link. |
 | Lower limit of heading | `1` | Sets the shallowest level that **Decrease headings** may reach; `0` permits conversion to a paragraph. |
 | Enable override Tab behavior | Off | Makes Tab and Shift+Tab shift headings when the active selection contains a heading. |
-| Show Editor Gutter heading level markers | On | Shows H1–H12 heading markers in the editor gutter and H7–H12 markers inside linked embeds. Existing `showHeadingMarkers` preferences migrate automatically. |
+| Show Editor Gutter heading level markers | On | Shows H1–H12 heading markers in the editor gutter and inside linked embeds. Existing `showHeadingMarkers` preferences migrate automatically. |
 | Show Outline pane heading level markers | On | Shows an H1–H12 marker to the left of every matched heading in Obsidian's default Outline. |
 | Show before line numbers | On | Places heading markers before the line-number gutter. |
 | Show in source mode | On | Shows heading markers in Source mode as well as Live Preview. |
@@ -166,7 +166,7 @@ The **Heading Hover Breadcrumb Popover Timeout** controls adapt Nested Propertie
 
 These controls apply to both Editor and Outline breadcrumbs in all three viewing modes. They use the existing global/per-mode dismissal delay; there is no extra hover timer. Click navigation always takes priority and is never undone by dismissal. Escape, window blur, settings changes, or replacing the popover cancel deferred navigation. Clicking outside the popover also cancels it and leaves the main UI under your control. A changed note, mode, or document is never scrolled back to an old preview position.
 
-Internal linked embeds now show H7–H12 level markers using **Show Editor Gutter heading level markers** and its existing typography controls. The full label, fold button, and heading text occupy separate spaces within the embed, including H10–H12. These are display markers; an embedded heading does not activate a breadcrumb for the containing note.
+Internal linked embeds now show H1–H12 level markers using **Show Editor Gutter heading level markers** and its existing typography controls. The full label and heading text occupy separate spaces within the embed, including H10–H12 and wrapped titles. Extended headings do not add a fold button inside embeds; **Reading View folding** still applies outside embeds. These are display markers; an embedded heading does not activate a breadcrumb for the containing note.
 
 In **Style Settings → Extended Headings → Heading Hover Breadcrumb**, customize popover typography, dimensions, spacing, scrolling area, colors, current/hover appearance, borders, corners, shadow, and main-heading highlights. Marker typography includes size, weight, color, style, variant, letter spacing, opacity, reserved width, and gap; **All small caps** is the default variant. Static guides and threading expose all of the Outline's corresponding pattern, geometry, opacity, thickness, palette, fallback, and override controls. **Editor Pane Breadcrumb Decorations** and **Outline Pane Breadcrumb Decorations** can override the shared marker/guide/thread appearance independently, using the same defaults and precise numerical inputs.
 

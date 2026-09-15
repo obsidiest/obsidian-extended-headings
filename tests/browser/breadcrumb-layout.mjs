@@ -36,6 +36,7 @@ try {
       .breadcrumb-test-outline { position: fixed; right: 16px; top: 40px; width: 370px; height: 690px; overflow: auto; }
       .breadcrumb-test-outline .tree-item-self { min-height: 36px; padding: 4px; display: flex; }
       .breadcrumb-test-embed { margin: 30px; max-width: 600px; padding: 10px; }
+      body.breadcrumb-test-marker-typography { --extended-heading-level-marker-size: 1.5em; --extended-heading-level-marker-weight: 700; }
       .rename-test-modal { position: fixed; top: 30px; left: 50%; transform: translateX(-50%);
         box-sizing: border-box; width: min(600px, calc(100vw - 32px)); padding: 20px; }
       .rename-test-modal.rename-test-narrow { width: 260px; }
@@ -209,38 +210,76 @@ try {
       assert.equal(committed.caret, committed.line); checks++;
       assert.ok(committed.scroll > 1000, JSON.stringify(committed)); checks++;
     }
-    // The embedded reading renderer has no CodeMirror gutter. Check all six
-    // extended marker labels and their separation from folds and wrapped text.
+    // Process while detached, then attach without reprocessing: all twelve
+    // markers must fit, and a pre-existing Reading fold must become invisible.
     for (const folding of [true, false]) {
       await page.evaluate((folding) => {
         window.setupBreadcrumb(); window.breadcrumbTest.manager.destroy();
         window.breadcrumbTest.cm.destroy(); document.body.replaceChildren();
         document.body.classList.add("extended-headings-show-level-markers");
         const section = document.createElement("div"); section.className = "markdown-preview-section";
-        for (let level = 7; level <= 12; level++) {
-          const paragraph = document.createElement("p");
-          paragraph.textContent = `${"#".repeat(level)} Extended heading level ${level} with a long title that should wrap within the embed`;
-          section.append(paragraph);
+        for (let level = 1; level <= 12; level++) {
+          const heading = document.createElement(level <= 6 ? `h${level}` : "p");
+          const title = `Heading level ${level} with a long title that should wrap within the embed`;
+          if (level > 6) heading.append(`${"#".repeat(level)} `);
+          else heading.dataset.heading = title;
+          const link = document.createElement("a"); link.href = "#target"; link.className = "internal-link";
+          link.textContent = title; heading.append(link);
+          section.append(heading);
         }
         window.renderExtendedHeadings(section, () => ({ maximumLevel: 12, readingModeFolding: folding }));
         const embed = document.createElement("div"); embed.className = "internal-embed markdown-embed breadcrumb-test-embed";
         embed.append(section); document.body.append(embed);
+        const ordinary = document.createElement("div"); ordinary.className = "breadcrumb-test-reading";
+        const native = document.createElement("h4"); native.textContent = "Ordinary native heading";
+        const extended = document.createElement("p"); extended.textContent = "####### Ordinary extended heading";
+        ordinary.append(native, extended); document.body.append(ordinary);
+        window.renderExtendedHeadings(ordinary, () => ({ maximumLevel: 12, readingModeFolding: folding }));
       }, folding);
-      const boxes = await page.locator(".extended-heading-reading").evaluateAll((headings) => headings.map((heading) => {
-        const marker = heading.querySelector(".extended-heading-embed-marker"), content = heading.querySelector(".extended-heading-reading-content"), fold = heading.querySelector(".extended-heading-fold");
+      const embeddedHeadings = page.locator(".breadcrumb-test-embed .extended-heading-reading, .breadcrumb-test-embed .extended-heading-embed-host");
+      const boxes = await embeddedHeadings.evaluateAll((headings) => headings.map((heading) => {
+        const marker = heading.querySelector(".extended-heading-embed-marker"), content = heading.querySelector(".extended-heading-reading-content, .extended-heading-embed-content"), fold = heading.querySelector(".extended-heading-fold");
         const rect = (el) => { const r = el.getBoundingClientRect(); return { left: r.left, right: r.right, width: r.width }; };
-        return { level: heading.getAttribute("aria-level"), label: marker.textContent, heading: rect(heading), marker: rect(marker), content: rect(content), fold: fold && rect(fold) };
+        return { level: heading.getAttribute("aria-level") ?? heading.tagName.slice(1), label: marker.textContent,
+          heading: rect(heading), marker: rect(marker), content: rect(content), labelBox: rect(marker.firstElementChild),
+          scrollWidth: content.scrollWidth, clientWidth: content.clientWidth,
+          foldDisplay: fold ? getComputedStyle(fold).display : "none", link: content.querySelector("a")?.getAttribute("href") };
       }));
+      assert.equal(boxes.length, 12); checks++;
       for (const box of boxes) {
         assert.equal(box.label, `H${box.level}`);
         assert.ok(box.marker.width > 0 && box.marker.left >= box.heading.left - 1);
-        assert.ok(box.marker.right <= (box.fold ?? box.content).left);
-        assert.ok(!box.fold || box.fold.right <= box.content.left);
+        assert.ok(box.marker.right <= box.content.left);
+        assert.ok(box.labelBox.right <= box.marker.right + 1);
+        assert.equal(box.foldDisplay, "none");
         assert.ok(box.content.right <= box.heading.right + 1);
-        checks += 5;
+        assert.ok(box.scrollWidth <= box.clientWidth + 1);
+        assert.equal(box.link, "#target");
+        checks += 8;
       }
+      assert.equal(await page.locator(".breadcrumb-test-embed .extended-heading-fold:visible").count(), 0); checks++;
+      assert.equal(await page.locator(".breadcrumb-test-reading .extended-heading-embed-marker:visible").count(), 0); checks++;
+      assert.equal(await page.locator(".breadcrumb-test-reading .extended-heading-fold:visible").count(), folding ? 1 : 0); checks++;
+      const nativeLayout = await page.locator(".breadcrumb-test-reading h4").evaluate((heading) => ({
+        display: getComputedStyle(heading).display,
+        contentDisplay: getComputedStyle(heading.querySelector(".extended-heading-embed-content")).display,
+      }));
+      assert.notEqual(nativeLayout.display, "grid"); assert.equal(nativeLayout.contentDisplay, "contents"); checks += 2;
+      await page.evaluate(() => document.body.classList.add("breadcrumb-test-marker-typography"));
+      for (const style of await embeddedHeadings.locator(".extended-heading-embed-marker").evaluateAll((markers) => markers.map((marker) => ({
+        size: parseFloat(getComputedStyle(marker.firstElementChild).fontSize) / parseFloat(getComputedStyle(marker).fontSize),
+        weight: getComputedStyle(marker).fontWeight,
+      })))) {
+        assert.equal(style.size, 1.5); assert.equal(style.weight, "700"); checks += 2;
+      }
+      if (process.env.EMBED_SCREENSHOT && width === 1200 && folding) await page.screenshot({ path: process.env.EMBED_SCREENSHOT, fullPage: true });
       await page.evaluate(() => document.body.classList.remove("extended-headings-show-level-markers"));
       assert.equal(await page.locator(".extended-heading-embed-marker:visible").count(), 0); checks++;
+      for (const offset of await embeddedHeadings.evaluateAll((headings) => headings.map((heading) =>
+        heading.querySelector(".extended-heading-reading-content, .extended-heading-embed-content").getBoundingClientRect().left - heading.getBoundingClientRect().left))) {
+        assert.ok(Math.abs(offset) < 1, `Hidden markers must not leave a gap: ${offset}`); checks++;
+      }
+      await page.evaluate(() => document.body.classList.remove("breadcrumb-test-marker-typography"));
     }
     // Check real textarea layout before any click, then editing, narrow
     // layouts, bounded scrolling, keyboard submission, and the off switch.

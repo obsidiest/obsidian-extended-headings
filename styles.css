@@ -3641,15 +3641,22 @@ body:not(.extended-headings-markers-before) .cm-extended-heading-gutter { order:
   position: relative;
 }
 
-.extended-heading-reading-content { display: contents; }
+.extended-heading-reading-content,
+.extended-heading-embed-content { display: contents; }
 .extended-heading-embed-marker { display: none; }
 
-/* Embeds have no editor gutter. Keep the complete H7-H12 marker, folding
-   control, and inline title in separate columns within the embed boundary. */
-.internal-embed .extended-heading-reading {
+/* Embeds have no editor gutter. Keep H1-H12 markers and inline titles in
+   separate columns within the embed boundary, without an extra fold control. */
+.internal-embed .extended-heading-reading,
+.internal-embed .extended-heading-embed-host {
   display: grid;
-  grid-template-columns: auto auto minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: baseline;
+  column-gap: 0;
+}
+
+body.extended-headings-show-level-markers .internal-embed .extended-heading-reading,
+body.extended-headings-show-level-markers .internal-embed .extended-heading-embed-host {
   column-gap: 0.25em;
 }
 
@@ -3666,14 +3673,12 @@ body.extended-headings-show-level-markers .internal-embed .extended-heading-embe
 }
 .extended-heading-embed-marker > span { font-size: var(--extended-heading-level-marker-size); }
 .internal-embed .extended-heading-reading > .extended-heading-fold {
-  grid-column: 2;
-  grid-row: 1;
-  margin-inline: 0;
-  min-width: 1em;
+  display: none;
 }
-.internal-embed .extended-heading-reading > .extended-heading-reading-content {
+.internal-embed .extended-heading-reading > .extended-heading-reading-content,
+.internal-embed .extended-heading-embed-host > .extended-heading-embed-content {
   display: block;
-  grid-column: 3;
+  grid-column: 2;
   grid-row: 1;
   min-width: 0;
   overflow-wrap: anywhere;

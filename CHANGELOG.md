@@ -8,7 +8,8 @@
 
 - Added the Heading Hover Breadcrumb Navigation subsection with independent controls for main-UI navigation before and after the popover timeout. Before-timeout preview defaults on; after-timeout navigation defaults off. The controls cover both panes and all viewing modes, preserve the editor caret during hover, and use the existing dismissal delay.
 - Made hover previews temporary by default. Timeout restores the prior view unless after-timeout navigation is enabled; explicit clicks commit navigation regardless of the hover settings. Cancellation and note/mode/document changes do not trigger deferred navigation.
-- Fixed missing H7–H12 heading-level markers in internal linked embeds. Complete labels use the existing editor-marker visibility and typography settings, with separate space for markers, fold buttons, and wrapped inline heading content. Detached embed rendering and H10–H12 labels are covered.
+- Fixed missing H1–H12 heading-level markers in internal linked embeds. Complete labels use the existing editor-marker visibility and typography settings, with separate space for markers and wrapped inline heading content. Detached embed rendering and H10–H12 labels are covered.
+- Removed the extra H7–H12 fold control from internal linked embeds while retaining extended-heading folding in ordinary Reading views. Fold controls created before embed attachment are hidden and cannot fold the containing note.
 - Updated release metadata to 2.1.0, retaining the 1.13.0 minimum Obsidian version.
 
 ## 2.0.0
