@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.1.1
+
+- Render Heading Hover Breadcrumb labels through Obsidian’s Markdown renderer, preserving LaTeX, inline SVG, Markdown formatting, and source-relative links. Keep heading navigation and keyboard controls, and release render resources on dismissal.
+- Recognize math and SVG-only headings in partial core Outlines; hide literal SVG source reversibly while displaying sanitized icons.
+- Start static Outline guides at the viewport boundary only when a known parent row is actually above it. Missing, filtered, or hidden parents use a local branch start instead of an overdrawn spine.
+- Adapt List Tree Indentation Guides 2.0.2’s replacement Style Settings color dialog for all 55 themed color controls. Await persistence and CSS regeneration before closing, preserve inherited defaults, handle save errors, and repair malformed saved colors belonging to this plugin.
+- Add rich-content lifecycle, partial Outline, geometry, color persistence, and actual Style Settings 1.0.9 manager regression coverage. Automated/browser checks are distinct from pending Obsidian application validation; see [validation notes](docs/validation-2.1.1.md).
+- Update release metadata to 2.1.1, retaining the 1.13.0 minimum Obsidian version.
+
 ## 2.1.0
 
 - Suppressed the success notification after renaming a heading with no updated backlinks. Both rename commands now complete silently in that case; link-update counts and failed-update notices remain available.

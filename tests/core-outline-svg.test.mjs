@@ -549,10 +549,7 @@ test("measures visible row portions and excludes rows outside the Outline viewpo
 });
 
 test("continues visible guides and threads when their parent row is clipped above", () => {
-  assert.match(
-    source,
-    /parent\s*\?\s*undefined\s*:\s*Math\.min\(\.\.\.children\.map\(\(entry\) => entry\.clipTop\)\)/s,
-  );
+  // Missing/hidden parents are covered by geometry tests in outline-rendering.
   assert.match(source, /parent\?\.y \?\? child\.clipTop/);
   assert.match(source, /clipTop:\s*clamp\(visibleMeasurement\.clipTop - hostRect\.top/);
 });

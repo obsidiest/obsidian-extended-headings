@@ -1,8 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { existsSync, readFileSync } from "node:fs";
-import vm from "node:vm";
-import ts from "typescript";
+import { sourceLoader } from "./helpers/load-source.mjs";
 
 const moduleUrl = new URL("../src/style-settings-precision.ts", import.meta.url);
 const source = existsSync(moduleUrl) ? readFileSync(moduleUrl, "utf8") : "";
@@ -17,12 +16,7 @@ class TestEvent {
 
 function loadModule() {
   if (!source) return {};
-  const compiled = ts.transpileModule(source, {
-    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
-  }).outputText;
-  const module = { exports: {} };
-  vm.runInNewContext(compiled, { module, exports: module.exports });
-  return module.exports;
+  return sourceLoader()("style-settings-precision");
 }
 
 function inputElement(initialValue = "") {

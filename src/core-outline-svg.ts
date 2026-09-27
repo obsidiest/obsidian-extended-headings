@@ -291,7 +291,8 @@ function hasRenderableOutlineMarkdown(rawBody: string): boolean {
     /!?\[\[[^\]]+\]\]/u.test(withoutSvg) ||
     /!?\[[^\]]*\]\([^)]*\)/u.test(withoutSvg) ||
     /(?:\*\*|__|~~|==|[*_`])/u.test(withoutSvg) ||
-    /<\/?[A-Za-z][^>]*>/u.test(withoutSvg)
+    /<\/?[A-Za-z][^>]*>/u.test(withoutSvg) ||
+    /\$/u.test(withoutSvg) || inlineSvgPattern().test(rawBody)
   );
 }
 
@@ -372,15 +373,25 @@ export function matchOutlineSvgSpecs(
   return matches.sort((left, right) => left.itemIndex - right.itemIndex);
 }
 
+function outlineMatchKey(value: string): string {
+  // Core Outline can remove math delimiters while retaining the TeX source.
+  const normalized = normalizeOutlineLabel(value).replace(/\$\$([^$]+)\$\$|\$([^$\n]+)\$/gu,
+    (_match, display: string | undefined, inline: string | undefined) => display ?? inline ?? "");
+  if (normalized) return normalized;
+  // SVG-only headings must not collapse to the empty key of a blank heading.
+  const svgs = Array.from(value.matchAll(inlineSvgPattern()), match => match[0]);
+  return svgs.length ? `\uFFFC${svgs.join(" ").replace(/\s+/gu, " ")}` : "";
+}
+
 export function matchOutlineHeadingSpecs(
   outlineLabels: string[],
   specs: OutlineHeadingSpec[],
 ): OutlineHeadingMatch[] {
-  const normalizedItems = outlineLabels.map(normalizeOutlineLabel);
+  const normalizedItems = outlineLabels.map(outlineMatchKey);
   const normalizedSpecs = specs.map(
     (spec) => new Set(
-      [spec.label, ...(spec.alternateLabels ?? [])]
-        .map(normalizeOutlineLabel)
+      [spec.label, ...(spec.alternateLabels ?? []), ...(spec.svgMarkup?.length ? [spec.svgMarkup.join(" ")] : [])]
+        .map(outlineMatchKey)
         .filter((label) => label.length > 0),
     ),
   );
@@ -949,6 +960,14 @@ export class CoreOutlineRenderer {
 
         const rendered = renderedMarkdown.get(match.specIndex);
         if (rendered) this.applyRenderedMarkdown(item, rendered);
+        else if (this.plugin.settings.renderInlineSvgsInDefaultOutline && spec.svgMarkup?.length) {
+          // SVG-only labels (and labels with Markdown rendering disabled) have
+          // no Markdown template. Hide literal SVG source reversibly before
+          // appending the sanitized icon, rather than showing both together.
+          const label = (item.ownerDocument.win as Window & { createSpan(): HTMLSpanElement }).createSpan();
+          label.textContent = (item.textContent ?? "").replace(inlineSvgPattern(), " ").trim();
+          this.applyRenderedMarkdown(item, label);
+        }
 
         if (this.plugin.settings.showOutlinePaneHeadingLevelMarkers) {
           const marker = item.createSpan({
@@ -1326,11 +1345,20 @@ export class CoreOutlineRenderer {
         height,
         false,
         parent,
-        parent
-          ? undefined
-          : Math.min(...children.map((entry) => entry.clipTop)),
+        parent ? undefined : this.clippedParentStart(attachment, parentIndex, children),
       );
     }
+  }
+
+  private clippedParentStart(attachment: OutlineAttachment, parentIndex: number, children: MeasuredOutlineRow[]): number | undefined {
+    const parent = attachment.rowsBySpecIndex.get(parentIndex)?.row;
+    if (!parent || children.length === 0) return undefined;
+    const rect = parent.getBoundingClientRect();
+    const clipTop = Math.min(...children.map(entry => entry.clipTop));
+    const hostTop = attachment.container.getBoundingClientRect().top;
+    // An unmatched/filtered/hidden parent is not evidence of clipping. Only a
+    // real row above the viewport warrants a spine from the viewport's top.
+    return rect.height > 0 && rect.bottom <= hostTop + clipTop ? clipTop : undefined;
   }
 
   private appendStaticGuideForRows(

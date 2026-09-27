@@ -9,6 +9,7 @@ import {
   breadcrumbEntries, breadcrumbHeadings, breadcrumbKeyboardTarget, breadcrumbThreadPlan, type BreadcrumbHeading,
 } from "./breadcrumb-tree";
 import { breadcrumbHighlight } from "./breadcrumb-editor";
+import { BreadcrumbContent } from "./breadcrumb-content";
 import { scanHeadings, parseHeadingLine, type ParsedHeading } from "./headings";
 import {
   buildOutlineGuidePath, buildOutlineRootThreadPath, buildRoundedOutlineThreadPath, outlineLabelFromHeadingBody,
@@ -44,7 +45,8 @@ interface Popup {
   tree: HTMLElement;
   content: HTMLElement;
   svg: SVGSVGElement;
-  rows: Map<number, HTMLButtonElement>;
+  rows: Map<number, HTMLElement>;
+  renderer: BreadcrumbContent;
   anchorRect: DOMRect;
   resize: ResizeObserver;
   frame: number | null;
@@ -417,14 +419,17 @@ export class HeadingBreadcrumb {
     // Do not let SVG's default 300×150 viewport become scrollable content.
     svg.setAttribute("width", "0"); svg.setAttribute("height", "0");
     content.append(svg); tree.append(content); element.append(title, tree);
-    const rows = new Map<number, HTMLButtonElement>();
+    const rows = new Map<number, HTMLElement>();
+    const renderer = new BreadcrumbContent();
+    renderer.load();
+    const labels: { heading: BreadcrumbHeading; label: HTMLElement }[] = [];
     const settings = this.plugin.settings;
     const options = breadcrumbFeature(settings, target.pane, "Threading") ? breadcrumbThreadOptions(settings, target.pane) : null;
     const indexes = breadcrumbEntries(headings, current, options);
     for (const index of indexes) {
       const heading = headings[index];
-      const row = create("button", "extended-breadcrumb-row");
-      row.type = "button"; row.tabIndex = index === current ? 0 : -1;
+      const row = create("div", "extended-breadcrumb-row");
+      row.tabIndex = index === current ? 0 : -1;
       row.dataset.index = String(index);
       row.style.setProperty("--extended-breadcrumb-depth", String(heading.depth));
       row.classList.toggle("is-current", index === current);
@@ -435,13 +440,22 @@ export class HeadingBreadcrumb {
         const marker = create("span", "extended-breadcrumb-level-marker");
         marker.textContent = `H${heading.level}`; marker.setAttribute("aria-hidden", "true"); row.append(marker);
       }
-      const label = create("span", "extended-breadcrumb-label");
-      label.textContent = outlineLabelFromHeadingBody(heading.rawBody) || "(Untitled heading)";
+      const label = create("div", "extended-breadcrumb-label markdown-rendered");
+      label.textContent = outlineLabelFromHeadingBody(heading.rawBody) || (heading.rawBody.trim() ? "Heading content" : "(Untitled heading)");
       row.setAttribute("aria-label", `H${heading.level} ${label.textContent}`);
       row.append(label); content.append(row); rows.set(index, row);
+      labels.push({ heading, label });
       row.addEventListener("pointerenter", () => this.activate(state, index));
       row.addEventListener("focus", () => { this.cancelDismiss(state); this.activate(state, index); });
       row.addEventListener("click", (event) => {
+        const clicked = elementAt(event);
+        const link = clicked?.closest<HTMLAnchorElement>("a.internal-link");
+        if (link) {
+          event.preventDefault(); event.stopPropagation();
+          void this.plugin.app.workspace.openLinkText(link.dataset.href ?? link.getAttribute("href") ?? "", target.file, event.ctrlKey || event.metaKey);
+          return;
+        }
+        if (clicked?.closest("a, button, input, select, textarea")) return;
         event.preventDefault(); event.stopPropagation();
         if (!state.popup) return;
         state.popup.selected = index;
@@ -451,19 +465,30 @@ export class HeadingBreadcrumb {
     const resize = new win.ResizeObserver(() => this.scheduleDraw(state));
     const popup: Popup = { target, headings, current, active: current, selected: current,
       hovered: null, committedLine: null, preview: null, sourceDocument: editorView(target.view)?.state.doc,
-      element, tree, content, svg, rows, anchorRect: target.activationRect, resize, frame: null };
+      element, tree, content, svg, rows, renderer, anchorRect: target.activationRect, resize, frame: null };
     state.popup = popup;
     element.addEventListener("pointerenter", () => this.cancelDismiss(state));
     element.addEventListener("pointerleave", () => this.scheduleDismiss(state));
     element.addEventListener("focusout", () => this.scheduleDismiss(state));
     tree.addEventListener("keydown", (event) => {
+      if (!elementAt(event)?.matches(".extended-breadcrumb-row")) return;
       const activePosition = indexes.findIndex((index) => rows.get(index) === state.document.activeElement);
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        if (activePosition >= 0) rows.get(indexes[activePosition])?.click();
+        return;
+      }
       const position = breadcrumbKeyboardTarget(event.key, activePosition, indexes.length);
       if (position === null) return;
       event.preventDefault(); rows.get(indexes[position])?.focus();
     });
     state.document.body.append(element);
     resize.observe(content);
+    for (const { heading, label } of labels) {
+      void renderer.render(this.plugin.app, heading.rawBody, label, target.file).then(() => {
+        if (state.popup === popup) this.scheduleDraw(state);
+      });
+    }
     this.draw(state);
     const currentRow = rows.get(current);
     if (currentRow) {
@@ -707,6 +732,7 @@ export class HeadingBreadcrumb {
     const popup = state.popup;
     state.popup = null;
     popup?.resize.disconnect();
+    popup?.renderer.dispose();
     if (popup?.frame !== null && popup?.frame !== undefined) state.document.defaultView?.cancelAnimationFrame(popup.frame);
     popup?.element.remove();
     this.clearHighlight(state);
