@@ -4194,7 +4194,8 @@ body.theme-light {
   padding: 2px;
 }
 .extended-breadcrumb-guides { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 2; }
-.extended-breadcrumb-popover button.extended-breadcrumb-row {
+.extended-breadcrumb-popover .extended-breadcrumb-row {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   position: relative;
@@ -4229,11 +4230,11 @@ body.theme-light {
   white-space: normal;
   overflow-wrap: anywhere;
 }
-.extended-breadcrumb-popover button.extended-breadcrumb-row.is-current {
+.extended-breadcrumb-popover .extended-breadcrumb-row.is-current {
   color: var(--extended-breadcrumb-current-color);
   background: color-mix(in srgb, var(--extended-breadcrumb-current-color) calc(var(--extended-breadcrumb-current-background-opacity) * 1%), transparent);
 }
-.extended-breadcrumb-popover button.extended-breadcrumb-row:is(.is-active, :focus-visible) {
+.extended-breadcrumb-popover .extended-breadcrumb-row:is(.is-active, :focus-visible) {
   color: var(--extended-breadcrumb-current-color);
   background: var(--extended-breadcrumb-hover-color);
   outline: var(--extended-breadcrumb-main-outline-thickness) solid color-mix(in srgb, var(--extended-breadcrumb-current-color) calc(var(--extended-breadcrumb-main-outline-opacity) * 100%), transparent);
@@ -4936,3 +4937,48 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
+
+/* Native Markdown/MathJax/SVG content inside heading breadcrumbs. */
+.extended-breadcrumb-label > :first-child { margin-top: 0; }
+.extended-breadcrumb-label > :last-child { margin-bottom: 0; }
+.extended-breadcrumb-label p { margin-block: 0; }
+.extended-breadcrumb-label :is(img, svg):not(mjx-container svg, .math svg) {
+  max-width: 100%;
+  max-height: 1.4em;
+  width: auto;
+  vertical-align: middle;
+}
+.extended-breadcrumb-label mjx-container { max-width: 100%; }
+.extended-breadcrumb-label .math-block { overflow-x: auto; }
+
+/* Color dialogs adapted from List Tree Indentation Guides 2.0.2. */
+.extended-headings-style-color-original { display: none !important; }
+.extended-headings-style-color-controls, .extended-headings-color-dialog-fields, .extended-headings-color-dialog-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.extended-headings-style-color-swatch::before {
+  content: "";
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-inline-end: 6px;
+  vertical-align: middle;
+  border-radius: 3px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--extended-headings-chosen-color);
+}
+.extended-headings-color-dialog {
+  color: var(--text-normal);
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-l, 12px);
+  padding: 24px;
+  max-width: min(480px, calc(100vw - 32px));
+}
+.extended-headings-color-dialog::backdrop { background: rgba(0, 0, 0, 0.4); }
+.extended-headings-color-dialog-fields input[type="text"] { min-width: 0; flex: 1; }
+.extended-headings-color-dialog-fields input[type="color"] { width: 48px; height: 32px; padding: 2px; }
+.extended-headings-color-dialog-status { min-height: 1.5em; margin-block: 8px; }
+.extended-headings-color-dialog-actions { justify-content: flex-end; }

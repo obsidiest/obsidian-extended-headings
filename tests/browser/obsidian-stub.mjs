@@ -2,11 +2,13 @@ export class MarkdownView {
 }
 export class MarkdownRenderChild {
 }
-export class Component {
-}
+export { Component } from "../helpers/obsidian-component.mjs";
 export class TFile {
 }
-export const MarkdownRenderer = {};
+export const MarkdownRenderer = { render: async (...args) => {
+  if (window.extendedRenderMarkdown) return window.extendedRenderMarkdown(...args);
+  args[2].textContent = args[1];
+} };
 export const sanitizeHTMLToDom = () => document.createDocumentFragment();
 
 function modalElement(tag, options = {}) {

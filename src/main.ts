@@ -1,6 +1,7 @@
 import { HeadingBreadcrumb } from "./heading-breadcrumb";
 import { breadcrumbHighlightField } from "./breadcrumb-editor";
 import { MarkdownView, Notice, Plugin } from "obsidian";
+import { styleSettingsColorStore } from "./style-settings-colors";
 import { CoreIntegration } from "./core-integration";
 import { CoreOutlineRenderer } from "./core-outline-svg";
 import {
@@ -36,8 +37,10 @@ export default class ExtendedHeadingsPlugin extends Plugin {
     // Notify it after this stylesheet has been registered so controls appear
     // immediately when either plugin is enabled or updated.
     this.app.workspace.trigger("parse-style-settings");
-    this.styleSettingsPrecisionControls = new StyleSettingsPrecisionControls();
+    this.styleSettingsPrecisionControls = new StyleSettingsPrecisionControls(() => styleSettingsColorStore(this.app));
     this.styleSettingsPrecisionControls.start();
+    this.registerEvent(this.app.workspace.on("css-change", () => this.styleSettingsPrecisionControls?.refreshColors()));
+    this.registerEvent(this.app.workspace.on("window-close", (_leaf, win) => this.styleSettingsPrecisionControls?.removeDocument(win.document)));
     this.app.workspace.iterateAllLeaves((leaf) => {
       this.styleSettingsPrecisionControls?.observeDocument(
         leaf.view.containerEl.ownerDocument,

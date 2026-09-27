@@ -4,6 +4,7 @@ import { setImmediate } from "node:timers";
 import { JSDOM } from "jsdom";
 import { EditorState, StateEffect } from "@codemirror/state";
 import { sourceLoader } from "./helpers/load-source.mjs";
+import { Component } from "./helpers/obsidian-component.mjs";
 
 class MarkdownView {
   getMode() { return this.mode; }
@@ -18,7 +19,12 @@ function fixture(mode = "source", text = "# Root\n## Child\n############ Deep") 
   win.createFragment = () => document.createDocumentFragment();
   win.ResizeObserver = class { observe() {} disconnect() {} };
   win.HTMLElement.prototype.scrollIntoView = function () {};
-  const load = sourceLoader({ obsidian: { MarkdownView, MarkdownRenderChild } }, { document, window: win });
+  const renderCalls = [];
+  const MarkdownRenderer = { render: async (_app, markdown, label, path, component) => {
+    renderCalls.push({ markdown, label, path, component });
+    label.textContent = markdown;
+  } };
+  const load = sourceLoader({ obsidian: { MarkdownView, MarkdownRenderChild, Component, MarkdownRenderer } }, { document, window: win });
   const { HeadingBreadcrumb } = load("heading-breadcrumb");
   const { DEFAULT_BREADCRUMB_SETTINGS } = load("breadcrumb-settings");
   const settings = { ...DEFAULT_BREADCRUMB_SETTINGS, maximumLevel: 12 };
@@ -87,11 +93,32 @@ function fixture(mode = "source", text = "# Root\n## Child\n############ Deep") 
   };
   const manager = new HeadingBreadcrumb(plugin); manager.start();
   const move = (element, line = 1, x = 25) => element.dispatchEvent(new win.MouseEvent("pointermove", { bubbles: true, clientY: 115 + line * 30, clientX: x }));
-  return { manager, view, settings, document, win, handlers, lines, effects, navigation, move, load,
+  return { manager, view, settings, document, win, handlers, lines, effects, navigation, move, load, renderCalls,
     caret: () => caret, focused: () => focused,
     close: () => { manager.destroy(); win.close(); },
   };
 }
+
+for (const mode of ["source", "livePreview", "reading"]) test(`${mode}: breadcrumb passes complete math, SVG, and Markdown to the note renderer`, async () => {
+  const titles = ["test $\\approx$ test", '<svg viewBox="0 0 24 24"><path d="M12 5v16"/></svg>', "[[Testing Document]] **bold**"];
+  const text = titles.map((title, i) => `${"#".repeat(i + 9)} ${title}`).join("\n");
+  const f = fixture(mode, text);
+  try {
+    if (mode === "reading") {
+      const reading = f.document.querySelector(".markdown-preview-view");
+      for (const [index, title] of titles.entries()) {
+        const heading = f.document.createElement("div");
+        heading.className = "extended-heading-reading"; heading.setAttribute("aria-level", String(index + 9));
+        heading.textContent = title; heading.dataset.line = String(index); reading.append(heading);
+      }
+      f.manager.processReading(reading, { sourcePath: "Test.md", addChild() {}, getSectionInfo: () => ({ text, lineStart: 0, lineEnd: 2 }) });
+      f.move(reading.querySelectorAll(".extended-breadcrumb-reading-marker")[2], 2);
+    } else f.move(f.document.querySelectorAll(".cm-gutterElement")[2], 2);
+    await new Promise(setImmediate);
+    assert.deepEqual(f.renderCalls.map(call => call.markdown), titles);
+    assert.ok(f.renderCalls.every(call => call.path === "Test.md"));
+  } finally { f.close(); }
+});
 
 for (const mode of ["livePreview", "source"]) {
   test(`${mode}: full gutter cell activates, hashes do not, and preview preserves the caret`, () => {

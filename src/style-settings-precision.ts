@@ -1,3 +1,5 @@
+import { StyleSettingsColors, type StyleSettingsColorStore } from "./style-settings-colors";
+
 const STYLE_SETTING_MARKER_SELECTOR = [
   '[data-id^="extended-"]',
   '[data-id^="extended-headings-style@@extended-"]',
@@ -24,6 +26,13 @@ type QueryableNode = ParentNode & {
 
 export class StyleSettingsPrecisionControls {
   private readonly observers = new Map<Document, MutationObserver>();
+  private readonly colors: StyleSettingsColors;
+  constructor(getColors: () => StyleSettingsColorStore | null = () => null) {
+    this.colors = new StyleSettingsColors(getColors);
+  }
+  refreshColors(): void {
+    for (const doc of this.observers.keys()) this.colors.enhance(doc);
+  }
 
   start(documents?: Iterable<Document>): void {
     for (const ownerDocument of documents ?? getDefaultDocuments()) {
@@ -35,6 +44,7 @@ export class StyleSettingsPrecisionControls {
     if (!ownerDocument?.body || this.observers.has(ownerDocument)) return;
 
     enhanceStyleSettingsNumberControls(ownerDocument);
+    this.colors.enhance(ownerDocument);
     const Observer =
       ownerDocument.defaultView?.MutationObserver ??
       (typeof MutationObserver === "undefined" ? null : MutationObserver);
@@ -52,6 +62,7 @@ export class StyleSettingsPrecisionControls {
           node.nodeType === 1 && (node as Element).matches(".extended-breadcrumb-popover, .extended-breadcrumb-reading-marker"));
       })) return;
       enhanceStyleSettingsNumberControls(ownerDocument);
+      this.colors.enhance(ownerDocument);
     });
     observer.observe(ownerDocument.body, {
       attributes: true,
@@ -65,6 +76,13 @@ export class StyleSettingsPrecisionControls {
   stop(): void {
     for (const observer of this.observers.values()) observer.disconnect();
     this.observers.clear();
+    this.colors.stop();
+  }
+
+  removeDocument(doc: Document): void {
+    this.observers.get(doc)?.disconnect();
+    this.observers.delete(doc);
+    this.colors.removeDocument(doc);
   }
 }
 
