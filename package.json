@@ -1,6 +1,6 @@
 {
   "name": "obsidian-extended-headings",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Extend ATX heading support through H12.",
   "type": "module",
   "private": true,
@@ -16,7 +16,7 @@
     "check": "tsc --noEmit --pretty false",
     "lint": "eslint . --max-warnings 0",
     "test": "node --test tests/*.test.mjs",
-    "test:browser": "node tests/browser/breadcrumb-layout.mjs && node tests/browser/rich-content-colors.mjs",
+    "test:browser": "node tests/browser/breadcrumb-layout.mjs && node tests/browser/rich-content-colors.mjs && node tests/browser/heading-footnotes.mjs",
     "test:style-settings": "node tests/browser/upstream-colors.mjs"
   },
   "devDependencies": {

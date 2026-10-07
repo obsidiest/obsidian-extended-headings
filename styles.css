@@ -4942,6 +4942,10 @@ SOFTWARE.
 .extended-breadcrumb-label > :first-child { margin-top: 0; }
 .extended-breadcrumb-label > :last-child { margin-bottom: 0; }
 .extended-breadcrumb-label p { margin-block: 0; }
+.extended-breadcrumb-label .footnote-ref,
+.extended-heading-outline-markdown-rendered .footnote-ref {
+  white-space: nowrap;
+}
 .extended-breadcrumb-label :is(img, svg):not(mjx-container svg, .math svg) {
   max-width: 100%;
   max-height: 1.4em;

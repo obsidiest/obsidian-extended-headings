@@ -14,11 +14,13 @@ function fixture(mode = "source", text = "# Root\n## Child\n############ Deep") 
   const dom = new JSDOM('<body><div class="workspace-leaf-content" data-type="markdown"><div class="markdown-source-view mod-cm6"><div class="cm-scroller"><div class="cm-content"></div><div class="cm-extended-heading-gutter"></div></div></div><div class="markdown-preview-view"></div></div><div data-type="outline"></div></body>', { pretendToBeVisual: true });
   const win = dom.window, document = win.document;
   document.win = win;
+  document.elementFromPoint = () => null;
   win.createEl = (tag) => document.createElement(tag);
   win.createSpan = () => document.createElement("span");
   win.createFragment = () => document.createDocumentFragment();
   win.ResizeObserver = class { observe() {} disconnect() {} };
   win.HTMLElement.prototype.scrollIntoView = function () {};
+  win.HTMLElement.prototype.createDiv = function () { const el = document.createElement("div"); this.append(el); return el; };
   const renderCalls = [];
   const MarkdownRenderer = { render: async (_app, markdown, label, path, component) => {
     renderCalls.push({ markdown, label, path, component });
@@ -72,7 +74,8 @@ function fixture(mode = "source", text = "# Root\n## Child\n############ Deep") 
   const handlers = new Map();
   const plugin = { settings,
     registerEvent() {},
-    app: { workspace: { getLeavesOfType: (type) => type === "markdown" ? [{ view }] : [],
+    app: { metadataCache: { getFileCache: () => null, on: (name, fn) => { handlers.set(`metadata-${name}`, fn); return {}; } },
+      workspace: { getLeavesOfType: (type) => type === "markdown" ? [{ view }] : [],
       onLayoutReady: (fn) => fn(), on: (name, fn) => { handlers.set(name, fn); return {}; },
     } },
   };
@@ -481,6 +484,41 @@ test("popover keyboard navigation, wrapping toggle, settings refresh, and window
     assert.equal(f.document.querySelector(".extended-breadcrumb-popover"), null);
     f.manager.destroy(); f.move(f.document.querySelectorAll(".cm-gutterElement")[2], 2);
     assert.equal(f.document.querySelector(".extended-breadcrumb-popover"), null);
+  } finally { f.close(); }
+});
+
+test("footnote metadata refresh preserves the popup, selection and committed navigation", async () => {
+  const f = fixture("source", "# Parent[^1]\n## Child[^1]\n\n[^1]: Definition");
+  try {
+    f.settings.breadcrumbNavigateBeforeTimeout = false;
+    f.move(f.lines[1], 1, 35);
+    const popup = f.document.querySelector(".extended-breadcrumb-popover");
+    const row = popup.querySelector(".extended-breadcrumb-row");
+    row.click();
+    const navigation = [...f.navigation];
+    f.handlers.get("metadata-changed")(f.view.file);
+    await new Promise(setImmediate);
+    assert.equal(f.document.querySelector(".extended-breadcrumb-popover"), popup);
+    assert.equal(row.getAttribute("aria-selected"), "true");
+    assert.deepEqual(f.navigation, navigation);
+  } finally { f.close(); }
+});
+
+test("a label resize keeps the popup open while the pointer remains on its heading marker", () => {
+  const f = fixture("source", "# Parent[^1]\n## Child[^1]\n\n[^1]: Definition");
+  try {
+    f.settings.globalBreadcrumbTimeoutSeconds = 0;
+    const marker = f.document.querySelectorAll(".cm-heading-marker")[1];
+    f.document.elementFromPoint = () => marker;
+    f.move(marker, 1, 35);
+    const popup = f.document.querySelector(".extended-breadcrumb-popover");
+    // Resizing can move a popup out from under the stationary pointer,
+    // generating pointerleave without leaving its source heading.
+    popup.dispatchEvent(new f.win.Event("pointerleave"));
+    assert.equal(popup.isConnected, true);
+    f.document.elementFromPoint = () => f.document.body;
+    popup.dispatchEvent(new f.win.Event("pointerleave"));
+    assert.equal(popup.isConnected, false);
   } finally { f.close(); }
 });
 

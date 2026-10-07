@@ -1,0 +1,1493 @@
+{
+  "source": "# Hidden root\n\nAn earlier reference[^earlier] and an earlier inline note^[Earlier inline body].\n\n# Level 1[^h1]\n## Level 2[^h2]\n### Level 3[^h3]\n#### Level 4[^h4]\n##### Level 5[^h5]\n###### Level 6[^h6]\n####### Level 7[^h7]\n######## Level 8[^h8]\n######### Level 9[^h9]\n########## Level 10[^h10]\n########### Testing[^1]\n############ Level 12[^h12]\n\n# **Named**[^MixedCase] and repeated[^MixedCase]\n## Repeat[^h1]\n### Repeat[^h1]\n#### Inline^[Inline **body**]\n##### Literal \\[^h1] and `[^h1]`\n###### Missing[^undefined]\n####### Code ``[^h1] ` literal``\n\n[^earlier]: Earlier definition.\n[^h1]: Definition 1, with **formatting** and ![[Must not be embedded]]\n[^h2]: Definition 2.\n[^h3]: Definition 3.\n[^h4]: Definition 4.\n[^h5]: Definition 5.\n[^h6]: Definition 6.\n[^h7]: Definition 7.\n[^h8]: Definition 8.\n[^h9]: Definition 9.\n[^h10]: Definition 10.\n[^1]: Definition 11.\n[^h12]: Definition 12.\n[^MixedCase]: Named definition.\n\n```md\n[^undefined]: A code example is not a definition.\n```\n",
+  "cache": {
+    "embeds": [
+      {
+        "position": {
+          "start": {
+            "line": 26,
+            "col": 45,
+            "offset": 628
+          },
+          "end": {
+            "line": 26,
+            "col": 70,
+            "offset": 653
+          }
+        },
+        "link": "Must not be embedded",
+        "original": "![[Must not be embedded]]",
+        "displayText": "Must not be embedded"
+      }
+    ],
+    "headings": [
+      {
+        "position": {
+          "start": {
+            "line": 0,
+            "col": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "col": 13,
+            "offset": 13
+          }
+        },
+        "heading": "Hidden root",
+        "level": 1
+      },
+      {
+        "position": {
+          "start": {
+            "line": 4,
+            "col": 0,
+            "offset": 97
+          },
+          "end": {
+            "line": 4,
+            "col": 14,
+            "offset": 111
+          }
+        },
+        "heading": "Level 1[^h1]",
+        "level": 1
+      },
+      {
+        "position": {
+          "start": {
+            "line": 5,
+            "col": 0,
+            "offset": 112
+          },
+          "end": {
+            "line": 5,
+            "col": 15,
+            "offset": 127
+          }
+        },
+        "heading": "Level 2[^h2]",
+        "level": 2
+      },
+      {
+        "position": {
+          "start": {
+            "line": 6,
+            "col": 0,
+            "offset": 128
+          },
+          "end": {
+            "line": 6,
+            "col": 16,
+            "offset": 144
+          }
+        },
+        "heading": "Level 3[^h3]",
+        "level": 3
+      },
+      {
+        "position": {
+          "start": {
+            "line": 7,
+            "col": 0,
+            "offset": 145
+          },
+          "end": {
+            "line": 7,
+            "col": 17,
+            "offset": 162
+          }
+        },
+        "heading": "Level 4[^h4]",
+        "level": 4
+      },
+      {
+        "position": {
+          "start": {
+            "line": 8,
+            "col": 0,
+            "offset": 163
+          },
+          "end": {
+            "line": 8,
+            "col": 18,
+            "offset": 181
+          }
+        },
+        "heading": "Level 5[^h5]",
+        "level": 5
+      },
+      {
+        "position": {
+          "start": {
+            "line": 9,
+            "col": 0,
+            "offset": 182
+          },
+          "end": {
+            "line": 9,
+            "col": 19,
+            "offset": 201
+          }
+        },
+        "heading": "Level 6[^h6]",
+        "level": 6
+      },
+      {
+        "position": {
+          "start": {
+            "line": 17,
+            "col": 0,
+            "offset": 347
+          },
+          "end": {
+            "line": 17,
+            "col": 48,
+            "offset": 395
+          }
+        },
+        "heading": "**Named**[^MixedCase] and repeated[^MixedCase]",
+        "level": 1
+      },
+      {
+        "position": {
+          "start": {
+            "line": 18,
+            "col": 0,
+            "offset": 396
+          },
+          "end": {
+            "line": 18,
+            "col": 14,
+            "offset": 410
+          }
+        },
+        "heading": "Repeat[^h1]",
+        "level": 2
+      },
+      {
+        "position": {
+          "start": {
+            "line": 19,
+            "col": 0,
+            "offset": 411
+          },
+          "end": {
+            "line": 19,
+            "col": 15,
+            "offset": 426
+          }
+        },
+        "heading": "Repeat[^h1]",
+        "level": 3
+      },
+      {
+        "position": {
+          "start": {
+            "line": 20,
+            "col": 0,
+            "offset": 427
+          },
+          "end": {
+            "line": 20,
+            "col": 29,
+            "offset": 456
+          }
+        },
+        "heading": "Inline^[Inline **body**]",
+        "level": 4
+      },
+      {
+        "position": {
+          "start": {
+            "line": 21,
+            "col": 0,
+            "offset": 457
+          },
+          "end": {
+            "line": 21,
+            "col": 32,
+            "offset": 489
+          }
+        },
+        "heading": "Literal \\[^h1] and `[^h1]`",
+        "level": 5
+      },
+      {
+        "position": {
+          "start": {
+            "line": 22,
+            "col": 0,
+            "offset": 490
+          },
+          "end": {
+            "line": 22,
+            "col": 26,
+            "offset": 516
+          }
+        },
+        "heading": "Missing[^undefined]",
+        "level": 6
+      }
+    ],
+    "footnotes": [
+      {
+        "position": {
+          "start": {
+            "line": 2,
+            "col": 59,
+            "offset": 74
+          },
+          "end": {
+            "line": 2,
+            "col": 78,
+            "offset": 93
+          }
+        },
+        "id": "[inline1"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 20,
+            "col": 13,
+            "offset": 440
+          },
+          "end": {
+            "line": 20,
+            "col": 28,
+            "offset": 455
+          }
+        },
+        "id": "[inline15"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 25,
+            "col": 0,
+            "offset": 551
+          },
+          "end": {
+            "line": 25,
+            "col": 31,
+            "offset": 582
+          }
+        },
+        "id": "earlier"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 26,
+            "col": 0,
+            "offset": 583
+          },
+          "end": {
+            "line": 26,
+            "col": 70,
+            "offset": 653
+          }
+        },
+        "id": "h1"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 27,
+            "col": 0,
+            "offset": 654
+          },
+          "end": {
+            "line": 27,
+            "col": 20,
+            "offset": 674
+          }
+        },
+        "id": "h2"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 28,
+            "col": 0,
+            "offset": 675
+          },
+          "end": {
+            "line": 28,
+            "col": 20,
+            "offset": 695
+          }
+        },
+        "id": "h3"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 29,
+            "col": 0,
+            "offset": 696
+          },
+          "end": {
+            "line": 29,
+            "col": 20,
+            "offset": 716
+          }
+        },
+        "id": "h4"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 30,
+            "col": 0,
+            "offset": 717
+          },
+          "end": {
+            "line": 30,
+            "col": 20,
+            "offset": 737
+          }
+        },
+        "id": "h5"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 31,
+            "col": 0,
+            "offset": 738
+          },
+          "end": {
+            "line": 31,
+            "col": 20,
+            "offset": 758
+          }
+        },
+        "id": "h6"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 32,
+            "col": 0,
+            "offset": 759
+          },
+          "end": {
+            "line": 32,
+            "col": 20,
+            "offset": 779
+          }
+        },
+        "id": "h7"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 33,
+            "col": 0,
+            "offset": 780
+          },
+          "end": {
+            "line": 33,
+            "col": 20,
+            "offset": 800
+          }
+        },
+        "id": "h8"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 34,
+            "col": 0,
+            "offset": 801
+          },
+          "end": {
+            "line": 34,
+            "col": 20,
+            "offset": 821
+          }
+        },
+        "id": "h9"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 35,
+            "col": 0,
+            "offset": 822
+          },
+          "end": {
+            "line": 35,
+            "col": 22,
+            "offset": 844
+          }
+        },
+        "id": "h10"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 36,
+            "col": 0,
+            "offset": 845
+          },
+          "end": {
+            "line": 36,
+            "col": 20,
+            "offset": 865
+          }
+        },
+        "id": "1"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 37,
+            "col": 0,
+            "offset": 866
+          },
+          "end": {
+            "line": 37,
+            "col": 22,
+            "offset": 888
+          }
+        },
+        "id": "h12"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 38,
+            "col": 0,
+            "offset": 889
+          },
+          "end": {
+            "line": 38,
+            "col": 31,
+            "offset": 920
+          }
+        },
+        "id": "mixedcase"
+      }
+    ],
+    "footnoteRefs": [
+      {
+        "position": {
+          "start": {
+            "line": 2,
+            "col": 20,
+            "offset": 35
+          },
+          "end": {
+            "line": 2,
+            "col": 30,
+            "offset": 45
+          }
+        },
+        "id": "earlier"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 4,
+            "col": 9,
+            "offset": 106
+          },
+          "end": {
+            "line": 4,
+            "col": 14,
+            "offset": 111
+          }
+        },
+        "id": "h1"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 5,
+            "col": 10,
+            "offset": 122
+          },
+          "end": {
+            "line": 5,
+            "col": 15,
+            "offset": 127
+          }
+        },
+        "id": "h2"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 6,
+            "col": 11,
+            "offset": 139
+          },
+          "end": {
+            "line": 6,
+            "col": 16,
+            "offset": 144
+          }
+        },
+        "id": "h3"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 7,
+            "col": 12,
+            "offset": 157
+          },
+          "end": {
+            "line": 7,
+            "col": 17,
+            "offset": 162
+          }
+        },
+        "id": "h4"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 8,
+            "col": 13,
+            "offset": 176
+          },
+          "end": {
+            "line": 8,
+            "col": 18,
+            "offset": 181
+          }
+        },
+        "id": "h5"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 9,
+            "col": 14,
+            "offset": 196
+          },
+          "end": {
+            "line": 9,
+            "col": 19,
+            "offset": 201
+          }
+        },
+        "id": "h6"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 10,
+            "col": 15,
+            "offset": 217
+          },
+          "end": {
+            "line": 10,
+            "col": 20,
+            "offset": 222
+          }
+        },
+        "id": "h7"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 11,
+            "col": 16,
+            "offset": 239
+          },
+          "end": {
+            "line": 11,
+            "col": 21,
+            "offset": 244
+          }
+        },
+        "id": "h8"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 12,
+            "col": 17,
+            "offset": 262
+          },
+          "end": {
+            "line": 12,
+            "col": 22,
+            "offset": 267
+          }
+        },
+        "id": "h9"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 13,
+            "col": 19,
+            "offset": 287
+          },
+          "end": {
+            "line": 13,
+            "col": 25,
+            "offset": 293
+          }
+        },
+        "id": "h10"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 14,
+            "col": 19,
+            "offset": 313
+          },
+          "end": {
+            "line": 14,
+            "col": 23,
+            "offset": 317
+          }
+        },
+        "id": "1"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 15,
+            "col": 21,
+            "offset": 339
+          },
+          "end": {
+            "line": 15,
+            "col": 27,
+            "offset": 345
+          }
+        },
+        "id": "h12"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 17,
+            "col": 11,
+            "offset": 358
+          },
+          "end": {
+            "line": 17,
+            "col": 23,
+            "offset": 370
+          }
+        },
+        "id": "mixedcase"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 17,
+            "col": 36,
+            "offset": 383
+          },
+          "end": {
+            "line": 17,
+            "col": 48,
+            "offset": 395
+          }
+        },
+        "id": "mixedcase"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 18,
+            "col": 9,
+            "offset": 405
+          },
+          "end": {
+            "line": 18,
+            "col": 14,
+            "offset": 410
+          }
+        },
+        "id": "h1"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 19,
+            "col": 10,
+            "offset": 421
+          },
+          "end": {
+            "line": 19,
+            "col": 15,
+            "offset": 426
+          }
+        },
+        "id": "h1"
+      }
+    ],
+    "sections": [
+      {
+        "type": "heading",
+        "position": {
+          "start": {
+            "line": 0,
+            "col": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 0,
+            "col": 13,
+            "offset": 13
+          }
+        }
+      },
+      {
+        "type": "paragraph",
+        "position": {
+          "start": {
+            "line": 2,
+            "col": 0,
+            "offset": 15
+          },
+          "end": {
+            "line": 2,
+            "col": 80,
+            "offset": 95
+          }
+        }
+      },
+      {
+        "type": "heading",
+        "position": {
+          "start": {
+            "line": 4,
+            "col": 0,
+            "offset": 97
+          },
+          "end": {
+            "line": 4,
+            "col": 14,
+            "offset": 111
+          }
+        }
+      },
+      {
+        "type": "heading",
+        "position": {
+          "start": {
+            "line": 5,
+            "col": 0,
+            "offset": 112
+          },
+          "end": {
+            "line": 5,
+            "col": 15,
+            "offset": 127
+          }
+        }
+      },
+      {
+        "type": "heading",
+        "position": {
+          "start": {
+            "line": 6,
+            "col": 0,
+            "offset": 128
+          },
+          "end": {
+            "line": 6,
+            "col": 16,
+            "offset": 144
+          }
+        }
+      },
+      {
+        "type": "heading",
+        "position": {
+          "start": {
+            "line": 7,
+            "col": 0,
+            "offset": 145
+          },
+          "end": {
+            "line": 7,
+            "col": 17,
+            "offset": 162
+          }
+        }
+      },
+      {
+        "type": "heading",
+        "position": {
+          "start": {
+            "line": 8,
+            "col": 0,
+            "offset": 163
+          },
+          "end": {
+            "line": 8,
+            "col": 18,
+            "offset": 181
+          }
+        }
+      },
+      {
+        "type": "heading",
+        "position": {
+          "start": {
+            "line": 9,
+            "col": 0,
+            "offset": 182
+          },
+          "end": {
+            "line": 9,
+            "col": 19,
+            "offset": 201
+          }
+        }
+      },
+      {
+        "type": "paragraph",
+        "position": {
+          "start": {
+            "line": 10,
+            "col": 0,
+            "offset": 202
+          },
+          "end": {
+            "line": 15,
+            "col": 27,
+            "offset": 345
+          }
+        }
+      },
+      {
+        "type": "heading",
+        "position": {
+          "start": {
+            "line": 17,
+            "col": 0,
+            "offset": 347
+          },
+          "end": {
+            "line": 17,
+            "col": 48,
+            "offset": 395
+          }
+        }
+      },
+      {
+        "type": "heading",
+        "position": {
+          "start": {
+            "line": 18,
+            "col": 0,
+            "offset": 396
+          },
+          "end": {
+            "line": 18,
+            "col": 14,
+            "offset": 410
+          }
+        }
+      },
+      {
+        "type": "heading",
+        "position": {
+          "start": {
+            "line": 19,
+            "col": 0,
+            "offset": 411
+          },
+          "end": {
+            "line": 19,
+            "col": 15,
+            "offset": 426
+          }
+        }
+      },
+      {
+        "type": "heading",
+        "position": {
+          "start": {
+            "line": 20,
+            "col": 0,
+            "offset": 427
+          },
+          "end": {
+            "line": 20,
+            "col": 29,
+            "offset": 456
+          }
+        }
+      },
+      {
+        "type": "heading",
+        "position": {
+          "start": {
+            "line": 21,
+            "col": 0,
+            "offset": 457
+          },
+          "end": {
+            "line": 21,
+            "col": 32,
+            "offset": 489
+          }
+        }
+      },
+      {
+        "type": "heading",
+        "position": {
+          "start": {
+            "line": 22,
+            "col": 0,
+            "offset": 490
+          },
+          "end": {
+            "line": 22,
+            "col": 26,
+            "offset": 516
+          }
+        }
+      },
+      {
+        "type": "paragraph",
+        "position": {
+          "start": {
+            "line": 23,
+            "col": 0,
+            "offset": 517
+          },
+          "end": {
+            "line": 23,
+            "col": 32,
+            "offset": 549
+          }
+        }
+      },
+      {
+        "type": "footnoteDefinition",
+        "position": {
+          "start": {
+            "line": 25,
+            "col": 0,
+            "offset": 551
+          },
+          "end": {
+            "line": 25,
+            "col": 31,
+            "offset": 582
+          }
+        }
+      },
+      {
+        "type": "footnoteDefinition",
+        "position": {
+          "start": {
+            "line": 26,
+            "col": 0,
+            "offset": 583
+          },
+          "end": {
+            "line": 26,
+            "col": 70,
+            "offset": 653
+          }
+        }
+      },
+      {
+        "type": "footnoteDefinition",
+        "position": {
+          "start": {
+            "line": 27,
+            "col": 0,
+            "offset": 654
+          },
+          "end": {
+            "line": 27,
+            "col": 20,
+            "offset": 674
+          }
+        }
+      },
+      {
+        "type": "footnoteDefinition",
+        "position": {
+          "start": {
+            "line": 28,
+            "col": 0,
+            "offset": 675
+          },
+          "end": {
+            "line": 28,
+            "col": 20,
+            "offset": 695
+          }
+        }
+      },
+      {
+        "type": "footnoteDefinition",
+        "position": {
+          "start": {
+            "line": 29,
+            "col": 0,
+            "offset": 696
+          },
+          "end": {
+            "line": 29,
+            "col": 20,
+            "offset": 716
+          }
+        }
+      },
+      {
+        "type": "footnoteDefinition",
+        "position": {
+          "start": {
+            "line": 30,
+            "col": 0,
+            "offset": 717
+          },
+          "end": {
+            "line": 30,
+            "col": 20,
+            "offset": 737
+          }
+        }
+      },
+      {
+        "type": "footnoteDefinition",
+        "position": {
+          "start": {
+            "line": 31,
+            "col": 0,
+            "offset": 738
+          },
+          "end": {
+            "line": 31,
+            "col": 20,
+            "offset": 758
+          }
+        }
+      },
+      {
+        "type": "footnoteDefinition",
+        "position": {
+          "start": {
+            "line": 32,
+            "col": 0,
+            "offset": 759
+          },
+          "end": {
+            "line": 32,
+            "col": 20,
+            "offset": 779
+          }
+        }
+      },
+      {
+        "type": "footnoteDefinition",
+        "position": {
+          "start": {
+            "line": 33,
+            "col": 0,
+            "offset": 780
+          },
+          "end": {
+            "line": 33,
+            "col": 20,
+            "offset": 800
+          }
+        }
+      },
+      {
+        "type": "footnoteDefinition",
+        "position": {
+          "start": {
+            "line": 34,
+            "col": 0,
+            "offset": 801
+          },
+          "end": {
+            "line": 34,
+            "col": 20,
+            "offset": 821
+          }
+        }
+      },
+      {
+        "type": "footnoteDefinition",
+        "position": {
+          "start": {
+            "line": 35,
+            "col": 0,
+            "offset": 822
+          },
+          "end": {
+            "line": 35,
+            "col": 22,
+            "offset": 844
+          }
+        }
+      },
+      {
+        "type": "footnoteDefinition",
+        "position": {
+          "start": {
+            "line": 36,
+            "col": 0,
+            "offset": 845
+          },
+          "end": {
+            "line": 36,
+            "col": 20,
+            "offset": 865
+          }
+        }
+      },
+      {
+        "type": "footnoteDefinition",
+        "position": {
+          "start": {
+            "line": 37,
+            "col": 0,
+            "offset": 866
+          },
+          "end": {
+            "line": 37,
+            "col": 22,
+            "offset": 888
+          }
+        }
+      },
+      {
+        "type": "footnoteDefinition",
+        "position": {
+          "start": {
+            "line": 38,
+            "col": 0,
+            "offset": 889
+          },
+          "end": {
+            "line": 38,
+            "col": 31,
+            "offset": 920
+          }
+        }
+      },
+      {
+        "type": "code",
+        "position": {
+          "start": {
+            "line": 40,
+            "col": 0,
+            "offset": 922
+          },
+          "end": {
+            "line": 42,
+            "col": 3,
+            "offset": 981
+          }
+        }
+      },
+      {
+        "type": "text",
+        "position": {
+          "start": {
+            "line": 43,
+            "col": 0,
+            "offset": 981
+          },
+          "end": {
+            "line": 43,
+            "col": 0,
+            "offset": 981
+          }
+        }
+      },
+      {
+        "type": "element",
+        "position": {
+          "start": {
+            "line": 43,
+            "col": 0,
+            "offset": 981
+          },
+          "end": {
+            "line": 43,
+            "col": 0,
+            "offset": 981
+          }
+        }
+      }
+    ]
+  },
+  "headings": [
+    {
+      "rawBody": "Hidden root",
+      "level": 1,
+      "line": 0,
+      "coreLabel": "Hidden root",
+      "expectedRefs": []
+    },
+    {
+      "rawBody": "Level 1[^h1]",
+      "level": 1,
+      "line": 4,
+      "coreLabel": "Level 1h1",
+      "expectedRefs": [
+        {
+          "id": "h1",
+          "label": "[3]"
+        }
+      ]
+    },
+    {
+      "rawBody": "Level 2[^h2]",
+      "level": 2,
+      "line": 5,
+      "coreLabel": "Level 2h2",
+      "expectedRefs": [
+        {
+          "id": "h2",
+          "label": "[4]"
+        }
+      ]
+    },
+    {
+      "rawBody": "Level 3[^h3]",
+      "level": 3,
+      "line": 6,
+      "coreLabel": "Level 3h3",
+      "expectedRefs": [
+        {
+          "id": "h3",
+          "label": "[5]"
+        }
+      ]
+    },
+    {
+      "rawBody": "Level 4[^h4]",
+      "level": 4,
+      "line": 7,
+      "coreLabel": "Level 4h4",
+      "expectedRefs": [
+        {
+          "id": "h4",
+          "label": "[6]"
+        }
+      ]
+    },
+    {
+      "rawBody": "Level 5[^h5]",
+      "level": 5,
+      "line": 8,
+      "coreLabel": "Level 5h5",
+      "expectedRefs": [
+        {
+          "id": "h5",
+          "label": "[7]"
+        }
+      ]
+    },
+    {
+      "rawBody": "Level 6[^h6]",
+      "level": 6,
+      "line": 9,
+      "coreLabel": "Level 6h6",
+      "expectedRefs": [
+        {
+          "id": "h6",
+          "label": "[8]"
+        }
+      ]
+    },
+    {
+      "rawBody": "Level 7[^h7]",
+      "level": 7,
+      "line": 10,
+      "coreLabel": "Level 7h7",
+      "expectedRefs": [
+        {
+          "id": "h7",
+          "label": "[9]"
+        }
+      ]
+    },
+    {
+      "rawBody": "Level 8[^h8]",
+      "level": 8,
+      "line": 11,
+      "coreLabel": "Level 8h8",
+      "expectedRefs": [
+        {
+          "id": "h8",
+          "label": "[10]"
+        }
+      ]
+    },
+    {
+      "rawBody": "Level 9[^h9]",
+      "level": 9,
+      "line": 12,
+      "coreLabel": "Level 9h9",
+      "expectedRefs": [
+        {
+          "id": "h9",
+          "label": "[11]"
+        }
+      ]
+    },
+    {
+      "rawBody": "Level 10[^h10]",
+      "level": 10,
+      "line": 13,
+      "coreLabel": "Level 10h10",
+      "expectedRefs": [
+        {
+          "id": "h10",
+          "label": "[12]"
+        }
+      ]
+    },
+    {
+      "rawBody": "Testing[^1]",
+      "level": 11,
+      "line": 14,
+      "coreLabel": "Testing1",
+      "expectedRefs": [
+        {
+          "id": "1",
+          "label": "[13]"
+        }
+      ]
+    },
+    {
+      "rawBody": "Level 12[^h12]",
+      "level": 12,
+      "line": 15,
+      "coreLabel": "Level 12h12",
+      "expectedRefs": [
+        {
+          "id": "h12",
+          "label": "[14]"
+        }
+      ]
+    },
+    {
+      "rawBody": "**Named**[^MixedCase] and repeated[^MixedCase]",
+      "level": 1,
+      "line": 17,
+      "coreLabel": "Namedmixedcase and repeatedmixedcase",
+      "expectedRefs": [
+        {
+          "id": "mixedcase",
+          "label": "[15]"
+        },
+        {
+          "id": "mixedcase",
+          "label": "[15-1]"
+        }
+      ]
+    },
+    {
+      "rawBody": "Repeat[^h1]",
+      "level": 2,
+      "line": 18,
+      "coreLabel": "Repeath1",
+      "expectedRefs": [
+        {
+          "id": "h1",
+          "label": "[3-1]"
+        }
+      ]
+    },
+    {
+      "rawBody": "Repeat[^h1]",
+      "level": 3,
+      "line": 19,
+      "coreLabel": "Repeath1",
+      "expectedRefs": [
+        {
+          "id": "h1",
+          "label": "[3-2]"
+        }
+      ]
+    },
+    {
+      "rawBody": "Inline^[Inline **body**]",
+      "level": 4,
+      "line": 20,
+      "coreLabel": "Inline\n1. Inline body",
+      "expectedRefs": [
+        {
+          "id": "[inline15",
+          "label": "[16]"
+        }
+      ]
+    },
+    {
+      "rawBody": "Literal \\[^h1] and `[^h1]`",
+      "level": 5,
+      "line": 21,
+      "coreLabel": "Literal [^h1] and [^h1]",
+      "expectedRefs": []
+    },
+    {
+      "rawBody": "Missing[^undefined]",
+      "level": 6,
+      "line": 22,
+      "coreLabel": "Missingundefined",
+      "expectedRefs": []
+    },
+    {
+      "rawBody": "Code ``[^h1] ` literal``",
+      "level": 7,
+      "line": 23,
+      "coreLabel": "Code [^h1] ` literal",
+      "expectedRefs": []
+    }
+  ],
+  "renders": {
+    "Hidden root": "<p>Hidden root</p>",
+    "Level 1[^h1]": "<p>Level 1h1</p>",
+    "Level 1[^h1]\n\n[^h1]: footnote": "<p>Level 1<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"h1\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\"><p>footnote<a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a></p></li>\n</ol></section>",
+    "Level 2[^h2]": "<p>Level 2h2</p>",
+    "Level 2[^h2]\n\n[^h2]: footnote": "<p>Level 2<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"h2\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\"><p>footnote<a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a></p></li>\n</ol></section>",
+    "Level 3[^h3]": "<p>Level 3h3</p>",
+    "Level 3[^h3]\n\n[^h3]: footnote": "<p>Level 3<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"h3\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\"><p>footnote<a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a></p></li>\n</ol></section>",
+    "Level 4[^h4]": "<p>Level 4h4</p>",
+    "Level 4[^h4]\n\n[^h4]: footnote": "<p>Level 4<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"h4\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\"><p>footnote<a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a></p></li>\n</ol></section>",
+    "Level 5[^h5]": "<p>Level 5h5</p>",
+    "Level 5[^h5]\n\n[^h5]: footnote": "<p>Level 5<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"h5\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\"><p>footnote<a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a></p></li>\n</ol></section>",
+    "Level 6[^h6]": "<p>Level 6h6</p>",
+    "Level 6[^h6]\n\n[^h6]: footnote": "<p>Level 6<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"h6\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\"><p>footnote<a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a></p></li>\n</ol></section>",
+    "Level 7[^h7]": "<p>Level 7h7</p>",
+    "Level 7[^h7]\n\n[^h7]: footnote": "<p>Level 7<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"h7\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\"><p>footnote<a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a></p></li>\n</ol></section>",
+    "Level 8[^h8]": "<p>Level 8h8</p>",
+    "Level 8[^h8]\n\n[^h8]: footnote": "<p>Level 8<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"h8\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\"><p>footnote<a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a></p></li>\n</ol></section>",
+    "Level 9[^h9]": "<p>Level 9h9</p>",
+    "Level 9[^h9]\n\n[^h9]: footnote": "<p>Level 9<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"h9\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\"><p>footnote<a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a></p></li>\n</ol></section>",
+    "Level 10[^h10]": "<p>Level 10h10</p>",
+    "Level 10[^h10]\n\n[^h10]: footnote": "<p>Level 10<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"h10\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\"><p>footnote<a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a></p></li>\n</ol></section>",
+    "Testing[^1]": "<p>Testing1</p>",
+    "Testing[^1]\n\n[^1]: footnote": "<p>Testing<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"1\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\"><p>footnote<a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a></p></li>\n</ol></section>",
+    "Level 12[^h12]": "<p>Level 12h12</p>",
+    "Level 12[^h12]\n\n[^h12]: footnote": "<p>Level 12<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"h12\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\"><p>footnote<a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a></p></li>\n</ol></section>",
+    "**Named**[^MixedCase] and repeated[^MixedCase]": "<p><strong>Named</strong>mixedcase and repeatedmixedcase</p>",
+    "**Named**[^MixedCase] and repeated[^MixedCase]\n\n[^mixedcase]: footnote": "<p><strong>Named</strong><sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"mixedcase\">[1]</a></sup> and repeated<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"mixedcase\">[1-1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\"><p>footnote<a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a><a class=\"footnote-backref footnote-link\" href=\"#fnref-1-1\">↩︎</a></p></li>\n</ol></section>",
+    "Repeat[^h1]": "<p>Repeath1</p>",
+    "Repeat[^h1]\n\n[^h1]: footnote": "<p>Repeat<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"h1\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\"><p>footnote<a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a></p></li>\n</ol></section>",
+    "Inline^[Inline **body**]": "<p>Inline<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"[inline0\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\">Inline <strong>body</strong><a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a></li>\n</ol></section>",
+    "Literal \\[^h1] and `[^h1]`": "<p>Literal [^h1] and <code>[^h1]</code></p>",
+    "Literal \\[^h1] and `[^h1]`\n\n[^h1]: footnote": "<p>Literal [^h1] and <code>[^h1]</code></p>",
+    "Missing[^undefined]": "<p>Missingundefined</p>",
+    "Code ``[^h1] ` literal``": "<p>Code <code>[^h1] ` literal</code></p>",
+    "Code ``[^h1] ` literal``\n\n[^h1]: footnote": "<p>Code <code>[^h1] ` literal</code></p>"
+  }
+}

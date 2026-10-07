@@ -3,6 +3,7 @@ import test from "node:test";
 import { existsSync, readFileSync } from "node:fs";
 import vm from "node:vm";
 import ts from "typescript";
+import { sourceLoader } from "./helpers/load-source.mjs";
 
 const moduleUrl = new URL("../src/core-outline-svg.ts", import.meta.url);
 const source = existsSync(moduleUrl) ? readFileSync(moduleUrl, "utf8") : "";
@@ -35,6 +36,7 @@ function loadOutlineSvgModule() {
         };
       }
       if (specifier === "./headings") return { scanHeadings: () => [] };
+      if (specifier === "./heading-footnotes") return sourceLoader()("heading-footnotes");
       throw new Error(`Unexpected dependency: ${specifier}`);
     },
   });

@@ -10,6 +10,7 @@ import {
 } from "./breadcrumb-tree";
 import { breadcrumbHighlight } from "./breadcrumb-editor";
 import { BreadcrumbContent } from "./breadcrumb-content";
+import { HeadingFootnotes, hasHeadingFootnotes } from "./heading-footnotes";
 import { scanHeadings, parseHeadingLine, type ParsedHeading } from "./headings";
 import {
   buildOutlineGuidePath, buildOutlineRootThreadPath, buildRoundedOutlineThreadPath, outlineLabelFromHeadingBody,
@@ -104,6 +105,17 @@ export class HeadingBreadcrumb {
       if (!(view instanceof MarkdownView)) return;
       for (const state of this.documents.values()) {
         if (state.popup?.target.view === view) this.dismiss(state);
+      }
+    }));
+    this.plugin.registerEvent(this.plugin.app.metadataCache.on("changed", (file) => {
+      for (const state of this.documents.values()) {
+        const popup = state.popup;
+        if (popup?.target.file === file.path && popup.headings.some(heading => hasHeadingFootnotes(heading.rawBody))) {
+          popup.renderer.dispose();
+          popup.renderer = new BreadcrumbContent();
+          popup.renderer.load();
+          this.renderContent(state, popup);
+        }
       }
     }));
     this.plugin.registerEvent(this.plugin.app.workspace.on("css-change", () => {
@@ -266,7 +278,7 @@ export class HeadingBreadcrumb {
     return null;
   }
 
-  private targetAt(element: HTMLElement, event: PointerEvent): HoverTarget | null {
+  private targetAt(element: HTMLElement, event: Pick<PointerEvent, "clientX" | "clientY">): HoverTarget | null {
     const settings = this.plugin.settings;
     if (!settings.headingHoverBreadcrumb) return null;
     const rowSelector = ".tree-item-self[data-extended-breadcrumb-line]";
@@ -422,7 +434,6 @@ export class HeadingBreadcrumb {
     const rows = new Map<number, HTMLElement>();
     const renderer = new BreadcrumbContent();
     renderer.load();
-    const labels: { heading: BreadcrumbHeading; label: HTMLElement }[] = [];
     const settings = this.plugin.settings;
     const options = breadcrumbFeature(settings, target.pane, "Threading") ? breadcrumbThreadOptions(settings, target.pane) : null;
     const indexes = breadcrumbEntries(headings, current, options);
@@ -444,7 +455,6 @@ export class HeadingBreadcrumb {
       label.textContent = outlineLabelFromHeadingBody(heading.rawBody) || (heading.rawBody.trim() ? "Heading content" : "(Untitled heading)");
       row.setAttribute("aria-label", `H${heading.level} ${label.textContent}`);
       row.append(label); content.append(row); rows.set(index, row);
-      labels.push({ heading, label });
       row.addEventListener("pointerenter", () => this.activate(state, index));
       row.addEventListener("focus", () => { this.cancelDismiss(state); this.activate(state, index); });
       row.addEventListener("click", (event) => {
@@ -484,11 +494,7 @@ export class HeadingBreadcrumb {
     });
     state.document.body.append(element);
     resize.observe(content);
-    for (const { heading, label } of labels) {
-      void renderer.render(this.plugin.app, heading.rawBody, label, target.file).then(() => {
-        if (state.popup === popup) this.scheduleDraw(state);
-      });
-    }
+    this.renderContent(state, popup);
     this.draw(state);
     const currentRow = rows.get(current);
     if (currentRow) {
@@ -496,6 +502,20 @@ export class HeadingBreadcrumb {
       // Scroll only if the current row is out of view. Centering a row in a
       // short list used to cut off otherwise visible ancestors.
       if (rowRect.bottom > treeRect.bottom) tree.scrollTop += rowRect.bottom - treeRect.bottom;
+    }
+  }
+
+  private renderContent(state: DocumentState, popup: Popup): void {
+    const { target, renderer } = popup;
+    const footnotes = new HeadingFootnotes(target.view.editor.getValue(),
+      target.view.file ? this.plugin.app.metadataCache.getFileCache(target.view.file) : null);
+    for (const [index, row] of popup.rows) {
+      const heading = popup.headings[index];
+      const label = row.querySelector<HTMLElement>(".extended-breadcrumb-label");
+      if (!heading || !label) continue;
+      void renderer.render(this.plugin.app, heading.rawBody, label, target.file, footnotes, heading.line).then(() => {
+        if (state.popup === popup && popup.renderer === renderer) this.scheduleDraw(state);
+      });
     }
   }
 
@@ -714,16 +734,27 @@ export class HeadingBreadcrumb {
     state.timer = null;
   }
 
+  private pointerOnTarget(state: DocumentState): boolean {
+    if (!state.popup || !state.pointer) return false;
+    const { x, y } = state.pointer;
+    const element = state.document.elementFromPoint(x, y) as HTMLElement | null;
+    if (!element) return false;
+    const target = this.targetAt(element, { clientX: x, clientY: y });
+    const current = state.popup.target;
+    return target?.view === current.view && target.file === current.file
+      && target.line === current.line && target.pane === current.pane;
+  }
+
   private scheduleDismiss(state: DocumentState): void {
     if (!state.popup || state.timer !== null || this.pointerInPopup(state) || state.popup.element.matches(":hover")
-      || state.popup.element.contains(state.document.activeElement)) return;
+      || state.popup.element.contains(state.document.activeElement) || this.pointerOnTarget(state)) return;
     const timeout = breadcrumbTimeout(this.plugin.settings, state.popup.target.mode);
     if (timeout === 0) { this.dismiss(state, true); return; }
     const popup = state.popup;
     state.timer = state.document.defaultView?.setTimeout(() => {
       state.timer = null;
       if (state.popup === popup && !this.pointerInPopup(state) && !popup.element.matches(":hover")
-        && !popup.element.contains(state.document.activeElement)) this.dismiss(state, true);
+        && !popup.element.contains(state.document.activeElement) && !this.pointerOnTarget(state)) this.dismiss(state, true);
     }, timeout) ?? null;
   }
 

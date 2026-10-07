@@ -8,6 +8,7 @@ import {
   type WorkspaceLeaf,
 } from "obsidian";
 import { scanHeadings } from "./headings";
+import { HeadingFootnotes, hasHeadingFootnotes, outlineFootnoteReferenceLabel } from "./heading-footnotes";
 import type ExtendedHeadingsPlugin from "./main";
 
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
@@ -209,18 +210,18 @@ export function normalizeOutlineLabel(value: string): string {
 }
 
 export function outlineLabelCandidatesFromHeadingBody(rawBody: string): string[] {
-  const aliasLabel = normalizeOutlineLabel(rawBody);
-  const targetLabel = normalizeOutlineLabel(
-    rawBody.replace(/!?\[\[([^\]]+)\]\]/gu, (_match, rawTarget: string) => {
+  const labels = [rawBody, outlineFootnoteReferenceLabel(rawBody)].flatMap(body => [
+    normalizeOutlineLabel(body),
+    normalizeOutlineLabel(body.replace(/!?\[\[([^\]]+)\]\]/gu, (_match, rawTarget: string) => {
       const aliasSeparator = rawTarget.lastIndexOf("|");
       return rawTarget
         .slice(0, aliasSeparator >= 0 ? aliasSeparator : undefined)
         .replace(/\\([#|\]])/gu, "$1")
         .replace(/\.md(?=#|$)/giu, "");
-    }),
-  );
+    })),
+  ]);
   return Array.from(
-    new Set([aliasLabel, targetLabel].filter((label) => label.length > 0)),
+    new Set(labels.filter((label) => label.length > 0)),
   );
 }
 
@@ -292,7 +293,7 @@ function hasRenderableOutlineMarkdown(rawBody: string): boolean {
     /!?\[[^\]]*\]\([^)]*\)/u.test(withoutSvg) ||
     /(?:\*\*|__|~~|==|[*_`])/u.test(withoutSvg) ||
     /<\/?[A-Za-z][^>]*>/u.test(withoutSvg) ||
-    /\$/u.test(withoutSvg) || inlineSvgPattern().test(rawBody)
+    /\$/u.test(withoutSvg) || inlineSvgPattern().test(rawBody) || hasHeadingFootnotes(withoutSvg)
   );
 }
 
@@ -856,6 +857,7 @@ export class CoreOutlineRenderer {
     ) return;
 
     const specs = this.buildSpecs(text, file);
+    const footnotes = new HeadingFootnotes(text, this.plugin.app.metadataCache.getFileCache(file));
     const model = buildOutlineTreeModel(specs.map((spec) => spec.level));
     let items: HTMLElement[] = [];
     let matches: OutlineHeadingMatch[] = [];
@@ -873,17 +875,15 @@ export class CoreOutlineRenderer {
     const markdownCacheSignature = JSON.stringify([
       file.path,
       specs.map((spec) => spec.markdown ?? null),
+      footnotes.signature,
     ]);
     let replacementMarkdownComponent: Component | null = null;
     let replacementMarkdownTemplates: Map<string, HTMLElement> | null = null;
     let renderedMarkdown = new Map<number, HTMLElement>();
-    if (markdownEnabled && matches.length > 0) {
+    if (markdownEnabled && items.length > 0) {
+      let templates: Map<string, HTMLElement>;
       if (attachment.markdownCacheSignature === markdownCacheSignature) {
-        renderedMarkdown = this.cloneMarkdownLabels(
-          specs,
-          matches,
-          attachment.markdownTemplates,
-        );
+        templates = attachment.markdownTemplates;
       } else {
         replacementMarkdownComponent = new Component();
         replacementMarkdownComponent.load();
@@ -892,14 +892,11 @@ export class CoreOutlineRenderer {
           file.path,
           specs,
           replacementMarkdownComponent,
+          footnotes,
         );
         replacementMarkdownTemplates = replacementMarkdownBatch.templates;
         const replacementMarkdownComplete = replacementMarkdownBatch.complete;
-        renderedMarkdown = this.cloneMarkdownLabels(
-          specs,
-          matches,
-          replacementMarkdownTemplates,
-        );
+        templates = replacementMarkdownTemplates;
 
         if (!replacementMarkdownComplete) {
           replacementMarkdownComponent.unload();
@@ -907,6 +904,12 @@ export class CoreOutlineRenderer {
           replacementMarkdownTemplates = null;
         }
       }
+      for (const spec of specs) {
+        const label = spec.markdown ? templates.get(spec.markdown)?.dataset.extendedFootnoteOutlineLabel : undefined;
+        if (label) spec.alternateLabels = [...(spec.alternateLabels ?? []), label];
+      }
+      matches = matchOutlineHeadingSpecs(items.map(item => item.textContent ?? ""), specs);
+      renderedMarkdown = this.cloneMarkdownLabels(specs, matches, templates, footnotes);
     }
 
     if (
@@ -1006,6 +1009,7 @@ export class CoreOutlineRenderer {
     sourcePath: string,
     specs: OutlineHeadingSpec[],
     component: Component,
+    footnotes = new HeadingFootnotes(),
   ): Promise<{ complete: boolean; templates: Map<string, HTMLElement> }> {
     const templates = new Map<string, HTMLElement>();
     const markdownItems = outlineMarkdownItemsFromSpecs(specs);
@@ -1022,7 +1026,7 @@ export class CoreOutlineRenderer {
         try {
           await MarkdownRenderer.render(
             this.plugin.app,
-            markdown,
+            footnotes.withDefinitions(markdown),
             rendered,
             sourcePath,
             component,
@@ -1031,6 +1035,9 @@ export class CoreOutlineRenderer {
           continue;
         }
 
+        const footnoteLabel = footnotes.outlineLabel(rendered);
+        if (footnoteLabel) rendered.dataset.extendedFootnoteOutlineLabel = footnoteLabel;
+        HeadingFootnotes.removeDefinitions(rendered);
         const paragraph = rendered.querySelector(":scope > p");
         if (paragraph && rendered.children.length === 1) {
           paragraph.replaceWith(...Array.from(paragraph.childNodes));
@@ -1058,13 +1065,16 @@ export class CoreOutlineRenderer {
     specs: OutlineHeadingSpec[],
     matches: OutlineHeadingMatch[],
     templates: Map<string, HTMLElement>,
+    footnotes = new HeadingFootnotes(),
   ): Map<number, HTMLElement> {
     const renderedBySpecIndex = new Map<number, HTMLElement>();
     for (const { specIndex } of matches) {
       const markdown = specs[specIndex]?.markdown;
       const template = markdown ? templates.get(markdown) : undefined;
       if (template) {
-        renderedBySpecIndex.set(specIndex, template.cloneNode(true) as HTMLElement);
+        const rendered = template.cloneNode(true) as HTMLElement;
+        footnotes.finish(rendered, specs[specIndex]?.line ?? 0);
+        renderedBySpecIndex.set(specIndex, rendered);
       }
     }
     return renderedBySpecIndex;

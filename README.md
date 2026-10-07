@@ -14,12 +14,12 @@ The default maximum is H12. It can be lowered to H7 under **Settings → Communi
 
 ## Obsidian compatibility
 
-- **Latest compatibility target:** Obsidian 1.13.7 (Desktop, public release).
+- **Latest compatibility target:** Obsidian 1.14.4 (Desktop, public release).
 - **Minimum supported Obsidian version:** 1.13.0.
 
-The compatibility target records the Obsidian version used for the compatibility audit. For 2.1.1, automated tests, Chromium/CodeMirror checks, and integration checks with the Style Settings manager are separate from testing inside Obsidian; see [2.1.1 validation](docs/validation-2.1.1.md). Version 0.4.9 deliberately raises the minimum from 1.7.2 to 1.13.0 so the plugin can use Obsidian's searchable declarative settings API without retaining a second legacy settings renderer. Earlier releases remain mapped to their historical minimum versions in `versions.json`.
+The compatibility target records the Obsidian version used for the compatibility audit. For 2.1.2, checks using the extracted Obsidian 1.14.4 Markdown parser and Chromium layout tests are separate from testing inside the Obsidian application; see [2.1.2 validation](docs/validation-2.1.2.md). Version 0.4.9 deliberately raises the minimum from 1.7.2 to 1.13.0 so the plugin can use Obsidian's searchable declarative settings API without retaining a second legacy settings renderer. Earlier releases remain mapped to their historical minimum versions in `versions.json`.
 
-Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 2.1.1 has not been device-tested on Obsidian Mobile.
+Extended Headings declares mobile compatibility because its runtime uses Obsidian and CodeMirror APIs rather than Node.js or Electron APIs. Version 2.1.2 has not been device-tested on Obsidian Mobile.
 
 ## Features
 
