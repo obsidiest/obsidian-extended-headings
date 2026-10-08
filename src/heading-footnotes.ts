@@ -41,19 +41,23 @@ export class HeadingFootnotes {
     for (const ref of cache?.footnoteRefs ?? []) {
       const { start, end } = ref.position;
       const id = ref.id.toLowerCase();
+      const token = text.slice(start.offset, end.offset);
       // Metadata may lag an editor transaction. Do not apply stale offsets
       // to a different token; the next metadata update supplies fresh context.
-      if (this.definitions.has(id) && text.slice(start.offset, end.offset).toLowerCase() === `[^${id}]`) {
-        this.occurrences.push({ id, line: start.line, offset: start.offset, inline: false, label: "" });
+      if (this.definitions.has(id) && token.toLowerCase() === `[^${id}]`) {
+        // The editor displays the written identifier, not the Reading
+        // renderer's ordinal. Preserve spelling, case and leading zeroes;
+        // repeated references must keep that same identifier too.
+        this.occurrences.push({ id, line: start.line, offset: start.offset, inline: false, label: `[${token.slice(2, -1)}]` });
       }
     }
     this.occurrences.sort((a, b) => a.offset - b.offset);
-    const counts = new Map<string, { number: number; count: number }>();
+    const seen = new Set<string>();
     for (const occurrence of this.occurrences) {
-      let count = counts.get(occurrence.id);
-      if (!count) { count = { number: counts.size + 1, count: 0 }; counts.set(occurrence.id, count); }
-      occurrence.label = `[${count.number}${count.count ? `-${count.count}` : ""}]`;
-      count.count++;
+      seen.add(occurrence.id);
+      // Inline notes have no written identifier; retain their existing native
+      // document ordinal without applying it to named/numbered references.
+      if (occurrence.inline) occurrence.label = `[${seen.size}]`;
     }
   }
 
@@ -107,9 +111,12 @@ export class HeadingFootnotes {
       // and links cannot target definitions that live in the owning note.
       link.parentElement?.removeAttribute("id");
       link.parentElement?.removeAttribute("data-footnote-id");
+      // A known definition can outlive its reference's stale metadata offsets.
+      // Never expose a fragment-local ordinal while waiting for fresh metadata.
+      if (!inline) link.textContent = occurrence?.label ?? `[${id}]`;
       if (!occurrence) {
-        // Inline notes still render without a metadata cache. Keep their
-        // native superscript, but do not leave a dead fragment link behind.
+        // Keep the superscript when metadata is unavailable, but do not leave
+        // a fragment link pointing at a removed definition section.
         link.replaceWith(...Array.from(link.childNodes));
         continue;
       }

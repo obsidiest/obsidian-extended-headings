@@ -2,7 +2,7 @@
 
 ## 2.1.2
 
-- Supply footnote definition context when rendering heading hover breadcrumbs and core Outline labels, preserving real superscripts instead of flattened identifiers. Use the owning note's metadata for numbering, repeated references, and links back to definitions; keep definition bodies out of labels.
+- Supply footnote definition context when rendering heading hover breadcrumbs and core Outline labels, preserving real superscripts instead of flattened identifiers. Display the number or name written in each reference, including repeated references, letter case, and leading zeroes; preserve links back to definitions and keep definition bodies out of labels. Correct the initial 2.1.2 candidate's mistaken conversion of explicit identifiers into sequential Reading-mode ordinals.
 - Include footnote-only headings in Outline Markdown rendering and match core's flattened reference labels in filtered Outlines, retaining their level markers and source locations.
 - Refresh open footnote breadcrumbs when Obsidian finishes updating metadata, preserving navigation state and keeping the popup open while its source heading remains hovered. Keep superscript reference tokens together on wrapped lines. Leave escaped/code references literal and reject stale source offsets.
 - Add regressions using captured output from the official Obsidian 1.14.4 parser, with optional checks against the extracted parser itself and Chromium superscript/layout checks. Actual Obsidian application validation remains separate; see [validation notes](docs/validation-2.1.2.md).

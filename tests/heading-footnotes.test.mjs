@@ -11,10 +11,13 @@ const load = sourceLoader({ obsidian: { Component, MarkdownView: class {}, TFile
 const outline = load("core-outline-svg");
 const { HeadingFootnotes } = load("heading-footnotes");
 const fixture = JSON.parse(readFileSync(new URL("./fixtures/footnote-renderer-1.14.4.json", import.meta.url), "utf8"));
+const identifiers = JSON.parse(readFileSync(new URL("./fixtures/footnote-identifiers-1.14.4.json", import.meta.url), "utf8"));
+const fixtures = { "H1–H12": fixture, "reported identifiers": identifiers };
+const renders = { ...fixture.renders, ...identifiers.renders };
 const native = process.env.OBSIDIAN_APP_JS ? loadObsidianNativeParser(process.env.OBSIDIAN_APP_JS) : null;
 const render = markdown => {
-  assert(Object.hasOwn(fixture.renders, markdown), `No parser snapshot for ${markdown}`);
-  const html = fixture.renders[markdown];
+  assert(Object.hasOwn(renders, markdown), `No parser snapshot for ${markdown}`);
+  const html = renders[markdown];
   if (native) assert.equal(native.render(markdown), html, "snapshot agrees with the actual 1.14.4 parser");
   return html;
 };
@@ -65,7 +68,16 @@ test("1.14.4 parser output reproduces the missing-definition cause, including na
   }
 });
 
-test("breadcrumbs keep document-wide superscripts for H1–H12, named, repeated and inline notes", async () => {
+test("the reported identifiers are independent of native Reading-mode ordinals", () => {
+  const expected = identifiers.headings.map(heading => heading.expectedRefs.map(ref => ref.label));
+  assert.deepEqual(expected.slice(0, 5).flat(), ["[1]", "[6]", "[4]", "[3]", "[5]"]);
+  assert.deepEqual(expected.slice(5), [["[6]", "[6]"], ["[MixedCase]", "[mixedcase]"], ["[006]"]]);
+  assert.deepEqual(identifiers.headings.slice(0, 5).flatMap(h => h.nativeRefs.map(ref => ref.label)),
+    ["[1]", "[2]", "[3]", "[4]", "[5]"]);
+  if (native) assert.deepEqual(JSON.parse(JSON.stringify(native.metadata(identifiers.source))), identifiers.cache);
+});
+
+for (const [name, fixture] of Object.entries(fixtures)) test(`${name}: breadcrumbs preserve source identifiers, repeated references and inline notes`, async () => {
   const dom = newDOM("<body></body>");
   const calls = [];
   const { BreadcrumbContent } = sourceLoader({ obsidian: { Component, MarkdownRenderer: {
@@ -98,6 +110,16 @@ test("stale metadata never supplies definitions from unrelated source offsets", 
   assert.equal(context.withDefinitions("Testing[^1]"), "Testing[^1]");
 });
 
+test("lagging reference metadata cannot replace a known numeric identifier with an isolated ordinal", () => {
+  const context = new HeadingFootnotes(identifiers.source, { ...identifiers.cache, footnoteRefs: [] });
+  const dom = new JSDOM(render(context.withDefinitions("Testing[^6]")));
+  try {
+    context.finish(dom.window.document.body, 1);
+    assert.equal(dom.window.document.querySelector("sup")?.textContent, "[6]");
+    assert.equal(dom.window.document.querySelector("a, .footnotes"), null);
+  } finally { dom.window.close(); }
+});
+
 test("inline footnotes without metadata remain superscripted without a dead fragment link or definition list", () => {
   const dom = new JSDOM(render("Inline^[Inline **body**]"));
   try {
@@ -128,7 +150,7 @@ test("late rendering from replaced footnote context cannot overwrite the refresh
   } finally { current.dispose(); dom.window.close(); }
 });
 
-for (const partial of [false, true]) test(`${partial ? "filtered" : "complete"} Outline preserves footnotes, markers, template reuse and restoration`, async () => {
+for (const [name, fixture] of Object.entries(fixtures)) for (const partial of [false, true]) test(`${name}: ${partial ? "filtered" : "complete"} Outline preserves footnotes, markers, template reuse and restoration`, async () => {
   const dom = new JSDOM('<body><div data-type="outline"></div></body>', { pretendToBeVisual: true });
   const doc = dom.window.document, container = doc.querySelector("div");
   doc.win = dom.window;
@@ -138,7 +160,7 @@ for (const partial of [false, true]) test(`${partial ? "filtered" : "complete"} 
     for (const [key, value] of Object.entries(options.attr ?? {})) el.setAttribute(key, value);
     this.append(el); return el;
   };
-  const headings = partial ? fixture.headings.filter(h => h.expectedRefs.length) : fixture.headings;
+  const headings = partial ? fixture.headings.filter((h, index) => h.expectedRefs.length && index !== 0) : fixture.headings;
   for (const heading of headings) {
     const row = doc.createElement("div"); row.className = "tree-item-self";
     const item = doc.createElement("div"); item.className = "tree-item-inner"; item.textContent = heading.coreLabel;
