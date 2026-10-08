@@ -1,0 +1,752 @@
+{
+  "source": "########### Testing[^1]\n########## Testing[^6]\n########### Testing[^4]\n############ Extended Heading Level 12[^3]\n# Test Heading 1[^5]\n\n## Repeat[^6] and repeat[^6]\n### Named[^MixedCase] and repeated[^mixedcase]\n#### Leading zeroes[^006]\n\n[^1]: First definition.\n[^2]: An unused definition must not affect displayed identifiers.\n[^3]: Third definition.\n[^4]: Fourth definition.\n[^5]: Fifth definition.\n[^6]: Sixth definition.\n[^MixedCase]: A named definition.\n[^006]: A different identifier from 6.\n",
+  "cache": {
+    "headings": [
+      {
+        "position": {
+          "start": {
+            "line": 4,
+            "col": 0,
+            "offset": 114
+          },
+          "end": {
+            "line": 4,
+            "col": 20,
+            "offset": 134
+          }
+        },
+        "heading": "Test Heading 1[^5]",
+        "level": 1
+      },
+      {
+        "position": {
+          "start": {
+            "line": 6,
+            "col": 0,
+            "offset": 136
+          },
+          "end": {
+            "line": 6,
+            "col": 28,
+            "offset": 164
+          }
+        },
+        "heading": "Repeat[^6] and repeat[^6]",
+        "level": 2
+      },
+      {
+        "position": {
+          "start": {
+            "line": 7,
+            "col": 0,
+            "offset": 165
+          },
+          "end": {
+            "line": 7,
+            "col": 46,
+            "offset": 211
+          }
+        },
+        "heading": "Named[^MixedCase] and repeated[^mixedcase]",
+        "level": 3
+      },
+      {
+        "position": {
+          "start": {
+            "line": 8,
+            "col": 0,
+            "offset": 212
+          },
+          "end": {
+            "line": 8,
+            "col": 25,
+            "offset": 237
+          }
+        },
+        "heading": "Leading zeroes[^006]",
+        "level": 4
+      }
+    ],
+    "footnotes": [
+      {
+        "position": {
+          "start": {
+            "line": 10,
+            "col": 0,
+            "offset": 239
+          },
+          "end": {
+            "line": 10,
+            "col": 23,
+            "offset": 262
+          }
+        },
+        "id": "1"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 11,
+            "col": 0,
+            "offset": 263
+          },
+          "end": {
+            "line": 11,
+            "col": 65,
+            "offset": 328
+          }
+        },
+        "id": "2"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 12,
+            "col": 0,
+            "offset": 329
+          },
+          "end": {
+            "line": 12,
+            "col": 23,
+            "offset": 352
+          }
+        },
+        "id": "3"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 13,
+            "col": 0,
+            "offset": 353
+          },
+          "end": {
+            "line": 13,
+            "col": 24,
+            "offset": 377
+          }
+        },
+        "id": "4"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 14,
+            "col": 0,
+            "offset": 378
+          },
+          "end": {
+            "line": 14,
+            "col": 23,
+            "offset": 401
+          }
+        },
+        "id": "5"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 15,
+            "col": 0,
+            "offset": 402
+          },
+          "end": {
+            "line": 15,
+            "col": 23,
+            "offset": 425
+          }
+        },
+        "id": "6"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 16,
+            "col": 0,
+            "offset": 426
+          },
+          "end": {
+            "line": 16,
+            "col": 33,
+            "offset": 459
+          }
+        },
+        "id": "mixedcase"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 17,
+            "col": 0,
+            "offset": 460
+          },
+          "end": {
+            "line": 17,
+            "col": 38,
+            "offset": 498
+          }
+        },
+        "id": "006"
+      }
+    ],
+    "footnoteRefs": [
+      {
+        "position": {
+          "start": {
+            "line": 0,
+            "col": 19,
+            "offset": 19
+          },
+          "end": {
+            "line": 0,
+            "col": 23,
+            "offset": 23
+          }
+        },
+        "id": "1"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 1,
+            "col": 18,
+            "offset": 42
+          },
+          "end": {
+            "line": 1,
+            "col": 22,
+            "offset": 46
+          }
+        },
+        "id": "6"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 2,
+            "col": 19,
+            "offset": 66
+          },
+          "end": {
+            "line": 2,
+            "col": 23,
+            "offset": 70
+          }
+        },
+        "id": "4"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 3,
+            "col": 38,
+            "offset": 109
+          },
+          "end": {
+            "line": 3,
+            "col": 42,
+            "offset": 113
+          }
+        },
+        "id": "3"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 4,
+            "col": 16,
+            "offset": 130
+          },
+          "end": {
+            "line": 4,
+            "col": 20,
+            "offset": 134
+          }
+        },
+        "id": "5"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 6,
+            "col": 9,
+            "offset": 145
+          },
+          "end": {
+            "line": 6,
+            "col": 13,
+            "offset": 149
+          }
+        },
+        "id": "6"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 6,
+            "col": 24,
+            "offset": 160
+          },
+          "end": {
+            "line": 6,
+            "col": 28,
+            "offset": 164
+          }
+        },
+        "id": "6"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 7,
+            "col": 9,
+            "offset": 174
+          },
+          "end": {
+            "line": 7,
+            "col": 21,
+            "offset": 186
+          }
+        },
+        "id": "mixedcase"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 7,
+            "col": 34,
+            "offset": 199
+          },
+          "end": {
+            "line": 7,
+            "col": 46,
+            "offset": 211
+          }
+        },
+        "id": "mixedcase"
+      },
+      {
+        "position": {
+          "start": {
+            "line": 8,
+            "col": 19,
+            "offset": 231
+          },
+          "end": {
+            "line": 8,
+            "col": 25,
+            "offset": 237
+          }
+        },
+        "id": "006"
+      }
+    ],
+    "sections": [
+      {
+        "type": "paragraph",
+        "position": {
+          "start": {
+            "line": 0,
+            "col": 0,
+            "offset": 0
+          },
+          "end": {
+            "line": 3,
+            "col": 42,
+            "offset": 113
+          }
+        }
+      },
+      {
+        "type": "heading",
+        "position": {
+          "start": {
+            "line": 4,
+            "col": 0,
+            "offset": 114
+          },
+          "end": {
+            "line": 4,
+            "col": 20,
+            "offset": 134
+          }
+        }
+      },
+      {
+        "type": "heading",
+        "position": {
+          "start": {
+            "line": 6,
+            "col": 0,
+            "offset": 136
+          },
+          "end": {
+            "line": 6,
+            "col": 28,
+            "offset": 164
+          }
+        }
+      },
+      {
+        "type": "heading",
+        "position": {
+          "start": {
+            "line": 7,
+            "col": 0,
+            "offset": 165
+          },
+          "end": {
+            "line": 7,
+            "col": 46,
+            "offset": 211
+          }
+        }
+      },
+      {
+        "type": "heading",
+        "position": {
+          "start": {
+            "line": 8,
+            "col": 0,
+            "offset": 212
+          },
+          "end": {
+            "line": 8,
+            "col": 25,
+            "offset": 237
+          }
+        }
+      },
+      {
+        "type": "footnoteDefinition",
+        "position": {
+          "start": {
+            "line": 10,
+            "col": 0,
+            "offset": 239
+          },
+          "end": {
+            "line": 10,
+            "col": 23,
+            "offset": 262
+          }
+        }
+      },
+      {
+        "type": "footnoteDefinition",
+        "position": {
+          "start": {
+            "line": 11,
+            "col": 0,
+            "offset": 263
+          },
+          "end": {
+            "line": 11,
+            "col": 65,
+            "offset": 328
+          }
+        }
+      },
+      {
+        "type": "footnoteDefinition",
+        "position": {
+          "start": {
+            "line": 12,
+            "col": 0,
+            "offset": 329
+          },
+          "end": {
+            "line": 12,
+            "col": 23,
+            "offset": 352
+          }
+        }
+      },
+      {
+        "type": "footnoteDefinition",
+        "position": {
+          "start": {
+            "line": 13,
+            "col": 0,
+            "offset": 353
+          },
+          "end": {
+            "line": 13,
+            "col": 24,
+            "offset": 377
+          }
+        }
+      },
+      {
+        "type": "footnoteDefinition",
+        "position": {
+          "start": {
+            "line": 14,
+            "col": 0,
+            "offset": 378
+          },
+          "end": {
+            "line": 14,
+            "col": 23,
+            "offset": 401
+          }
+        }
+      },
+      {
+        "type": "footnoteDefinition",
+        "position": {
+          "start": {
+            "line": 15,
+            "col": 0,
+            "offset": 402
+          },
+          "end": {
+            "line": 15,
+            "col": 23,
+            "offset": 425
+          }
+        }
+      },
+      {
+        "type": "footnoteDefinition",
+        "position": {
+          "start": {
+            "line": 16,
+            "col": 0,
+            "offset": 426
+          },
+          "end": {
+            "line": 16,
+            "col": 33,
+            "offset": 459
+          }
+        }
+      },
+      {
+        "type": "footnoteDefinition",
+        "position": {
+          "start": {
+            "line": 17,
+            "col": 0,
+            "offset": 460
+          },
+          "end": {
+            "line": 17,
+            "col": 38,
+            "offset": 498
+          }
+        }
+      },
+      {
+        "type": "text",
+        "position": {
+          "start": {
+            "line": 18,
+            "col": 0,
+            "offset": 498
+          },
+          "end": {
+            "line": 18,
+            "col": 0,
+            "offset": 498
+          }
+        }
+      },
+      {
+        "type": "element",
+        "position": {
+          "start": {
+            "line": 18,
+            "col": 0,
+            "offset": 498
+          },
+          "end": {
+            "line": 18,
+            "col": 0,
+            "offset": 498
+          }
+        }
+      }
+    ]
+  },
+  "headings": [
+    {
+      "rawBody": "Testing[^1]",
+      "level": 11,
+      "line": 0,
+      "coreLabel": "Testing1",
+      "nativeRefs": [
+        {
+          "id": "1",
+          "label": "[1]"
+        }
+      ],
+      "expectedRefs": [
+        {
+          "id": "1",
+          "label": "[1]"
+        }
+      ]
+    },
+    {
+      "rawBody": "Testing[^6]",
+      "level": 10,
+      "line": 1,
+      "coreLabel": "Testing6",
+      "nativeRefs": [
+        {
+          "id": "6",
+          "label": "[2]"
+        }
+      ],
+      "expectedRefs": [
+        {
+          "id": "6",
+          "label": "[6]"
+        }
+      ]
+    },
+    {
+      "rawBody": "Testing[^4]",
+      "level": 11,
+      "line": 2,
+      "coreLabel": "Testing4",
+      "nativeRefs": [
+        {
+          "id": "4",
+          "label": "[3]"
+        }
+      ],
+      "expectedRefs": [
+        {
+          "id": "4",
+          "label": "[4]"
+        }
+      ]
+    },
+    {
+      "rawBody": "Extended Heading Level 12[^3]",
+      "level": 12,
+      "line": 3,
+      "coreLabel": "Extended Heading Level 123",
+      "nativeRefs": [
+        {
+          "id": "3",
+          "label": "[4]"
+        }
+      ],
+      "expectedRefs": [
+        {
+          "id": "3",
+          "label": "[3]"
+        }
+      ]
+    },
+    {
+      "rawBody": "Test Heading 1[^5]",
+      "level": 1,
+      "line": 4,
+      "coreLabel": "Test Heading 15",
+      "nativeRefs": [
+        {
+          "id": "5",
+          "label": "[5]"
+        }
+      ],
+      "expectedRefs": [
+        {
+          "id": "5",
+          "label": "[5]"
+        }
+      ]
+    },
+    {
+      "rawBody": "Repeat[^6] and repeat[^6]",
+      "level": 2,
+      "line": 6,
+      "coreLabel": "Repeat6 and repeat6",
+      "nativeRefs": [
+        {
+          "id": "6",
+          "label": "[2-1]"
+        },
+        {
+          "id": "6",
+          "label": "[2-2]"
+        }
+      ],
+      "expectedRefs": [
+        {
+          "id": "6",
+          "label": "[6]"
+        },
+        {
+          "id": "6",
+          "label": "[6]"
+        }
+      ]
+    },
+    {
+      "rawBody": "Named[^MixedCase] and repeated[^mixedcase]",
+      "level": 3,
+      "line": 7,
+      "coreLabel": "Namedmixedcase and repeatedmixedcase",
+      "nativeRefs": [
+        {
+          "id": "mixedcase",
+          "label": "[6]"
+        },
+        {
+          "id": "mixedcase",
+          "label": "[6-1]"
+        }
+      ],
+      "expectedRefs": [
+        {
+          "id": "mixedcase",
+          "label": "[MixedCase]"
+        },
+        {
+          "id": "mixedcase",
+          "label": "[mixedcase]"
+        }
+      ]
+    },
+    {
+      "rawBody": "Leading zeroes[^006]",
+      "level": 4,
+      "line": 8,
+      "coreLabel": "Leading zeroes006",
+      "nativeRefs": [
+        {
+          "id": "006",
+          "label": "[7]"
+        }
+      ],
+      "expectedRefs": [
+        {
+          "id": "006",
+          "label": "[006]"
+        }
+      ]
+    }
+  ],
+  "renders": {
+    "Testing[^1]": "<p>Testing1</p>",
+    "Testing[^1]\n\n[^1]: footnote": "<p>Testing<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"1\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\"><p>footnote<a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a></p></li>\n</ol></section>",
+    "Testing[^6]": "<p>Testing6</p>",
+    "Testing[^6]\n\n[^6]: footnote": "<p>Testing<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"6\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\"><p>footnote<a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a></p></li>\n</ol></section>",
+    "Testing[^4]": "<p>Testing4</p>",
+    "Testing[^4]\n\n[^4]: footnote": "<p>Testing<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"4\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\"><p>footnote<a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a></p></li>\n</ol></section>",
+    "Extended Heading Level 12[^3]": "<p>Extended Heading Level 123</p>",
+    "Extended Heading Level 12[^3]\n\n[^3]: footnote": "<p>Extended Heading Level 12<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"3\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\"><p>footnote<a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a></p></li>\n</ol></section>",
+    "Test Heading 1[^5]": "<p>Test Heading 15</p>",
+    "Test Heading 1[^5]\n\n[^5]: footnote": "<p>Test Heading 1<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"5\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\"><p>footnote<a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a></p></li>\n</ol></section>",
+    "Repeat[^6] and repeat[^6]": "<p>Repeat6 and repeat6</p>",
+    "Repeat[^6] and repeat[^6]\n\n[^6]: footnote": "<p>Repeat<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"6\">[1]</a></sup> and repeat<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"6\">[1-1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\"><p>footnote<a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a><a class=\"footnote-backref footnote-link\" href=\"#fnref-1-1\">↩︎</a></p></li>\n</ol></section>",
+    "Named[^MixedCase] and repeated[^mixedcase]": "<p>Namedmixedcase and repeatedmixedcase</p>",
+    "Named[^MixedCase] and repeated[^mixedcase]\n\n[^mixedcase]: footnote": "<p>Named<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"mixedcase\">[1]</a></sup> and repeated<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"mixedcase\">[1-1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\"><p>footnote<a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a><a class=\"footnote-backref footnote-link\" href=\"#fnref-1-1\">↩︎</a></p></li>\n</ol></section>",
+    "Leading zeroes[^006]": "<p>Leading zeroes006</p>",
+    "Leading zeroes[^006]\n\n[^006]: footnote": "<p>Leading zeroes<sup class=\"footnote-ref\" data-footnote-id=\"fnref-1\"><a class=\"footnote-link\" href=\"#fn-1\" data-footref=\"006\">[1]</a></sup></p>\n\n\n<section class=\"footnotes\"><hr><ol>\n<li data-footnote-id=\"fn-1\"><p>footnote<a class=\"footnote-backref footnote-link\" href=\"#fnref-1\">↩︎</a></p></li>\n</ol></section>"
+  }
+}

@@ -22,7 +22,7 @@ test("keeps release versions and compatibility metadata synchronized", () => {
   const packageJson = JSON.parse(read("package.json"));
   const versions = JSON.parse(read("versions.json"));
 
-  assert.equal(manifest.version, "2.1.1");
+  assert.equal(manifest.version, "2.1.2");
   assert.equal(packageJson.version, manifest.version);
   assert.equal(versions[manifest.version], manifest.minAppVersion);
 });
@@ -31,11 +31,11 @@ test("documents compatibility, disclosures, attribution, and licensing", () => {
   const readme = read("README.md");
   const changelog = read("CHANGELOG.md");
 
-  assert.match(readme, /Latest compatibility target:\*\* Obsidian 1\.13\.7/);
+  assert.match(readme, /Latest compatibility target:\*\* Obsidian 1\.14\.4/);
   assert.match(readme, /Privacy, security, and file-change disclosures/);
   assert.match(readme, /GPT-5\.6 Sol \(Extra High\), OpenAI/);
   assert.match(readme, /GPT-5\.6 Sol \(Max\), OpenAI/);
-  assert.match(readme, /Version 2\.1\.1 has not been device-tested on Obsidian Mobile/);
+  assert.match(readme, /Version 2\.1\.2 has not been device-tested on Obsidian Mobile/);
   assert.match(readme, /\[MIT\]\(LICENSE\)/);
   assert.match(changelog, /## 1\.0\.0/);
   assert.match(changelog, /## 1\.0\.1/);

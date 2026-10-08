@@ -1,4 +1,5 @@
 import { EditorState } from "@codemirror/state";
+import "./host-dom.mjs";
 import { EditorView, gutter, GutterMarker } from "@codemirror/view";
 import { MarkdownView } from "obsidian";
 import { HeadingBreadcrumb } from "../../src/heading-breadcrumb";
@@ -66,7 +67,9 @@ Object.assign(window, { setupBreadcrumb: (settingsOverrides = {}, options = {}) 
         }
         const settings = { ...DEFAULT_BREADCRUMB_SETTINGS, maximumLevel: 12, ...settingsOverrides };
         const handlers = new Map();
-        const plugin = { settings, registerEvent() { }, app: { workspace: {
+        const plugin = { settings, registerEvent() { }, app: {
+                metadataCache: { getFileCache: () => null, on: (name, callback) => { handlers.set(`metadata-${name}`, callback); return {}; } },
+                workspace: {
                     getLeavesOfType: (type) => type === "markdown" ? [{ view }] : [],
                     onLayoutReady: (callback) => callback(), on: (name, callback) => { handlers.set(name, callback); return {}; },
                 } } };
